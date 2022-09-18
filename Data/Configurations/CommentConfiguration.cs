@@ -8,6 +8,6 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
 {
     public void Configure(EntityTypeBuilder<Comment> builder)
     {
-        builder.HasCheckConstraint($"CK_${nameof(Comment)}_${nameof(Comment.ParentId)}", $"[{nameof(Comment.ParentId)}] != [{nameof(Comment.Id)}]");
+        builder.HasCheckConstraint($"CK_{nameof(Comment)}_{nameof(Comment.ParentId)}", $"[{nameof(Comment.ParentId)}] != [{nameof(Comment.Id)}]");
     }
 }

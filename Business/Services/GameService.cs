@@ -91,4 +91,16 @@ public class GameService : IGameService
         var games = await _unitOfWork.GameRepository.GetAllByPlatformTypesAsync(platformTypes);
         return _mapper.Map<IEnumerable<GameDto>>(games);
     }
+
+    public async Task<Stream> Download(string key)
+    {
+        var game = await _unitOfWork.GameRepository.GetByKeyWithDetailsAsync(key);
+
+        if (game == null)
+        {
+            throw new NotFoundException($"Game with key '{key}' not found.");
+        }
+        
+        return new MemoryStream(1024 * 128); // 128kb file stub
+    }
 }

@@ -63,4 +63,11 @@ public interface IGameService
     /// <param name="platformTypes">List of platform types</param>
     /// <returns>Games mapped into <see cref="GameDto"/></returns>
     public Task<IEnumerable<GameDto>> GetAllByPlatformTypesAsync(IEnumerable<string> platformTypes);
+
+    /// <summary>
+    /// Download game by game key
+    /// </summary>
+    /// <param name="key">Key of the game to be downloaded</param>
+    /// <returns>File stream of the game</returns>
+    public Task<Stream> Download(string key);
 }

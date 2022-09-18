@@ -11,6 +11,6 @@ public class GenreConfiguration : IEntityTypeConfiguration<Genre>
         builder.HasIndex(g => g.Name)
             .IsUnique();
         
-        builder.HasCheckConstraint($"CK_${nameof(Genre)}_${nameof(Genre.ParentId)}", $"[{nameof(Genre.ParentId)}] != [{nameof(Genre.Id)}]");
+        builder.HasCheckConstraint($"CK_{nameof(Genre)}_{nameof(Genre.ParentId)}", $"[{nameof(Genre.ParentId)}] != [{nameof(Genre.Id)}]");
     }
 }

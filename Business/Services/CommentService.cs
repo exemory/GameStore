@@ -35,6 +35,11 @@ public class CommentService : ICommentService
             {
                 throw new NotFoundException($"Comment with id '{commentCreationDto.ParentId.Value}' not found.");
             }
+
+            if (comment.GameId != commentCreationDto.GameId)
+            {
+                throw new GameStoreException($"Parent comment must be from the same game.");
+            }
         }
 
         var newComment = _mapper.Map<CommentCreationDto, Comment>(commentCreationDto);
