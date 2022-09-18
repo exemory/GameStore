@@ -8,6 +8,13 @@ namespace Data.Interfaces;
 public interface IGameRepository : IRepository<Game>
 {
     /// <summary>
+    /// Get a specific game by it's key
+    /// </summary>
+    /// <param name="key">Key of the game to be retrieved</param>
+    /// <returns><see cref="Game"/></returns>
+    public Task<Game?> GetByKeyAsync(string key);
+    
+    /// <summary>
     /// Get a specific game with details by it's key
     /// </summary>
     /// <param name="key">Key of the game to be retrieved</param>

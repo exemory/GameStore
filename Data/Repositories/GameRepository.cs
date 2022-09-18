@@ -15,6 +15,12 @@ public class GameRepository : Repository<Game>, IGameRepository
     {
     }
 
+    public async Task<Game?> GetByKeyAsync(string key)
+    {
+        return await Set.Where(g => g.Key == key)
+            .FirstOrDefaultAsync();
+    }
+    
     public async Task<Game?> GetByKeyWithDetailsAsync(string key)
     {
         return await Set.Include(g => g.Genres)
