@@ -28,12 +28,14 @@ public class GamesController : ControllerBase
     /// <param name="gameCreationDto">Game creation data</param>
     /// <returns>Newly created game</returns>
     /// <response code="201">Returns the newly created game</response>
+    /// <response code="400">Game with specified key already exists</response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<GameDto>> Create(GameCreationDto gameCreationDto)
     {
         var result = await _gameService.CreateAsync(gameCreationDto);
-        return CreatedAtAction(nameof(GetByKey), new {key = result.Key}, result);
+        return CreatedAtAction(nameof(GetByKey), new {gameKey = result.Key}, result);
     }
     
     /// <summary>
@@ -42,9 +44,11 @@ public class GamesController : ControllerBase
     /// <param name="id">Guid of the game to be updated</param>
     /// <param name="gameUpdateDto">Game update data</param>
     /// <response code="204">Game has been updated</response>
+    /// <response code="400">Game with specified key already exists</response>
     /// <response code="404">Game specified by <paramref name="id"/> not found</response>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Update(Guid id, GameUpdateDto gameUpdateDto)
     {
@@ -53,18 +57,18 @@ public class GamesController : ControllerBase
     }
     
     /// <summary>
-    /// Get a specific game by key
+    /// Get a specific game with details by key
     /// </summary>
-    /// <param name="key">Key of the game to be retrieved</param>
-    /// <returns>The game specified by <paramref name="key"/></returns>
-    /// <response code="200">Returns the game specified by <paramref name="key"/></response>
-    /// <response code="404">Game with specified <paramref name="key"/> not found</response>
-    [HttpGet("{key}")]
+    /// <param name="gameKey">Key of the game to be retrieved</param>
+    /// <returns>The game specified by <paramref name="gameKey"/></returns>
+    /// <response code="200">Returns the game specified by <paramref name="gameKey"/></response>
+    /// <response code="404">Game with specified <paramref name="gameKey"/> not found</response>
+    [HttpGet("{gameKey}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GameWithDetailsDto>> GetByKey(string key)
+    public async Task<ActionResult<GameWithDetailsDto>> GetByKey(string gameKey)
     {
-        return await _gameService.GetByKeyWithDetailsAsync(key);
+        return await _gameService.GetByKeyWithDetailsAsync(gameKey);
     }
     
     /// <summary>
@@ -81,7 +85,7 @@ public class GamesController : ControllerBase
     }
     
     /// <summary>
-    /// Delete the thread
+    /// Delete the game
     /// </summary>
     /// <param name="id">Guid of the game to be deleted</param>
     /// <response code="204">Game has been deleted</response>
@@ -98,13 +102,15 @@ public class GamesController : ControllerBase
     /// <summary>
     /// Download the game
     /// </summary>
-    /// <param name="key">Key of the game to be downloaded</param>
+    /// <param name="gameKey">Key of the game to be downloaded</param>
     /// <response code="200">Game file</response>
-    [HttpGet("{key}/download")]
+    /// <response code="404">Game specified by <paramref name="gameKey"/> not found</response>
+    [HttpGet("{gameKey}/download")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult> Download(string key)
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> Download(string gameKey)
     {
-        var fileStream = await _gameService.Download(key);
+        var fileStream = await _gameService.DownloadAsync(gameKey);
         return File(fileStream, "application/octet-stream", "stub.exe");
     }
 }
