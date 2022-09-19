@@ -11,6 +11,7 @@ public interface ICommentService
     /// <summary>
     /// Create new game comment
     /// </summary>
+    /// <param name="gameKey">Key of the game where comment need to be created</param>
     /// <param name="commentCreationDto">Comment creation data</param>
     /// <returns>Created comment mapped into <see cref="CommentDto"/></returns>
     /// <exception cref="NotFoundException">
@@ -23,7 +24,7 @@ public interface ICommentService
     /// <exception cref="GameStoreException">
     /// Thrown when parent comment does not belong to the specified game
     /// </exception>
-    public Task<CommentDto> CreateAsync(CommentCreationDto commentCreationDto);
+    public Task<CommentDto> CreateAsync(string gameKey, CommentCreationDto commentCreationDto);
     
     /// <summary>
     /// Get all game's comment by game key

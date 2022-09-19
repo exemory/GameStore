@@ -25,18 +25,20 @@ public class CommentsController : ControllerBase
     /// <summary>
     /// Create game comment
     /// </summary>
+    /// <param name="gameKey">Key of the game where comment need to be created</param>
     /// <param name="commentCreationDto">Comment creation data</param>
     /// <returns>Newly created comment</returns>
     /// <response code="201">Returns the newly created comment</response>
     /// <response code="400">Parent comment must be from the same game</response>
     /// <response code="404">Specified game or parent comment not found</response>
-    [HttpPost("[controller]")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [HttpPost("/games/{gameKey}/[controller]")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<CommentDto>> CreateComment(CommentCreationDto commentCreationDto)
+    public async Task<ActionResult<CommentDto>> CreateComment(string gameKey, CommentCreationDto commentCreationDto)
     {
-        return await _commentService.CreateAsync(commentCreationDto);
+        var result = await _commentService.CreateAsync(gameKey, commentCreationDto);
+        return CreatedAtAction(null, result);
     }
     
     /// <summary>

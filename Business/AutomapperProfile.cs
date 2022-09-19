@@ -16,7 +16,6 @@ public class AutomapperProfile : Profile
         CreateMap<GameUpdateDto, Game>(MemberList.Source);
         
         CreateMap<Comment, CommentDto>();
-        CreateMap<CommentCreationDto, Comment>(MemberList.Source)
-            .ForSourceMember(c => c.GameId, o => o.DoNotValidate());
+        CreateMap<CommentCreationDto, Comment>(MemberList.Source);
     }
 }
