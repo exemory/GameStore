@@ -13,6 +13,9 @@ public interface IGameService
     /// </summary>
     /// <param name="gameCreationDto">Game creation data</param>
     /// <returns>Created game mapped into <see cref="GameDto"/></returns>
+    /// <exception cref="GameStoreException">
+    /// Thrown when the game with specified key already exists
+    /// </exception>
     public Task<GameDto> CreateAsync(GameCreationDto gameCreationDto);
     
     /// <summary>
@@ -20,6 +23,9 @@ public interface IGameService
     /// </summary>
     /// <param name="id">Guid of the game to be updated</param>
     /// <param name="gameUpdateDto">Game update data</param>
+    /// <exception cref="GameStoreException">
+    /// Thrown when the game with specified key already exists
+    /// </exception>
     /// <exception cref="NotFoundException">
     /// Thrown when the game specified by <paramref name="id"/> does not exist
     /// </exception>
@@ -69,5 +75,5 @@ public interface IGameService
     /// </summary>
     /// <param name="key">Key of the game to be downloaded</param>
     /// <returns>File stream of the game</returns>
-    public Task<Stream> Download(string key);
+    public Task<Stream> DownloadAsync(string key);
 }

@@ -26,6 +26,13 @@ public class GameService : IGameService
 
     public async Task<GameDto> CreateAsync(GameCreationDto gameCreationDto)
     {
+        var game = await _unitOfWork.GameRepository.GetByKeyAsync(gameCreationDto.Key);
+
+        if (game != null)
+        {
+            throw new GameStoreException($"Game with key '{gameCreationDto.Key}' already exists.");
+        }
+        
         var newGame = _mapper.Map<Game>(gameCreationDto);
         
         _unitOfWork.GameRepository.Add(newGame);
@@ -36,7 +43,14 @@ public class GameService : IGameService
 
     public async Task UpdateAsync(Guid id, GameUpdateDto gameUpdateDto)
     {
-        var game = await _unitOfWork.GameRepository.GetByIdAsync(id);
+        var game = await _unitOfWork.GameRepository.GetByKeyAsync(gameUpdateDto.Key);
+
+        if (game != null)
+        {
+            throw new GameStoreException($"Game with key '{gameUpdateDto.Key}' already exists.");
+        }
+        
+        game = await _unitOfWork.GameRepository.GetByIdAsync(id);
 
         if (game == null)
         {
@@ -92,7 +106,7 @@ public class GameService : IGameService
         return _mapper.Map<IEnumerable<GameDto>>(games);
     }
 
-    public async Task<Stream> Download(string key)
+    public async Task<Stream> DownloadAsync(string key)
     {
         var game = await _unitOfWork.GameRepository.GetByKeyWithDetailsAsync(key);
 

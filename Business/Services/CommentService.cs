@@ -7,18 +7,24 @@ using Data.Interfaces;
 
 namespace Business.Services;
 
+/// <inheritdoc />
 public class CommentService : ICommentService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Constructor for initializing a <see cref="CommentService"/> class instance
+    /// </summary>
+    /// <param name="unitOfWork">Unit of work</param>
+    /// <param name="mapper">Mapper</param>
     public CommentService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
-    public async Task<CommentDto> CreateCommentAsync(CommentCreationDto commentCreationDto)
+    public async Task<CommentDto> CreateAsync(CommentCreationDto commentCreationDto)
     {
         var game = await _unitOfWork.GameRepository.GetByIdAsync(commentCreationDto.GameId);
 
@@ -50,7 +56,7 @@ public class CommentService : ICommentService
         return _mapper.Map<CommentDto>(newComment);
     }
 
-    public async Task<IEnumerable<CommentDto>> GetAllCommentsByGameKeyAsync(string gameKey)
+    public async Task<IEnumerable<CommentDto>> GetAllByGameKeyAsync(string gameKey)
     {
         var game = await _unitOfWork.GameRepository.GetByKeyWithDetailsAsync(gameKey);
 
