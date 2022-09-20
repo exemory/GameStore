@@ -7,17 +7,15 @@ namespace Data.Repositories;
 /// <inheritdoc />
 public class GenericRepository<T> : IGenericRepository<T> where T : EntityBase, new()
 {
-    protected readonly GameStoreContext Context;
     protected readonly DbSet<T> Set;
 
     /// <summary>
     /// Constructor for initializing a <see cref="GenericRepository{T}"/> class instance
     /// </summary>
     /// <param name="context">Context of the database</param>
-    public GenericRepository(GameStoreContext context)
+    public GenericRepository(DbContext context)
     {
-        Context = context;
-        Set = Context.Set<T>();
+        Set = context.Set<T>();
     }
 
     public async Task<IEnumerable<T>> GetAllAsync()
@@ -38,7 +36,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : EntityBase, 
 
     public void Update(T entity)
     {
-        Context.Entry(entity).State = EntityState.Modified;
+        Set.Update(entity);
     }
 
     public void Delete(T entity)
