@@ -49,6 +49,7 @@ public class CommentsController : ControllerBase
     /// <response code="200">Returns the array of games</response>
     /// <response code="404">The game specified by <paramref name="gameKey"/> not found</response>
     [HttpGet("/games/{gameKey}/[controller]")]
+    [ResponseCache(Duration = 60)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<CommentDto>> GetAllByGameKey(string gameKey)

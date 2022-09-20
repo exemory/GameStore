@@ -8,6 +8,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddWebApi(this IServiceCollection services)
     {
         services.AddControllers();
+        services.AddResponseCaching();
 
         services.AddSwaggerGen(options =>
         {

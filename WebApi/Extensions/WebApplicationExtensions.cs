@@ -22,6 +22,8 @@ public static class WebApplicationExtensions
 
         app.UseHttpsRedirection();
 
+        app.UseResponseCaching();
+
         app.UseRouting();
 
         app.UseMiddleware<ErrorHandlerMiddleware>();
