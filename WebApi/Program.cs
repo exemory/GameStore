@@ -1,5 +1,4 @@
 using Business.Extensions;
-using Business.Interfaces;
 using Data.Extensions;
 using WebApi.Extensions;
 
@@ -17,10 +16,6 @@ var app = builder.Build();
 
 app.UseWebApiPipeline();
 
-using (var scope = app.Services.CreateScope())
-{
-    var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-    await dbInitializer.Initialize();
-}
+await app.InitializeDb();
 
 app.Run();

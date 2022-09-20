@@ -1,4 +1,5 @@
-﻿using WebApi.Middlewares;
+﻿using Business.Interfaces;
+using WebApi.Middlewares;
 
 namespace WebApi.Extensions;
 
@@ -14,7 +15,7 @@ public static class WebApplicationExtensions
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "Game Store API v1");
             });
         }
-        
+
         if (!app.Environment.IsDevelopment())
         {
             app.UseHsts();
@@ -34,5 +35,12 @@ public static class WebApplicationExtensions
         });
 
         return app;
+    }
+
+    public static async Task InitializeDb(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+        await dbInitializer.Initialize();
     }
 }
