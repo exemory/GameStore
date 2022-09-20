@@ -26,30 +26,36 @@ public class GameService : IGameService
 
     public async Task<GameDto> CreateAsync(GameCreationDto gameCreationDto)
     {
-        var game = await _unitOfWork.GameRepository.GetByKeyAsync(gameCreationDto.Key);
-
-        if (game != null)
+        if (gameCreationDto.Key != null)
         {
-            throw new GameStoreException($"Game with key '{gameCreationDto.Key}' already exists.");
+            var existedGame = await _unitOfWork.GameRepository.GetByKeyAsync(gameCreationDto.Key);
+
+            if (existedGame != null)
+            {
+                throw new GameStoreException($"Game with key '{gameCreationDto.Key}' already exists.");
+            }
         }
-        
+
         var newGame = _mapper.Map<Game>(gameCreationDto);
-        
+
         _unitOfWork.GameRepository.Add(newGame);
         await _unitOfWork.SaveAsync();
-        
+
         return _mapper.Map<GameDto>(newGame);
     }
 
     public async Task UpdateAsync(Guid id, GameUpdateDto gameUpdateDto)
     {
-        var existedGame = await _unitOfWork.GameRepository.GetByKeyAsync(gameUpdateDto.Key);
-
-        if (existedGame != null && existedGame.Id != id)
+        if (gameUpdateDto.Key != null)
         {
-            throw new GameStoreException($"Game with key '{gameUpdateDto.Key}' already exists.");
+            var existedGame = await _unitOfWork.GameRepository.GetByKeyAsync(gameUpdateDto.Key);
+
+            if (existedGame != null && existedGame.Id != id)
+            {
+                throw new GameStoreException($"Game with key '{gameUpdateDto.Key}' already exists.");
+            }
         }
-        
+
         var gameToUpdate = await _unitOfWork.GameRepository.GetByIdAsync(id);
 
         if (gameToUpdate == null)
@@ -58,7 +64,7 @@ public class GameService : IGameService
         }
 
         _mapper.Map(gameUpdateDto, gameToUpdate);
-        
+
         _unitOfWork.GameRepository.Update(gameToUpdate);
         await _unitOfWork.SaveAsync();
     }
@@ -89,7 +95,7 @@ public class GameService : IGameService
         {
             throw new NotFoundException($"Game with id '{id}' not found.");
         }
-        
+
         _unitOfWork.GameRepository.Delete(game);
         await _unitOfWork.SaveAsync();
     }
@@ -114,7 +120,7 @@ public class GameService : IGameService
         {
             throw new NotFoundException($"Game with key '{key}' not found.");
         }
-        
+
         return new MemoryStream(1024 * 128); // 128kb file stub
     }
 }
