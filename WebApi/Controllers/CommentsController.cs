@@ -8,7 +8,7 @@ namespace WebApi.Controllers;
 /// Comments controller
 /// </summary>
 [ApiController]
-[Route("api")]
+[Route("api/games/{gameKey}/[controller]")]
 public class CommentsController : ControllerBase
 {
     private readonly ICommentService _commentService;
@@ -31,11 +31,11 @@ public class CommentsController : ControllerBase
     /// <response code="201">Returns the newly created comment</response>
     /// <response code="400">Parent comment must be from the same game</response>
     /// <response code="404">Specified game or parent comment not found</response>
-    [HttpPost("/games/{gameKey}/[controller]")]
+    [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<CommentDto>> CreateComment(string gameKey, CommentCreationDto commentCreationDto)
+    public async Task<ActionResult<CommentDto>> NewComment(string gameKey, CommentCreationDto commentCreationDto)
     {
         var result = await _commentService.CreateAsync(gameKey, commentCreationDto);
         return CreatedAtAction(null, result);
@@ -48,7 +48,7 @@ public class CommentsController : ControllerBase
     /// <returns>Array of game's comments</returns>
     /// <response code="200">Returns the array of games</response>
     /// <response code="404">The game specified by <paramref name="gameKey"/> not found</response>
-    [HttpGet("/games/{gameKey}/[controller]")]
+    [HttpGet]
     [ResponseCache(Duration = 60)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
