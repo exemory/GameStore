@@ -43,23 +43,23 @@ public class GameService : IGameService
 
     public async Task UpdateAsync(Guid id, GameUpdateDto gameUpdateDto)
     {
-        var game = await _unitOfWork.GameRepository.GetByKeyAsync(gameUpdateDto.Key);
+        var existedGame = await _unitOfWork.GameRepository.GetByKeyAsync(gameUpdateDto.Key);
 
-        if (game != null)
+        if (existedGame != null && existedGame.Id != id)
         {
             throw new GameStoreException($"Game with key '{gameUpdateDto.Key}' already exists.");
         }
         
-        game = await _unitOfWork.GameRepository.GetByIdAsync(id);
+        var gameToUpdate = await _unitOfWork.GameRepository.GetByIdAsync(id);
 
-        if (game == null)
+        if (gameToUpdate == null)
         {
             throw new NotFoundException($"Game with id '{id}' not found.");
         }
 
-        _mapper.Map(gameUpdateDto, game);
+        _mapper.Map(gameUpdateDto, gameToUpdate);
         
-        _unitOfWork.GameRepository.Update(game);
+        _unitOfWork.GameRepository.Update(gameToUpdate);
         await _unitOfWork.SaveAsync();
     }
 
