@@ -5,16 +5,16 @@ using Microsoft.EntityFrameworkCore;
 namespace Data.Repositories;
 
 /// <inheritdoc />
-public class Repository<T> : IRepository<T> where T : EntityBase, new()
+public class GenericRepository<T> : IGenericRepository<T> where T : EntityBase, new()
 {
     protected readonly GameStoreContext Context;
     protected readonly DbSet<T> Set;
 
     /// <summary>
-    /// Constructor for initializing a <see cref="Repository{T}"/> class instance
+    /// Constructor for initializing a <see cref="GenericRepository{T}"/> class instance
     /// </summary>
     /// <param name="context">Context of the database</param>
-    public Repository(GameStoreContext context)
+    public GenericRepository(GameStoreContext context)
     {
         Context = context;
         Set = Context.Set<T>();

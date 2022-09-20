@@ -4,7 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories;
 
-public class CommentRepository : Repository<Comment>, ICommentRepository
+/// <inheritdoc cref="ICommentRepository" />
+public class CommentRepository : GenericRepository<Comment>, ICommentRepository
 {
     /// <summary>
     /// Constructor for initializing a <see cref="CommentRepository"/> class instance

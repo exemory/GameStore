@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Data.Repositories;
 
 /// <inheritdoc cref="IGameRepository" />
-public class GameRepository : Repository<Game>, IGameRepository
+public class GameRepository : GenericRepository<Game>, IGameRepository
 {
     /// <summary>
     /// Constructor for initializing a <see cref="GameRepository"/> class instance

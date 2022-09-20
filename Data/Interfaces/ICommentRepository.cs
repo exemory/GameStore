@@ -2,7 +2,10 @@
 
 namespace Data.Interfaces;
 
-public interface ICommentRepository : IRepository<Comment>
+/// <summary>
+/// Repository of <see cref="Comment"/> entities
+/// </summary>
+public interface ICommentRepository : IGenericRepository<Comment>
 {
     /// <summary>
     /// Get all game's comments by specified game key
