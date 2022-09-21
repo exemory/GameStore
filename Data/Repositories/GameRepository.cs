@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Data.Repositories;
 
 /// <inheritdoc cref="IGameRepository" />
-public class GameRepository : GenericRepository<Game>, IGameRepository
+public class GameRepository : Repository<Game>, IGameRepository
 {
     /// <summary>
     /// Constructor for initializing a <see cref="GameRepository"/> class instance
@@ -17,13 +17,13 @@ public class GameRepository : GenericRepository<Game>, IGameRepository
 
     public async Task<Game?> GetByKeyAsync(string key)
     {
-        return await Set.Where(g => g.Key == key)
+        return await Entities.Where(g => g.Key == key)
             .FirstOrDefaultAsync();
     }
     
     public async Task<Game?> GetByKeyWithDetailsAsync(string key)
     {
-        return await Set.Include(g => g.Genres)
+        return await Entities.Include(g => g.Genres)
             .Include(g => g.PlatformTypes)
             .Where(g => g.Key == key)
             .FirstOrDefaultAsync();
@@ -31,13 +31,13 @@ public class GameRepository : GenericRepository<Game>, IGameRepository
 
     public async Task<IEnumerable<Game>> GetAllByGenreAsync(string genre)
     {
-        return await Set.Where(g => g.Genres.Any(g2 => g2.Name == genre))
+        return await Entities.Where(g => g.Genres.Any(g2 => g2.Name == genre))
             .ToListAsync();
     }
 
     public async Task<IEnumerable<Game>> GetAllByPlatformTypesAsync(IEnumerable<string> platformTypes)
     {
-        return await Set.Where(g => g.PlatformTypes.All(pt => platformTypes.Contains(pt.Type)))
+        return await Entities.Where(g => g.PlatformTypes.All(pt => platformTypes.Contains(pt.Type)))
             .ToListAsync();
     }
 }

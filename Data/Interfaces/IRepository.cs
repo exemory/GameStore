@@ -6,7 +6,7 @@ namespace Data.Interfaces;
 /// Generic repository
 /// </summary>
 /// <typeparam name="T">Entity type, inherited from <see cref="EntityBase"/></typeparam>
-public interface IGenericRepository<T> where T : EntityBase
+public interface IRepository<T> where T : EntityBase
 {
     /// <summary>
     /// Get all entities

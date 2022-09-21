@@ -12,6 +12,7 @@ public class UnitOfWork : IUnitOfWork
     /// </summary>
     /// <param name="context">Context of the database</param>
     /// <param name="gameRepository">Game repository</param>
+    /// <param name="commentRepository">Comment repository</param>
     public UnitOfWork(GameStoreContext context, IGameRepository gameRepository, ICommentRepository commentRepository)
     {
         _context = context;

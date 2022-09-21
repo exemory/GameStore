@@ -5,7 +5,7 @@ namespace Data.Interfaces;
 /// <summary>
 /// Repository of <see cref="Game"/> entities
 /// </summary>
-public interface IGameRepository : IGenericRepository<Game>
+public interface IGameRepository : IRepository<Game>
 {
     /// <summary>
     /// Get a specific game by it's key

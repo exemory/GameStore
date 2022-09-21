@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Data.Repositories;
 
 /// <inheritdoc cref="ICommentRepository" />
-public class CommentRepository : GenericRepository<Comment>, ICommentRepository
+public class CommentRepository : Repository<Comment>, ICommentRepository
 {
     /// <summary>
     /// Constructor for initializing a <see cref="CommentRepository"/> class instance
@@ -17,7 +17,7 @@ public class CommentRepository : GenericRepository<Comment>, ICommentRepository
     
     public async Task<IEnumerable<Comment>> GetAllByGameKeyAsync(string gameKey)
     {
-        return await Set.Where(c => c.Game.Key == gameKey)
+        return await Entities.Where(c => c.Game.Key == gameKey)
             .ToListAsync();
     }
 }
