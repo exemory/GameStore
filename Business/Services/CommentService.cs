@@ -24,13 +24,13 @@ public class CommentService : ICommentService
         _mapper = mapper;
     }
 
-    public async Task<CommentDto> CreateAsync(string gameKey, CommentCreationDto commentCreationDto)
+    public async Task<CommentDto> CreateAsync(CommentCreationDto commentCreationDto)
     {
-        var game = await _unitOfWork.GameRepository.GetByKeyAsync(gameKey);
+        var game = await _unitOfWork.GameRepository.GetByIdAsync(commentCreationDto.GameId);
 
         if (game == null)
         {
-            throw new NotFoundException($"Game with key '{gameKey}' not found.");
+            throw new NotFoundException($"Game with id '{commentCreationDto.GameId}' not found.");
         }
 
         if (commentCreationDto.ParentId != null)
@@ -44,12 +44,11 @@ public class CommentService : ICommentService
 
             if (comment.GameId != game.Id)
             {
-                throw new GameStoreException($"Parent comment must be from the same game.");
+                throw new GameStoreException("Parent comment must be from the same game.");
             }
         }
 
         var newComment = _mapper.Map<CommentCreationDto, Comment>(commentCreationDto);
-        newComment.GameId = game.Id;
         
         _unitOfWork.CommentRepository.Add(newComment);
         await _unitOfWork.SaveAsync();

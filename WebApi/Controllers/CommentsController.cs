@@ -1,4 +1,5 @@
-﻿using Business.DataTransferObjects;
+﻿using System.ComponentModel.DataAnnotations;
+using Business.DataTransferObjects;
 using Business.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +9,7 @@ namespace WebApi.Controllers;
 /// Comments controller
 /// </summary>
 [ApiController]
-[Route("api/games/{gameKey}/[controller]")]
+[Route("api/[controller]")]
 public class CommentsController : ControllerBase
 {
     private readonly ICommentService _commentService;
@@ -25,7 +26,6 @@ public class CommentsController : ControllerBase
     /// <summary>
     /// Create game comment
     /// </summary>
-    /// <param name="gameKey">Key of the game where comment need to be created</param>
     /// <param name="commentCreationDto">Comment creation data</param>
     /// <returns>Newly created comment</returns>
     /// <response code="201">Returns the newly created comment</response>
@@ -35,9 +35,9 @@ public class CommentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<CommentDto>> NewComment(string gameKey, CommentCreationDto commentCreationDto)
+    public async Task<ActionResult<CommentDto>> NewComment(CommentCreationDto commentCreationDto)
     {
-        var result = await _commentService.CreateAsync(gameKey, commentCreationDto);
+        var result = await _commentService.CreateAsync(commentCreationDto);
         return CreatedAtAction(null, result);
     }
     
@@ -52,7 +52,7 @@ public class CommentsController : ControllerBase
     [ResponseCache(Duration = 60)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<CommentDto>> GetAllByGameKey(string gameKey)
+    public async Task<ActionResult<CommentDto>> GetAllByGameKey([Required] string gameKey)
     {
         var result = await _commentService.GetAllByGameKeyAsync(gameKey);
         return Ok(result);
