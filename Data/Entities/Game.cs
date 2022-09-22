@@ -1,4 +1,6 @@
-﻿namespace Data.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Data.Entities;
 
 public class Game : EntityBase
 {

@@ -1,8 +1,11 @@
-﻿namespace Data.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Data.Entities;
 
 public class Comment : EntityBase
 {
     public string Name { get; set; } = default!;
+    
     public string Body { get; set; } = default!;
 
     public Guid? ParentId { get; set; }

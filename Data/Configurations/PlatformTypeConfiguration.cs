@@ -8,6 +8,9 @@ public class PlatformTypeConfiguration : IEntityTypeConfiguration<PlatformType>
 {
     public void Configure(EntityTypeBuilder<PlatformType> builder)
     {
+        builder.Property(pt => pt.Type)
+            .HasMaxLength(50);
+
         builder.HasIndex(pt => pt.Type)
             .IsUnique();
 
