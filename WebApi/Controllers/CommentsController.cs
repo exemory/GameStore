@@ -40,7 +40,7 @@ public class CommentsController : ControllerBase
         var result = await _commentService.CreateAsync(commentCreationDto);
         return CreatedAtAction(null, result);
     }
-    
+
     /// <summary>
     /// Get all game's comments
     /// </summary>

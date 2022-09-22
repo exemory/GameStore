@@ -37,25 +37,25 @@ public class GamesController : ControllerBase
         var result = await _gameService.CreateAsync(gameCreationDto);
         return CreatedAtAction(nameof(GetByKey), new {gameKey = result.Key}, result);
     }
-    
+
     /// <summary>
     /// Update the game
     /// </summary>
-    /// <param name="id">Guid of the game to be updated</param>
+    /// <param name="gameId">Guid of the game to be updated</param>
     /// <param name="gameUpdateDto">Game update data</param>
     /// <response code="204">Game has been updated</response>
     /// <response code="400">Game with specified key already exists</response>
-    /// <response code="404">Game specified by <paramref name="id"/> not found</response>
-    [HttpPut("{id:guid}")]
+    /// <response code="404">Game specified by <paramref name="gameId"/> not found</response>
+    [HttpPut("{gameId:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> Update(Guid id, GameUpdateDto gameUpdateDto)
+    public async Task<ActionResult> Update(Guid gameId, GameUpdateDto gameUpdateDto)
     {
-        await _gameService.UpdateAsync(id, gameUpdateDto);
+        await _gameService.UpdateAsync(gameId, gameUpdateDto);
         return NoContent();
     }
-    
+
     /// <summary>
     /// Get a specific game with details by key
     /// </summary>
@@ -70,7 +70,7 @@ public class GamesController : ControllerBase
     {
         return await _gameService.GetByKeyWithDetailsAsync(gameKey);
     }
-    
+
     /// <summary>
     /// Get all games
     /// </summary>
@@ -83,22 +83,22 @@ public class GamesController : ControllerBase
         var result = await _gameService.GetAllAsync();
         return Ok(result);
     }
-    
+
     /// <summary>
     /// Delete the game
     /// </summary>
-    /// <param name="id">Guid of the game to be deleted</param>
+    /// <param name="gameId">Guid of the game to be deleted</param>
     /// <response code="204">Game has been deleted</response>
-    /// <response code="404">Game specified by <paramref name="id"/> not found</response>
-    [HttpDelete("{id:guid}")]
+    /// <response code="404">Game specified by <paramref name="gameId"/> not found</response>
+    [HttpDelete("{gameId:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> Delete(Guid id)
+    public async Task<ActionResult> Delete(Guid gameId)
     {
-        await _gameService.DeleteAsync(id);
+        await _gameService.DeleteAsync(gameId);
         return NoContent();
     }
-    
+
     /// <summary>
     /// Download the game
     /// </summary>
