@@ -1,4 +1,5 @@
 ﻿using Data.Interfaces;
+using Data.Options;
 using Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,9 +8,11 @@ namespace Data.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddDataLayer(this IServiceCollection services, string connectionString,
-        bool enableSensitiveDataLogging)
+    public static IServiceCollection AddDataLayer(this IServiceCollection services, Action<DataLayerOptions> configAction)
     {
+        var config = new DataLayerOptions();
+        configAction(config);
+        
         services.Scan(s =>
         {
             s.FromAssembliesOf(typeof(IRepository<>))
@@ -24,9 +27,9 @@ public static class ServiceCollectionExtensions
 
         services.AddDbContext<GameStoreContext>(options =>
         {
-            options.UseSqlServer(connectionString);
+            options.UseSqlServer(config.ConnectionString);
 
-            if (enableSensitiveDataLogging)
+            if (config.EnableSensitiveDataLogging)
             {
                 options.EnableSensitiveDataLogging();
             }

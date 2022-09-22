@@ -2,12 +2,19 @@ using Business.Extensions;
 using Data.Extensions;
 using WebApi.Extensions;
 using WebApi.Middlewares;
+using WebApi.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var enableSensitiveDataLogging = builder.Environment.IsDevelopment();
-builder.Services.AddDataLayer(connectionString, enableSensitiveDataLogging);
+var connectionStrings = builder.Configuration
+    .GetSection(nameof(ConnectionStrings))
+    .Get<ConnectionStrings>();
+
+builder.Services.AddDataLayer(c =>
+{
+    c.ConnectionString = connectionStrings.DefaultConnection;
+    c.EnableSensitiveDataLogging = builder.Environment.IsDevelopment();
+});
 
 builder.Services.AddBusinessLayer();
 
