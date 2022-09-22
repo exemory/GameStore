@@ -26,30 +26,15 @@ public class CommentService : ICommentService
 
     public async Task<CommentDto> CreateAsync(CommentCreationDto commentCreationDto)
     {
-        var game = await _unitOfWork.GameRepository.GetByIdAsync(commentCreationDto.GameId);
-
-        if (game == null)
-        {
-            throw new NotFoundException($"Game with id '{commentCreationDto.GameId}' not found.");
-        }
+        await CheckIfGameExists(commentCreationDto.GameId);
 
         if (commentCreationDto.ParentId != null)
         {
-            var comment = await _unitOfWork.CommentRepository.GetByIdAsync(commentCreationDto.ParentId.Value);
-
-            if (comment == null)
-            {
-                throw new NotFoundException($"Comment with id '{commentCreationDto.ParentId.Value}' not found.");
-            }
-
-            if (comment.GameId != game.Id)
-            {
-                throw new GameStoreException("Parent comment must be from the same game.");
-            }
+            await CheckParentComment(commentCreationDto.ParentId.Value);
         }
 
         var newComment = _mapper.Map<CommentCreationDto, Comment>(commentCreationDto);
-        
+
         _unitOfWork.CommentRepository.Add(newComment);
         await _unitOfWork.SaveAsync();
 
@@ -58,14 +43,44 @@ public class CommentService : ICommentService
 
     public async Task<IEnumerable<CommentDto>> GetAllByGameKeyAsync(string gameKey)
     {
-        var game = await _unitOfWork.GameRepository.GetByKeyWithDetailsAsync(gameKey);
+        await CheckIfGameExists(gameKey);
+
+        var comments = await _unitOfWork.CommentRepository.GetAllByGameKeyAsync(gameKey);
+        return _mapper.Map<IEnumerable<CommentDto>>(comments);
+    }
+
+    private async Task CheckIfGameExists(Guid gameId)
+    {
+        var game = await _unitOfWork.GameRepository.GetByIdAsync(gameId);
+
+        if (game == null)
+        {
+            throw new NotFoundException($"Game with id '{gameId}' not found.");
+        }
+    }
+
+    private async Task CheckIfGameExists(string gameKey)
+    {
+        var game = await _unitOfWork.GameRepository.GetByKeyAsync(gameKey);
 
         if (game == null)
         {
             throw new NotFoundException($"Game with key '{gameKey}' not found.");
         }
+    }
 
-        var comments = await _unitOfWork.CommentRepository.GetAllByGameKeyAsync(gameKey);
-        return _mapper.Map<IEnumerable<CommentDto>>(comments);
+    private async Task CheckParentComment(Guid commentId)
+    {
+        var comment = await _unitOfWork.CommentRepository.GetByIdAsync(commentId);
+
+        if (comment == null)
+        {
+            throw new NotFoundException($"Comment with id '{commentId}' not found.");
+        }
+
+        if (comment.GameId != commentId)
+        {
+            throw new GameStoreException("Parent comment must be from the same game.");
+        }
     }
 }

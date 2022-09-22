@@ -26,15 +26,7 @@ public class GameService : IGameService
 
     public async Task<GameDto> CreateAsync(GameCreationDto gameCreationDto)
     {
-        if (gameCreationDto.Key != null)
-        {
-            var existedGame = await _unitOfWork.GameRepository.GetByKeyAsync(gameCreationDto.Key);
-
-            if (existedGame != null)
-            {
-                throw new GameStoreException($"Game with key '{gameCreationDto.Key}' already exists.");
-            }
-        }
+        await GetGameByKey(gameCreationDto.Key);
 
         var newGame = _mapper.Map<Game>(gameCreationDto);
 
@@ -44,24 +36,11 @@ public class GameService : IGameService
         return _mapper.Map<GameDto>(newGame);
     }
 
-    public async Task UpdateAsync(Guid id, GameUpdateDto gameUpdateDto)
+    public async Task UpdateAsync(Guid gameId, GameUpdateDto gameUpdateDto)
     {
-        if (gameUpdateDto.Key != null)
-        {
-            var existedGame = await _unitOfWork.GameRepository.GetByKeyAsync(gameUpdateDto.Key);
+        await GetGameByKey(gameUpdateDto.Key);
 
-            if (existedGame != null && existedGame.Id != id)
-            {
-                throw new GameStoreException($"Game with key '{gameUpdateDto.Key}' already exists.");
-            }
-        }
-
-        var gameToUpdate = await _unitOfWork.GameRepository.GetByIdAsync(id);
-
-        if (gameToUpdate == null)
-        {
-            throw new NotFoundException($"Game with id '{id}' not found.");
-        }
+        var gameToUpdate = await GetGameById(gameId);
 
         _mapper.Map(gameUpdateDto, gameToUpdate);
 
@@ -69,14 +48,9 @@ public class GameService : IGameService
         await _unitOfWork.SaveAsync();
     }
 
-    public async Task<GameWithDetailsDto> GetByKeyWithDetailsAsync(string key)
+    public async Task<GameWithDetailsDto> GetByKeyWithDetailsAsync(string gameKey)
     {
-        var game = await _unitOfWork.GameRepository.GetByKeyWithDetailsAsync(key);
-
-        if (game == null)
-        {
-            throw new NotFoundException($"Game with key '{key}' not found.");
-        }
+        var game = await GetGameByKeyWithDetails(gameKey);
 
         return _mapper.Map<GameWithDetailsDto>(game);
     }
@@ -87,16 +61,11 @@ public class GameService : IGameService
         return _mapper.Map<IEnumerable<GameDto>>(games);
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid gameId)
     {
-        var game = await _unitOfWork.GameRepository.GetByIdAsync(id);
+        var gameToDelete = await GetGameById(gameId);
 
-        if (game == null)
-        {
-            throw new NotFoundException($"Game with id '{id}' not found.");
-        }
-
-        _unitOfWork.GameRepository.Delete(game);
+        _unitOfWork.GameRepository.Delete(gameToDelete);
         await _unitOfWork.SaveAsync();
     }
 
@@ -112,15 +81,56 @@ public class GameService : IGameService
         return _mapper.Map<IEnumerable<GameDto>>(games);
     }
 
-    public async Task<Stream> DownloadAsync(string key)
+    public async Task<Stream> DownloadAsync(string gameKey)
     {
-        var game = await _unitOfWork.GameRepository.GetByKeyWithDetailsAsync(key);
+        await GetGameByKey(gameKey);
+
+        return new MemoryStream(1024 * 128); // 128kb file stub
+    }
+
+    private async Task<Game> GetGameByKey(string gameKey)
+    {
+        var game = await _unitOfWork.GameRepository.GetByKeyAsync(gameKey);
 
         if (game == null)
         {
-            throw new NotFoundException($"Game with key '{key}' not found.");
+            ThrowGameNotFound(gameKey);
         }
 
-        return new MemoryStream(1024 * 128); // 128kb file stub
+        return game!;
+    }
+
+    private async Task<Game> GetGameById(Guid gameId)
+    {
+        var game = await _unitOfWork.GameRepository.GetByIdAsync(gameId);
+
+        if (game == null)
+        {
+            ThrowGameNotFound(gameId);
+        }
+
+        return game!;
+    }
+
+    private async Task<Game> GetGameByKeyWithDetails(string gameKey)
+    {
+        var game = await _unitOfWork.GameRepository.GetByKeyWithDetailsAsync(gameKey);
+
+        if (game == null)
+        {
+            ThrowGameNotFound(gameKey);
+        }
+
+        return game!;
+    }
+
+    private static void ThrowGameNotFound(Guid gameId)
+    {
+        throw new NotFoundException($"Game with gameId '{gameId}' not found.");
+    }
+
+    private static void ThrowGameNotFound(string gameKey)
+    {
+        throw new NotFoundException($"Game with gameKey '{gameKey}' not found.");
     }
 }
