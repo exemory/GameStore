@@ -41,6 +41,7 @@ app.UseResponseCaching();
 app.UseRouting();
 
 app.UseMiddleware<IpAddressLoggerMiddleware>();
+app.UseMiddleware<PerformanceLoggerMiddleware>();
 app.UseMiddleware<ErrorHandlerMiddleware>();
 
 app.UseEndpoints(endpoints =>
