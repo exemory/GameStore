@@ -20,6 +20,8 @@ builder.Services.AddBusinessLayer();
 
 builder.Services.AddWebApi();
 
+builder.AddOptions();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -38,6 +40,7 @@ app.UseResponseCaching();
 
 app.UseRouting();
 
+app.UseMiddleware<IpAddressLoggerMiddleware>();
 app.UseMiddleware<ErrorHandlerMiddleware>();
 
 app.UseEndpoints(endpoints =>
