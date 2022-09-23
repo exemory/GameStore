@@ -26,7 +26,7 @@ public class GameService : IGameService
 
     public async Task<GameDto> CreateAsync(GameCreationDto gameCreationDto)
     {
-        await GetGameByKey(gameCreationDto.Key);
+        await CheckIfGameWithKeyAlreadyExists(gameCreationDto.Key);
 
         var newGame = _mapper.Map<Game>(gameCreationDto);
 
@@ -38,7 +38,7 @@ public class GameService : IGameService
 
     public async Task UpdateAsync(Guid gameId, GameUpdateDto gameUpdateDto)
     {
-        await GetGameByKey(gameUpdateDto.Key);
+        await CheckIfGameWithKeyAlreadyExists(gameUpdateDto.Key, gameId);
 
         var gameToUpdate = await GetGameById(gameId);
 
@@ -51,7 +51,6 @@ public class GameService : IGameService
     public async Task<GameWithDetailsDto> GetByKeyWithDetailsAsync(string gameKey)
     {
         var game = await GetGameByKeyWithDetails(gameKey);
-
         return _mapper.Map<GameWithDetailsDto>(game);
     }
 
@@ -83,12 +82,22 @@ public class GameService : IGameService
 
     public async Task<Stream> DownloadAsync(string gameKey)
     {
-        await GetGameByKey(gameKey);
+        await CheckIfGameExists(gameKey);
 
         return new MemoryStream(1024 * 128); // 128kb file stub
     }
 
-    private async Task<Game> GetGameByKey(string gameKey)
+    private async Task CheckIfGameWithKeyAlreadyExists(string gameKey, Guid? exceptGameId = null)
+    {
+        var game = await _unitOfWork.GameRepository.GetByKeyAsync(gameKey);
+
+        if (game != null && (exceptGameId == null || exceptGameId != game.Id))
+        {
+            throw new GameStoreException($"Game with key '{gameKey}' already exists.");
+        }
+    }
+
+    private async Task CheckIfGameExists(string gameKey)
     {
         var game = await _unitOfWork.GameRepository.GetByKeyAsync(gameKey);
 
@@ -96,8 +105,6 @@ public class GameService : IGameService
         {
             ThrowGameNotFound(gameKey);
         }
-
-        return game!;
     }
 
     private async Task<Game> GetGameById(Guid gameId)
@@ -106,10 +113,10 @@ public class GameService : IGameService
 
         if (game == null)
         {
-            ThrowGameNotFound(gameId);
+            throw new NotFoundException($"Game with id '{gameId}' not found.");
         }
 
-        return game!;
+        return game;
     }
 
     private async Task<Game> GetGameByKeyWithDetails(string gameKey)
@@ -124,13 +131,8 @@ public class GameService : IGameService
         return game!;
     }
 
-    private static void ThrowGameNotFound(Guid gameId)
-    {
-        throw new NotFoundException($"Game with gameId '{gameId}' not found.");
-    }
-
     private static void ThrowGameNotFound(string gameKey)
     {
-        throw new NotFoundException($"Game with gameKey '{gameKey}' not found.");
+        throw new NotFoundException($"Game with key '{gameKey}' not found.");
     }
 }
