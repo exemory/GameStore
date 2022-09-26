@@ -1,10 +1,16 @@
 using Business.Extensions;
 using Data.Extensions;
+using Serilog;
 using WebApi.Extensions;
 using WebApi.Middlewares;
 using WebApi.Options;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((ctx, config) =>
+{
+    config.ReadFrom.Configuration(builder.Configuration);
+});
 
 var connectionStrings = builder.Configuration
     .GetSection(nameof(ConnectionStrings))
@@ -19,8 +25,6 @@ builder.Services.AddDataLayer(c =>
 builder.Services.AddBusinessLayer();
 
 builder.Services.AddWebApi();
-
-builder.AddOptions();
 
 var app = builder.Build();
 

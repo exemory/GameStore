@@ -20,7 +20,7 @@ public class PerformanceLoggerMiddleware
         _logger = logger;
         _next = next;
     }
-    
+
     /// <summary>
     /// Middleware logic for measuring and logging execution performance
     /// </summary>
@@ -31,7 +31,7 @@ public class PerformanceLoggerMiddleware
         stopwatch.Start();
 
         await _next(context);
-        
+
         stopwatch.Stop();
         LogExecutionTime(stopwatch.Elapsed);
     }
