@@ -45,7 +45,7 @@ public class CommentServiceTests
 
         result.Should().BeEquivalentTo(expected);
 
-        _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.Is<Comment>(g => expectedToCreate.Equals(g))),
+        _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.Is<Comment>(c => expectedToCreate.Equals(c))),
             Times.Once);
         _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Once);
     }
@@ -70,7 +70,7 @@ public class CommentServiceTests
 
         result.Should().BeEquivalentTo(expected);
 
-        _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.Is<Comment>(g => expectedToCreate.Equals(g))),
+        _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.Is<Comment>(c => expectedToCreate.Equals(c))),
             Times.Once);
         _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Once);
     }
@@ -79,6 +79,7 @@ public class CommentServiceTests
     public async Task CreateAsync_ShouldFail_WhenGameDoesNotExists()
     {
         var commentCreationDto = _fixture.Create<CommentCreationDto>();
+        var expectedExceptionMessage = $"Game with id '{commentCreationDto.GameId}' not found.";
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByIdAsync(commentCreationDto.GameId))
             .ReturnsAsync((Game?) null);
@@ -86,7 +87,7 @@ public class CommentServiceTests
         Func<Task> result = async () => await _sut.CreateAsync(commentCreationDto);
 
         await result.Should().ThrowAsync<NotFoundException>()
-            .WithMessage($"Game with id '{commentCreationDto.GameId}' not found.");
+            .WithMessage(expectedExceptionMessage);
 
         _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.IsAny<Comment>()), Times.Never);
         _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
@@ -96,6 +97,7 @@ public class CommentServiceTests
     public async Task CreateAsync_ShouldFail_WhenParentCommentDoesNotExists()
     {
         var commentCreationDto = _fixture.Create<CommentCreationDto>();
+        var expectedExceptionMessage = $"Comment with id '{commentCreationDto.ParentId}' not found.";
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByIdAsync(commentCreationDto.GameId))
             .ReturnsAsync(_fixture.Create<Game>());
@@ -105,7 +107,7 @@ public class CommentServiceTests
         Func<Task> result = async () => await _sut.CreateAsync(commentCreationDto);
 
         await result.Should().ThrowAsync<NotFoundException>()
-            .WithMessage($"Comment with id '{commentCreationDto.ParentId}' not found.");
+            .WithMessage(expectedExceptionMessage);
 
         _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.IsAny<Comment>()), Times.Never);
         _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
