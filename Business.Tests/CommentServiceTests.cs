@@ -30,6 +30,7 @@ public class CommentServiceTests
     [Fact]
     public async Task CreateAsync_ShouldCreateGame_WhenParentCommentUnspecified()
     {
+        // Arrange
         var commentCreationDto = _fixture.Build<CommentCreationDto>()
             .Without(c => c.ParentId)
             .Create();
@@ -41,8 +42,10 @@ public class CommentServiceTests
             .ReturnsAsync(_fixture.Create<Game>());
         _unitOfWorkMock.Setup(u => u.CommentRepository.Add(It.IsAny<Comment>()));
 
+        // Act
         var result = await _sut.CreateAsync(commentCreationDto);
 
+        // Assert
         result.Should().BeEquivalentTo(expected);
 
         _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.Is<Comment>(c => expectedToCreate.Equals(c))),
@@ -53,6 +56,7 @@ public class CommentServiceTests
     [Fact]
     public async Task CreateAsync_ShouldCreateGame_WhenParentCommentSpecified()
     {
+        // Arrange
         var commentCreationDto = _fixture.Create<CommentCreationDto>();
         var parentComment = _fixture.Build<Comment>()
             .With(c => c.GameId, commentCreationDto.GameId)
@@ -66,8 +70,10 @@ public class CommentServiceTests
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(commentCreationDto.ParentId!.Value))
             .ReturnsAsync(parentComment);
 
+        // Act
         var result = await _sut.CreateAsync(commentCreationDto);
 
+        // Assert
         result.Should().BeEquivalentTo(expected);
 
         _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.Is<Comment>(c => expectedToCreate.Equals(c))),
@@ -78,14 +84,17 @@ public class CommentServiceTests
     [Fact]
     public async Task CreateAsync_ShouldFail_WhenGameDoesNotExists()
     {
+        // Arrange
         var commentCreationDto = _fixture.Create<CommentCreationDto>();
         var expectedExceptionMessage = $"Game with id '{commentCreationDto.GameId}' not found.";
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByIdAsync(commentCreationDto.GameId))
             .ReturnsAsync((Game?) null);
 
+        // Act
         Func<Task> result = async () => await _sut.CreateAsync(commentCreationDto);
 
+        // Assert
         await result.Should().ThrowAsync<NotFoundException>()
             .WithMessage(expectedExceptionMessage);
 
@@ -96,6 +105,7 @@ public class CommentServiceTests
     [Fact]
     public async Task CreateAsync_ShouldFail_WhenParentCommentDoesNotExists()
     {
+        // Arrange
         var commentCreationDto = _fixture.Create<CommentCreationDto>();
         var expectedExceptionMessage = $"Comment with id '{commentCreationDto.ParentId}' not found.";
 
@@ -104,8 +114,10 @@ public class CommentServiceTests
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(commentCreationDto.ParentId!.Value))
             .ReturnsAsync((Comment?) null);
 
+        // Act
         Func<Task> result = async () => await _sut.CreateAsync(commentCreationDto);
 
+        // Assert
         await result.Should().ThrowAsync<NotFoundException>()
             .WithMessage(expectedExceptionMessage);
 
@@ -116,6 +128,7 @@ public class CommentServiceTests
     [Fact]
     public async Task CreateAsync_ShouldFail_WhenParentCommentFromOtherGame()
     {
+        // Arrange
         var commentCreationDto = _fixture.Create<CommentCreationDto>();
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByIdAsync(commentCreationDto.GameId))
@@ -123,8 +136,10 @@ public class CommentServiceTests
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(commentCreationDto.ParentId!.Value))
             .ReturnsAsync(_fixture.Create<Comment>());
 
+        // Act
         Func<Task> result = async () => await _sut.CreateAsync(commentCreationDto);
 
+        // Assert
         await result.Should().ThrowAsync<GameStoreException>();
 
         _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.IsAny<Comment>()), Times.Never);
@@ -134,6 +149,7 @@ public class CommentServiceTests
     [Fact]
     public async Task GetAllByGameKeyAsync_ShouldReturnAllCommentsRelatedToGame()
     {
+        // Arrange
         var game = _fixture.Create<Game>();
         var comments = _fixture.Build<Comment>()
             .Without(c => c.Game)
@@ -145,21 +161,26 @@ public class CommentServiceTests
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetAllByGameKeyAsync(game.Key))
             .ReturnsAsync(comments);
 
+        // Act
         var result = await _sut.GetAllByGameKeyAsync(game.Key);
 
+        // Assert
         result.Should().BeEquivalentTo(expectedComments);
     }
 
     [Fact]
     public async Task GetAllByGameKeyAsync_ShouldFail_WhenGameDoesNotExists()
     {
+        // Arrange
         var nonexistentGameKey = _fixture.Create<string>();
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByKeyAsync(nonexistentGameKey))
             .ReturnsAsync((Game?) null);
 
+        // Act
         Func<Task> result = async () => await _sut.GetAllByGameKeyAsync(nonexistentGameKey);
 
+        // Assert
         await result.Should().ThrowAsync<NotFoundException>();
     }
 }
