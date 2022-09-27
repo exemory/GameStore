@@ -1,4 +1,8 @@
 ﻿using System.Reflection;
+using Business.Validators;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.OpenApi.Models;
 
 namespace WebApi.Extensions;
@@ -9,6 +13,13 @@ public static class ServiceCollectionExtensions
     {
         services.AddControllers();
         services.AddResponseCaching();
+
+        services.AddValidatorsFromAssemblyContaining<GameCreationDtoValidator>();
+        services.AddFluentValidationRulesToSwagger();
+        services.AddFluentValidationAutoValidation(o =>
+        {
+            o.DisableDataAnnotationsValidation = true;
+        });
 
         services.AddSwaggerGen(options =>
         {
