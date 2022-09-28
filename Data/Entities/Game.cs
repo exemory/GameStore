@@ -1,11 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Data.Entities;
+﻿namespace Data.Entities;
 
 public class Game : EntityBase
 {
     public string Key { get; set; } = default!;
     public string Name { get; set; } = default!;
+    public decimal Price { get; set; }
     public string Description { get; set; } = default!;
 
     public IEnumerable<Comment> Comments { get; set; } = default!;

@@ -10,10 +10,6 @@ public class CommentCreationDtoValidator : AbstractValidator<CommentCreationDto>
         RuleFor(c => c.GameId)
             .NotEmpty();
 
-        RuleFor(c => c.Name)
-            .NotEmpty()
-            .MaximumLength(50);
-        
         RuleFor(c => c.Body)
             .NotEmpty()
             .MaximumLength(2000);
