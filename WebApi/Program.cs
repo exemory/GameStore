@@ -1,10 +1,16 @@
 using Business.Extensions;
 using Data.Extensions;
+using Serilog;
 using WebApi.Extensions;
 using WebApi.Middlewares;
 using WebApi.Options;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((ctx, config) =>
+{
+    config.ReadFrom.Configuration(builder.Configuration);
+});
 
 var connectionStrings = builder.Configuration
     .GetSection(nameof(ConnectionStrings))
@@ -38,6 +44,8 @@ app.UseResponseCaching();
 
 app.UseRouting();
 
+app.UseMiddleware<IpAddressLoggerMiddleware>();
+app.UseMiddleware<PerformanceLoggerMiddleware>();
 app.UseMiddleware<ErrorHandlerMiddleware>();
 
 app.UseEndpoints(endpoints =>

@@ -30,7 +30,7 @@ public class CommentService : ICommentService
 
         if (commentCreationDto.ParentId != null)
         {
-            await CheckParentComment(commentCreationDto.ParentId.Value);
+            await CheckParentComment(commentCreationDto.ParentId.Value, commentCreationDto.GameId);
         }
 
         var newComment = _mapper.Map<CommentCreationDto, Comment>(commentCreationDto);
@@ -69,7 +69,7 @@ public class CommentService : ICommentService
         }
     }
 
-    private async Task CheckParentComment(Guid commentId)
+    private async Task CheckParentComment(Guid commentId, Guid gameId)
     {
         var comment = await _unitOfWork.CommentRepository.GetByIdAsync(commentId);
 
@@ -78,7 +78,7 @@ public class CommentService : ICommentService
             throw new NotFoundException($"Comment with id '{commentId}' not found.");
         }
 
-        if (comment.GameId != commentId)
+        if (comment.GameId != gameId)
         {
             throw new GameStoreException("Parent comment must be from the same game.");
         }
