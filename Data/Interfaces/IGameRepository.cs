@@ -8,6 +8,12 @@ namespace Data.Interfaces;
 public interface IGameRepository : IRepository<Game>
 {
     /// <summary>
+    /// Get all games with included genres
+    /// </summary>
+    /// <returns>All games with included genres</returns>
+    public Task<IEnumerable<Game>> GetAllWithGenresAsync();
+    
+    /// <summary>
     /// Get a specific game by it's key
     /// </summary>
     /// <param name="key">Key of the game to be retrieved</param>
@@ -22,16 +28,16 @@ public interface IGameRepository : IRepository<Game>
     public Task<Game?> GetByKeyWithDetailsAsync(string key);
     
     /// <summary>
-    /// Get all games by genre
+    /// Get all games by genre with included genres
     /// </summary>
     /// <param name="genre">Game genre</param>
-    /// <returns>All games of specified genre</returns>
-    public Task<IEnumerable<Game>> GetAllByGenreAsync(string genre);
+    /// <returns>All games of specified genre with included genres</returns>
+    public Task<IEnumerable<Game>> GetAllByGenreWithGenresAsync(string genre);
     
     /// <summary>
-    /// Get all games by platform types
+    /// Get all games by platform types with included genres
     /// </summary>
     /// <param name="platformTypes">List of platform types</param>
-    /// <returns>All games supported on specified platform types</returns>
-    public Task<IEnumerable<Game>> GetAllByPlatformTypesAsync(IEnumerable<string> platformTypes);
+    /// <returns>All games supported on specified platform types with included genres</returns>
+    public Task<IEnumerable<Game>> GetAllByPlatformTypesWithGenresAsync(IEnumerable<string> platformTypes);
 }

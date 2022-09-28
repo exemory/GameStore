@@ -24,7 +24,7 @@ public class GameService : IGameService
         _mapper = mapper;
     }
 
-    public async Task<GameDto> CreateAsync(GameCreationDto gameCreationDto)
+    public async Task<GameWithGenresDto> CreateAsync(GameCreationDto gameCreationDto)
     {
         await CheckIfGameWithKeyAlreadyExists(gameCreationDto.Key);
 
@@ -33,7 +33,7 @@ public class GameService : IGameService
         _unitOfWork.GameRepository.Add(newGame);
         await _unitOfWork.SaveAsync();
 
-        return _mapper.Map<GameDto>(newGame);
+        return _mapper.Map<GameWithGenresDto>(newGame);
     }
 
     public async Task UpdateAsync(Guid gameId, GameUpdateDto gameUpdateDto)
@@ -54,10 +54,10 @@ public class GameService : IGameService
         return _mapper.Map<GameWithDetailsDto>(game);
     }
 
-    public async Task<IEnumerable<GameDto>> GetAllAsync()
+    public async Task<IEnumerable<GameWithGenresDto>> GetAllAsync()
     {
-        var games = await _unitOfWork.GameRepository.GetAllAsync();
-        return _mapper.Map<IEnumerable<GameDto>>(games);
+        var games = await _unitOfWork.GameRepository.GetAllWithGenresAsync();
+        return _mapper.Map<IEnumerable<GameWithGenresDto>>(games);
     }
 
     public async Task DeleteAsync(Guid gameId)
@@ -68,16 +68,16 @@ public class GameService : IGameService
         await _unitOfWork.SaveAsync();
     }
 
-    public async Task<IEnumerable<GameDto>> GetAllByGenreAsync(string genre)
+    public async Task<IEnumerable<GameWithGenresDto>> GetAllByGenreAsync(string genre)
     {
-        var games = await _unitOfWork.GameRepository.GetAllByGenreAsync(genre);
-        return _mapper.Map<IEnumerable<GameDto>>(games);
+        var games = await _unitOfWork.GameRepository.GetAllByGenreWithGenresAsync(genre);
+        return _mapper.Map<IEnumerable<GameWithGenresDto>>(games);
     }
 
-    public async Task<IEnumerable<GameDto>> GetAllByPlatformTypesAsync(IEnumerable<string> platformTypes)
+    public async Task<IEnumerable<GameWithGenresDto>> GetAllByPlatformTypesAsync(IEnumerable<string> platformTypes)
     {
-        var games = await _unitOfWork.GameRepository.GetAllByPlatformTypesAsync(platformTypes);
-        return _mapper.Map<IEnumerable<GameDto>>(games);
+        var games = await _unitOfWork.GameRepository.GetAllByPlatformTypesWithGenresAsync(platformTypes);
+        return _mapper.Map<IEnumerable<GameWithGenresDto>>(games);
     }
 
     public async Task<Stream> DownloadAsync(string gameKey)

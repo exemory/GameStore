@@ -34,7 +34,7 @@ public class GameServiceTests
         var gameCreationDto = _fixture.Create<GameCreationDto>();
         var mappedGame = _mapper.Map<Game>(gameCreationDto);
         var expectedToCreate = mappedGame.ToExpectedObject();
-        var expected = _mapper.Map<GameDto>(mappedGame);
+        var expected = _mapper.Map<GameWithGenresDto>(mappedGame);
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByKeyAsync(gameCreationDto.Key))
             .ReturnsAsync((Game?) null);
@@ -207,12 +207,11 @@ public class GameServiceTests
         // Arrange
         var games = _fixture.Build<Game>()
             .Without(g => g.Comments)
-            .Without(g => g.Genres)
             .Without(g => g.PlatformTypes)
             .CreateMany();
-        var expected = _mapper.Map<IEnumerable<GameDto>>(games);
+        var expected = _mapper.Map<IEnumerable<GameWithGenresDto>>(games);
 
-        _unitOfWorkMock.Setup(u => u.GameRepository.GetAllAsync())
+        _unitOfWorkMock.Setup(u => u.GameRepository.GetAllWithGenresAsync())
             .ReturnsAsync(games);
 
         // Act
@@ -229,12 +228,11 @@ public class GameServiceTests
         var genre = _fixture.Create<string>();
         var games = _fixture.Build<Game>()
             .Without(g => g.Comments)
-            .Without(g => g.Genres)
             .Without(g => g.PlatformTypes)
             .CreateMany();
-        var expected = _mapper.Map<IEnumerable<GameDto>>(games);
+        var expected = _mapper.Map<IEnumerable<GameWithGenresDto>>(games);
 
-        _unitOfWorkMock.Setup(u => u.GameRepository.GetAllByGenreAsync(genre))
+        _unitOfWorkMock.Setup(u => u.GameRepository.GetAllByGenreWithGenresAsync(genre))
             .ReturnsAsync(games);
 
         // Act
@@ -252,12 +250,11 @@ public class GameServiceTests
         var expectedPlatformTypes = platformTypes.ToExpectedObject();
         var games = _fixture.Build<Game>()
             .Without(g => g.Comments)
-            .Without(g => g.Genres)
             .Without(g => g.PlatformTypes)
             .CreateMany();
-        var expected = _mapper.Map<IEnumerable<GameDto>>(games);
+        var expected = _mapper.Map<IEnumerable<GameWithGenresDto>>(games);
 
-        _unitOfWorkMock.Setup(u => u.GameRepository.GetAllByPlatformTypesAsync(
+        _unitOfWorkMock.Setup(u => u.GameRepository.GetAllByPlatformTypesWithGenresAsync(
                 It.Is<IEnumerable<string>>(pts => expectedPlatformTypes.Equals(platformTypes))))
             .ReturnsAsync(games);
 

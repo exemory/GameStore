@@ -12,11 +12,11 @@ public interface IGameService
     /// Create new game
     /// </summary>
     /// <param name="gameCreationDto">Game creation data</param>
-    /// <returns>Created game mapped into <see cref="GameDto"/></returns>
+    /// <returns>Created game mapped into <see cref="GameWithGenresDto"/></returns>
     /// <exception cref="GameStoreException">
     /// Thrown when the game with specified key already exists
     /// </exception>
-    public Task<GameDto> CreateAsync(GameCreationDto gameCreationDto);
+    public Task<GameWithGenresDto> CreateAsync(GameCreationDto gameCreationDto);
     
     /// <summary>
     /// Updates the game
@@ -44,8 +44,8 @@ public interface IGameService
     /// <summary>
     /// Get all games
     /// </summary>
-    /// <returns>The list of games mapped into <see cref="GameDto"/></returns>
-    public Task<IEnumerable<GameDto>> GetAllAsync();
+    /// <returns>The list of games mapped into <see cref="GameWithGenresDto"/></returns>
+    public Task<IEnumerable<GameWithGenresDto>> GetAllAsync();
     
     /// <summary>
     /// Delete the game
@@ -60,15 +60,15 @@ public interface IGameService
     /// Get all games by specified genre
     /// </summary>
     /// <param name="genre">Game genre</param>
-    /// <returns>Games mapped into <see cref="GameDto"/></returns>
-    public Task<IEnumerable<GameDto>> GetAllByGenreAsync(string genre);
+    /// <returns>Games mapped into <see cref="GameWithGenresDto"/></returns>
+    public Task<IEnumerable<GameWithGenresDto>> GetAllByGenreAsync(string genre);
     
     /// <summary>
     /// Get all games by specified platform type
     /// </summary>
     /// <param name="platformTypes">List of platform types</param>
-    /// <returns>Games mapped into <see cref="GameDto"/></returns>
-    public Task<IEnumerable<GameDto>> GetAllByPlatformTypesAsync(IEnumerable<string> platformTypes);
+    /// <returns>Games mapped into <see cref="GameWithGenresDto"/></returns>
+    public Task<IEnumerable<GameWithGenresDto>> GetAllByPlatformTypesAsync(IEnumerable<string> platformTypes);
 
     /// <summary>
     /// Download game by game key

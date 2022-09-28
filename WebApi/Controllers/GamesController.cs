@@ -32,7 +32,7 @@ public class GamesController : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<GameDto>> Create(GameCreationDto gameCreationDto)
+    public async Task<ActionResult<GameWithGenresDto>> Create(GameCreationDto gameCreationDto)
     {
         var result = await _gameService.CreateAsync(gameCreationDto);
         return CreatedAtAction(nameof(GetByKey), new {gameKey = result.Key}, result);
@@ -78,7 +78,7 @@ public class GamesController : ControllerBase
     /// <response code="200">Returns the array of games</response>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<GameDto>>> GetAll()
+    public async Task<ActionResult<IEnumerable<GameWithGenresDto>>> GetAll()
     {
         var result = await _gameService.GetAllAsync();
         return Ok(result);
