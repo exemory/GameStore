@@ -40,6 +40,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors(b =>
+    b.AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+);
+
 app.UseResponseCaching();
 
 app.UseRouting();
