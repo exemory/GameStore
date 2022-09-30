@@ -1,0 +1,67 @@
+.wrapper {
+  max-width: 1400px;
+  margin: auto;
+  padding: 0 16px;
+}
+
+.game-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 300px);
+  grid-gap: 25px;
+
+  .game:nth-child(9n + 1),
+  .game:nth-child(9n + 5),
+  .game:nth-child(9n + 9) {
+    grid-column-start: span 2;
+    background: #3bc015;
+  }
+
+  .game {
+    position: relative;
+    background: cornflowerblue;
+    height: 400px;
+
+    .description {
+      position: absolute;
+      bottom: 0;
+      height: 100px;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.25);
+      padding: 10px;
+    }
+
+    .buy-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .price {
+        margin: 0;
+        color: #fff;
+        font-size: 32px;
+        font-weight: 300;
+      }
+
+      .buy-button {
+        background-color: #c54e35;
+        width: 100px;
+      }
+    }
+
+    .description-section
+    {
+      position: absolute;
+      bottom: 5px;
+
+      .genres, .name {
+        color: #fff;
+        margin: 0;
+      }
+
+      .genres {
+        font-size: 15px;
+        font-weight: 300;
+      }
+    }
+  }
+}
