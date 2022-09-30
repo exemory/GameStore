@@ -11,12 +11,14 @@ import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {ApiInterceptor} from "./interceptors/api.interceptor";
 import {MatButtonModule} from "@angular/material/button";
+import { GameComponent } from './components/game/game.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
-    GamesComponent
+    GamesComponent,
+    GameComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,64 @@
+.wrapper {
+  max-width: 1400px;
+  margin: auto;
+  padding: 0 16px;
+}
+
+.image-stub {
+  width: 100%;
+  height: 600px;
+  background-color: #9f8bb0;
+  margin-bottom: 50px;
+}
+
+.game-name {
+  font-size: 30px;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.buy-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  .price {
+    font-size: 28px;
+    font-weight: 300;
+    color: #222;
+  }
+
+  .buy-button {
+    width: 100px;
+  }
+}
+
+.divider {
+  border: 1px solid #999;
+  margin-bottom: 20px;
+}
+
+.genre-list,
+.platform-list {
+  display: flex;
+
+  .genre, .platform {
+    margin-right: 15px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    color: #fff;
+  }
+
+  .genre {
+    background-color: #3A9278;
+  }
+
+  .platform {
+    background-color: #AB737E;
+  }
+}
+
+.description {
+  font-size: 16px;
+}

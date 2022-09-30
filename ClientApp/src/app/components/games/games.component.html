@@ -5,15 +5,15 @@
 
   <ng-container *ngIf="!loading && !loadingError">
     <div class="game-list">
-      <div *ngFor="let game of games; let i = index" class="game">
-        <div class="description">
+      <div *ngFor="let game of games; let i = index" class="game" [routerLink]="[game.key]">
+        <div class="description" (click)="$event.stopPropagation()">
           <div class="buy-section">
             <p class="price">${{game.price}}</p>
-            <button mat-raised-button color="primary" class="buy-button">BUY</button>
+            <button mat-raised-button color="primary" class="buy-button" (click)="onBuyClick($event, game)">BUY</button>
           </div>
           <div class="description-section">
             <p class="genres">{{game.genres.join(' / ')}}</p>
-            <p class="name">{{game.name}}</p>
+            <a class="name" [routerLink]="[game.key]">{{game.name}}</a>
           </div>
         </div>
       </div>

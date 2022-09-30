@@ -32,4 +32,8 @@ export class GamesComponent implements OnInit {
         }
       })
   }
+
+  onBuyClick(event: any, game: Game): void {
+    event.stopPropagation();
+  }
 }

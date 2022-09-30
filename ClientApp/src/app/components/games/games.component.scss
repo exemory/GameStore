@@ -7,6 +7,7 @@
 .game-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, 300px);
+  justify-content: center;
   grid-gap: 25px;
 
   .game:nth-child(9n + 1),
@@ -20,6 +21,7 @@
     position: relative;
     background: cornflowerblue;
     height: 400px;
+    cursor: pointer;
 
     .description {
       position: absolute;
@@ -28,39 +30,51 @@
       width: 100%;
       background-color: rgba(0, 0, 0, 0.25);
       padding: 10px;
-    }
+      cursor: default;
 
-    .buy-section {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      .buy-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
 
-      .price {
-        margin: 0;
+        .price {
+          margin: 0;
+          color: #fff;
+          font-size: 32px;
+          font-weight: 300;
+        }
+
+        .buy-button {
+          background-color: #c54e35;
+          width: 100px;
+        }
+      }
+
+      .description-section {
+        position: absolute;
+        bottom: 5px;
         color: #fff;
-        font-size: 32px;
-        font-weight: 300;
-      }
 
-      .buy-button {
-        background-color: #c54e35;
-        width: 100px;
-      }
-    }
+        .genres, .name {
+          margin: 0;
+        }
 
-    .description-section
-    {
-      position: absolute;
-      bottom: 5px;
+        .genres {
+          font-size: 15px;
+          font-weight: 300;
+        }
 
-      .genres, .name {
-        color: #fff;
-        margin: 0;
-      }
+        .name {
+          text-decoration: none;
 
-      .genres {
-        font-size: 15px;
-        font-weight: 300;
+          &:hover {
+            text-decoration: underline;
+          }
+
+          &, &:active, &:visited {
+            color: #fff;
+          }
+        }
       }
     }
   }
