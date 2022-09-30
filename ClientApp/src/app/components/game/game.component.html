@@ -7,8 +7,11 @@
     <div class="image-stub"></div>
     <p class="game-name">{{game.name}}</p>
     <div class="buy-section">
-      <p class="price">${{game.price}}</p>
-      <button mat-raised-button color="primary" class="buy-button">BUY</button>
+      <p class="price">{{game.price | currency}}</p>
+      <button mat-raised-button color="primary" class="buy-button">
+        <mat-icon>shopping_cart</mat-icon>
+        BUY
+      </button>
     </div>
 
     <hr class="divider">

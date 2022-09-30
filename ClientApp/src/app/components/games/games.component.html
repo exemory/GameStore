@@ -8,14 +8,30 @@
       <div *ngFor="let game of games; let i = index" class="game" [routerLink]="[game.key]">
         <div class="description" (click)="$event.stopPropagation()">
           <div class="buy-section">
-            <p class="price">${{game.price}}</p>
-            <button mat-raised-button color="primary" class="buy-button" (click)="onBuyClick($event, game)">BUY</button>
+            <p class="price">{{game.price | currency}}</p>
+            <button mat-raised-button color="primary" class="buy-button" (click)="onBuyClick($event, game)">
+              <mat-icon>shopping_cart</mat-icon>
+              BUY
+            </button>
           </div>
           <div class="description-section">
             <p class="genres">{{game.genres.join(' / ')}}</p>
             <a class="name" [routerLink]="[game.key]">{{game.name}}</a>
           </div>
         </div>
+        <button mat-icon-button class="actions-button" [class.visible]="menuTrigger.menuOpen" [matMenuTriggerFor]="gameActionsMenu" #menuTrigger="matMenuTrigger" (click)="$event.stopPropagation()">
+          <mat-icon>more_horiz</mat-icon>
+        </button>
+        <mat-menu #gameActionsMenu="matMenu" class="thread-action-menu" xPosition="before">
+          <button mat-menu-item (click)="openEditGameDialog(game)">
+            <mat-icon>edit</mat-icon>
+            <span>Edit</span>
+          </button>
+          <button mat-menu-item class="delete-menu-option" (click)="deleteGame(game)">
+            <mat-icon>delete_forever</mat-icon>
+            <span>Delete</span>
+          </button>
+        </mat-menu>
       </div>
     </div>
   </ng-container>

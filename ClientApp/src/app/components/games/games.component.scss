@@ -8,7 +8,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, 300px);
   justify-content: center;
-  grid-gap: 25px;
+  grid-gap: 20px;
 
   .game:nth-child(9n + 1),
   .game:nth-child(9n + 5),
@@ -22,6 +22,22 @@
     background: cornflowerblue;
     height: 400px;
     cursor: pointer;
+
+    .actions-button {
+      display: none;
+      position: absolute;
+      top: 0;
+      right: 0;
+      color: #fff;
+
+      &.visible {
+        display: block;
+      }
+    }
+
+    &:hover .actions-button {
+      display: block;
+    }
 
     .description {
       position: absolute;
@@ -65,6 +81,7 @@
         }
 
         .name {
+          font-size: 16px;
           text-decoration: none;
 
           &:hover {
@@ -77,5 +94,11 @@
         }
       }
     }
+  }
+}
+
+.delete-menu-option {
+  &, mat-icon {
+    color: #C03221;
   }
 }

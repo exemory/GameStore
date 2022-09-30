@@ -12,6 +12,8 @@ import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {ApiInterceptor} from "./interceptors/api.interceptor";
 import {MatButtonModule} from "@angular/material/button";
 import { GameComponent } from './components/game/game.component';
+import {MatIconModule} from "@angular/material/icon";
+import {MatMenuModule} from "@angular/material/menu";
 
 @NgModule({
   declarations: [
@@ -27,7 +29,9 @@ import { GameComponent } from './components/game/game.component';
     MatProgressSpinnerModule,
     HttpClientModule,
     MatSnackBarModule,
-    MatButtonModule
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule
   ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true}

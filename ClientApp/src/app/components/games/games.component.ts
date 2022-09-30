@@ -36,4 +36,25 @@ export class GamesComponent implements OnInit {
   onBuyClick(event: any, game: Game): void {
     event.stopPropagation();
   }
+
+  openEditGameDialog(game: Game) {
+
+  }
+
+  deleteGame(game: Game) {
+    this.api.delete(`games/${game.id}`)
+      .subscribe({
+        next: () => {
+          const index = this.games.indexOf(game);
+          if (index !== -1) {
+            this.games.splice(index, 1);
+          }
+
+          this.ns.notifySuccess("Game has been deleted.");
+        },
+        error: err => {
+          this.ns.notifyError(`Operation failed. ${err.error?.message ?? ''}`);
+        }
+      });
+  }
 }
