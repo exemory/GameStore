@@ -12,6 +12,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IGameService, GameService>();
         services.AddScoped<ICommentService, CommentService>();
+        services.AddScoped<IGenreService, GenreService>();
 
         services.AddAutoMapper(typeof(AutomapperProfile));
         

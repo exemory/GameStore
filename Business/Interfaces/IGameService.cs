@@ -19,7 +19,7 @@ public interface IGameService
     public Task<GameWithGenresDto> CreateAsync(GameCreationDto gameCreationDto);
     
     /// <summary>
-    /// Updates the game
+    /// Update the game
     /// </summary>
     /// <param name="gameId">Guid of the game to be updated</param>
     /// <param name="gameUpdateDto">Game update data</param>

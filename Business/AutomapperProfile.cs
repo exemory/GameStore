@@ -15,8 +15,10 @@ public class AutomapperProfile : Profile
             .ForMember(g => g.PlatformTypes, o => o.MapFrom(g => g.PlatformTypes.Select(pt => pt.Type)));
         CreateMap<GameCreationDto, Game>(MemberList.Source);
         CreateMap<GameUpdateDto, Game>(MemberList.Source);
-        
+
         CreateMap<Comment, CommentDto>();
         CreateMap<CommentCreationDto, Comment>(MemberList.Source);
+
+        CreateMap<Genre, GenreDto>();
     }
 }
