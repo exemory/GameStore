@@ -11,9 +11,8 @@ public class GenreConfiguration : IEntityTypeConfiguration<Genre>
         builder.Property(g => g.Name)
             .HasMaxLength(50);
 
-        builder.HasIndex(g => new {g.Name, g.ParentId})
-            .IsUnique()
-            .HasFilter(null);
+        builder.HasIndex(g => g.Name)
+            .IsUnique();
 
         builder.HasCheckConstraint($"CK_{nameof(Genre)}_{nameof(Genre.ParentId)}",
             $"[{nameof(Genre.ParentId)}] != [{nameof(Genre.Id)}]");
@@ -70,14 +69,9 @@ public class GenreConfiguration : IEntityTypeConfiguration<Genre>
                 Id = new Guid("54f3b304-1535-418e-bbf0-2e8a4028c371"), Name = "TPS",
                 ParentId = new Guid("2a1dc5b7-373e-4da3-bd8c-caa3158888f7")
             },
-            new()
-            {
-                Id = new Guid("7707e09b-6f55-4eaa-bcab-ae1491bbb0db"), Name = "Misc.",
-                ParentId = new Guid("2a1dc5b7-373e-4da3-bd8c-caa3158888f7")
-            },
             new() {Id = new Guid("a13f2dfc-d2c3-4122-ade7-9a4c44915ada"), Name = "Adventure"},
             new() {Id = new Guid("8df84e6c-bbf3-4b77-bf8d-04878eeddc15"), Name = "Puzzle & Skill"},
-            new() {Id = new Guid("9e8cb492-4345-43ba-9050-dbdf34156713"), Name = "Misc."},
+            new() {Id = new Guid("9e8cb492-4345-43ba-9050-dbdf34156713"), Name = "Misc."}
         };
 
         builder.HasData(genres);
