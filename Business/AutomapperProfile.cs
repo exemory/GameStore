@@ -20,5 +20,7 @@ public class AutomapperProfile : Profile
         CreateMap<CommentCreationDto, Comment>(MemberList.Source);
 
         CreateMap<Genre, GenreDto>();
+
+        CreateMap<PlatformType, PlatformTypeDto>();
     }
 }
