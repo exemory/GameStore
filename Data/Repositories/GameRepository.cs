@@ -20,13 +20,20 @@ public class GameRepository : Repository<Game>, IGameRepository
         return await Entities.Include(g => g.Genres)
             .ToListAsync();
     }
-    
+
     public async Task<Game?> GetByKeyAsync(string key)
     {
         return await Entities.Where(g => g.Key == key)
             .FirstOrDefaultAsync();
     }
-    
+
+    public async Task<Game?> GetByIdWithDetailsAsync(Guid id)
+    {
+        return await Entities.Include(g => g.Genres)
+            .Include(g => g.PlatformTypes)
+            .FirstOrDefaultAsync(g => g.Id == id);
+    }
+
     public async Task<Game?> GetByKeyWithDetailsAsync(string key)
     {
         return await Entities.Include(g => g.Genres)

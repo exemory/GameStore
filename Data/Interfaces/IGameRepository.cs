@@ -19,6 +19,13 @@ public interface IGameRepository : IRepository<Game>
     /// <param name="key">Key of the game to be retrieved</param>
     /// <returns><see cref="Game"/></returns>
     public Task<Game?> GetByKeyAsync(string key);
+
+    /// <summary>
+    /// Get a specific game with details by it's id
+    /// </summary>
+    /// <param name="id">Guid of the game to be retrieved</param>
+    /// <returns><see cref="Game"/> with included genres and platform types</returns>
+    public Task<Game?> GetByIdWithDetailsAsync(Guid id);
     
     /// <summary>
     /// Get a specific game with details by it's key

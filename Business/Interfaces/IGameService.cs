@@ -16,8 +16,15 @@ public interface IGameService
     /// <exception cref="GameStoreException">
     /// Thrown when the game with specified key already exists
     /// </exception>
+    /// <exception cref="NotFoundException">
+    /// Thrown when:
+    /// <list type="bullet">
+    /// <item><description>Genres with specified ids do not exist</description></item>
+    /// <item><description>Platform types with specified ids do not exist</description></item>
+    /// </list>
+    /// </exception>
     public Task<GameWithGenresDto> CreateAsync(GameCreationDto gameCreationDto);
-    
+
     /// <summary>
     /// Update the game
     /// </summary>
@@ -27,10 +34,15 @@ public interface IGameService
     /// Thrown when the game with specified key already exists
     /// </exception>
     /// <exception cref="NotFoundException">
-    /// Thrown when the game specified by <paramref name="gameId"/> does not exist
+    /// Thrown when:
+    /// <list type="bullet">
+    /// <item><description>The game specified by <paramref name="gameId"/> does not exist</description></item>
+    /// <item><description>Genres with specified ids do not exist</description></item>
+    /// <item><description>Platform types with specified ids do not exist</description></item>
+    /// </list>
     /// </exception>
     public Task UpdateAsync(Guid gameId, GameUpdateDto gameUpdateDto);
-    
+
     /// <summary>
     /// Get a specific game with details by it's key
     /// </summary>
@@ -46,7 +58,7 @@ public interface IGameService
     /// </summary>
     /// <returns>The list of games mapped into <see cref="GameWithGenresDto"/></returns>
     public Task<IEnumerable<GameWithGenresDto>> GetAllAsync();
-    
+
     /// <summary>
     /// Delete the game
     /// </summary>
@@ -62,7 +74,7 @@ public interface IGameService
     /// <param name="genre">Game genre</param>
     /// <returns>Games mapped into <see cref="GameWithGenresDto"/></returns>
     public Task<IEnumerable<GameWithGenresDto>> GetAllByGenreAsync(string genre);
-    
+
     /// <summary>
     /// Get all games by specified platform type
     /// </summary>

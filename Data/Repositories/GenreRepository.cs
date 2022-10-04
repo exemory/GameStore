@@ -1,5 +1,6 @@
 ﻿using Data.Entities;
 using Data.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories;
 
@@ -12,5 +13,11 @@ public class GenreRepository : Repository<Genre>, IGenreRepository
     /// <param name="context">Context of the database</param>
     public GenreRepository(GameStoreContext context) : base(context)
     {
+    }
+
+    public async Task<ICollection<Genre>> GetByIdsAsync(IEnumerable<Guid> ids)
+    {
+        return await Entities.Where(g => ids.Contains(g.Id))
+            .ToListAsync();
     }
 }

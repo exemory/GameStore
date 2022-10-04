@@ -13,8 +13,12 @@ public class AutomapperProfile : Profile
         CreateMap<Game, GameWithDetailsDto>()
             .ForMember(g => g.Genres, o => o.MapFrom(gm => gm.Genres.Select(g => g.Name)))
             .ForMember(g => g.PlatformTypes, o => o.MapFrom(g => g.PlatformTypes.Select(pt => pt.Type)));
-        CreateMap<GameCreationDto, Game>(MemberList.Source);
-        CreateMap<GameUpdateDto, Game>(MemberList.Source);
+        CreateMap<GameCreationDto, Game>(MemberList.Source)
+            .ForSourceMember(g => g.GenreIds, o => o.DoNotValidate())
+            .ForSourceMember(g => g.PlatformTypeIds, o => o.DoNotValidate());
+        CreateMap<GameUpdateDto, Game>(MemberList.Source)
+            .ForSourceMember(g => g.GenreIds, o => o.DoNotValidate())
+            .ForSourceMember(g => g.PlatformTypeIds, o => o.DoNotValidate());
 
         CreateMap<Comment, CommentDto>();
         CreateMap<CommentCreationDto, Comment>(MemberList.Source);

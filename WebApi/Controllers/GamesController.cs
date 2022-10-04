@@ -29,9 +29,11 @@ public class GamesController : ControllerBase
     /// <returns>Newly created game</returns>
     /// <response code="201">Returns the newly created game</response>
     /// <response code="400">Game with specified key already exists</response>
+    /// <response code="404">Genres or platform types specified by ids do not exist</response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GameWithGenresDto>> Create(GameCreationDto gameCreationDto)
     {
         var result = await _gameService.CreateAsync(gameCreationDto);
@@ -45,7 +47,7 @@ public class GamesController : ControllerBase
     /// <param name="gameUpdateDto">Game update data</param>
     /// <response code="204">Game has been updated</response>
     /// <response code="400">Game with specified key already exists</response>
-    /// <response code="404">Game specified by <paramref name="gameId"/> not found</response>
+    /// <response code="404">Game specified by <paramref name="gameId"/> not found. Genres or platform types specified by ids do not exist</response>
     [HttpPut("{gameId:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

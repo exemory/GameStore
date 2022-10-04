@@ -1,5 +1,6 @@
 ﻿using Data.Entities;
 using Data.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories;
 
@@ -12,5 +13,11 @@ public class PlatformTypeRepository : Repository<PlatformType>, IPlatformTypeRep
     /// <param name="context">Context of the database</param>
     public PlatformTypeRepository(GameStoreContext context) : base(context)
     {
+    }
+
+    public async Task<ICollection<PlatformType>> GetByIdsAsync(IEnumerable<Guid> ids)
+    {
+        return await Entities.Where(p => ids.Contains(p.Id))
+            .ToListAsync();
     }
 }
