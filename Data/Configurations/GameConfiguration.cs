@@ -24,6 +24,9 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
 
         builder.Property(g => g.Description)
             .HasMaxLength(2000);
+        
+        builder.Property(g => g.ImageFileName)
+            .HasMaxLength(50);
 
         builder.HasIndex(g => g.Key)
             .IsUnique();

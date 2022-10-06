@@ -2,6 +2,7 @@
 using AutoMapper;
 using Business.DataTransferObjects;
 using Business.Exceptions;
+using Business.Interfaces;
 using Business.Services;
 using Data.Entities;
 using Data.Interfaces;
@@ -19,10 +20,11 @@ public class GameServiceTests
 
     private readonly Fixture _fixture = new();
     private readonly IMapper _mapper = UnitTestHelper.CreateMapper();
+    private readonly Mock<IStorageService> _storageServiceMock = new();
 
     public GameServiceTests()
     {
-        _sut = new GameService(_unitOfWorkMock.Object, _mapper);
+        _sut = new GameService(_unitOfWorkMock.Object, _mapper, _storageServiceMock.Object);
         _fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
         _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
     }
@@ -551,5 +553,108 @@ public class GameServiceTests
 
         // Assert
         await result.Should().ThrowExactlyAsync<NotFoundException>();
+    }
+
+    [Theory]
+    [InlineData("1.png")]
+    [InlineData("2.jpg")]
+    [InlineData("3.jpeg")]
+    public async Task UploadImage_ShouldUploadGame(string originalFileName)
+    {
+        // Arrange
+        var fileStream = new MemoryStream(1024);
+        var expected = _fixture.Create<ImageUploadResultDto>();
+
+        _storageServiceMock.Setup(s => s.StoreGameImageAsync(fileStream, originalFileName))
+            .ReturnsAsync(expected.ImageFileName);
+
+        // Act
+        var result = await _sut.UploadImage(fileStream, originalFileName);
+
+        // Assert
+        result.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task UploadImage_ShouldFail_WhenImageFileExtensionIsNotSupported()
+    {
+        // Arrange
+        var fileStream = new MemoryStream(1024);
+        const string originalFileName = "1.non_supported_extension";
+
+        _storageServiceMock.Setup(s => s.StoreGameImageAsync(fileStream, originalFileName))
+            .ThrowsAsync(new GameStoreException());
+
+        // Act
+        Func<Task> result = async () => await _sut.UploadImage(fileStream, originalFileName);
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<GameStoreException>();
+    }
+
+    [Fact]
+    public async Task GetImage_ShouldReturnFileStream()
+    {
+        // Arrange
+        var game = _fixture.Build<Game>()
+            .Without(g => g.Comments)
+            .Without(g => g.Genres)
+            .Without(g => g.PlatformTypes)
+            .Create();
+
+        var expected = ((Stream FileStream, string FileName))(new MemoryStream(1024), game.ImageFileName);
+
+        _unitOfWorkMock.Setup(u => u.GameRepository.GetByKeyAsync(game.Key))
+            .ReturnsAsync(game);
+        _storageServiceMock.Setup(s => s.GetGameImage(game.ImageFileName))
+            .Returns(expected.FileStream);
+
+        // Act
+        var result = await _sut.GetImage(game.Key);
+
+        // Assert
+        result.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task GetImage_ShouldFail_WhenGameDoesNotExist()
+    {
+        // Arrange
+        var nonexistentGameKey = _fixture.Create<string>();
+        var expectedExceptionMessage = $"Game with key '{nonexistentGameKey}' not found.";
+
+        _unitOfWorkMock.Setup(u => u.GameRepository.GetByKeyAsync(nonexistentGameKey))
+            .ReturnsAsync((Game?) null);
+
+        // Act
+        Func<Task> result = async () => await _sut.GetImage(nonexistentGameKey);
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<NotFoundException>()
+            .WithMessage(expectedExceptionMessage);
+    }
+
+    [Fact]
+    public async Task GetImage_ShouldFail_WhenGameImageDoesNotExist()
+    {
+        // Arrange
+        var game = _fixture.Build<Game>()
+            .Without(g => g.Comments)
+            .Without(g => g.Genres)
+            .Without(g => g.PlatformTypes)
+            .Create();
+        var expectedExceptionMessage = $"Image of game with key '{game.Key}' not found.";
+
+        _unitOfWorkMock.Setup(u => u.GameRepository.GetByKeyAsync(game.Key))
+            .ReturnsAsync(game);
+        _storageServiceMock.Setup(s => s.GetGameImage(game.ImageFileName))
+            .Throws<NotFoundException>();
+
+        // Act
+        Func<Task> result = async () => await _sut.GetImage(game.Key);
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<NotFoundException>()
+            .WithMessage(expectedExceptionMessage);
     }
 }

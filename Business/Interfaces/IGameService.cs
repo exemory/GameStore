@@ -19,6 +19,7 @@ public interface IGameService
     /// <exception cref="NotFoundException">
     /// Thrown when:
     /// <list type="bullet">
+    /// <item><description>Game image specified by ImageFileName does not exist</description></item>
     /// <item><description>Genres with specified ids do not exist</description></item>
     /// <item><description>Platform types with specified ids do not exist</description></item>
     /// </list>
@@ -37,6 +38,7 @@ public interface IGameService
     /// Thrown when:
     /// <list type="bullet">
     /// <item><description>The game specified by <paramref name="gameId"/> does not exist</description></item>
+    /// <item><description>Game image specified by ImageFileName does not exist</description></item>
     /// <item><description>Genres with specified ids do not exist</description></item>
     /// <item><description>Platform types with specified ids do not exist</description></item>
     /// </list>
@@ -88,4 +90,29 @@ public interface IGameService
     /// <param name="gameKey">Key of the game to be downloaded</param>
     /// <returns>File stream of the game</returns>
     public Task<Stream> DownloadAsync(string gameKey);
+
+    /// <summary>
+    /// Store the uploaded game image
+    /// </summary>
+    /// <param name="fileStream">Stream of the image file</param>
+    /// <param name="originalFileName">User-specified name of the uploading image</param>
+    /// <returns>Result of image uploading including it's file name</returns>
+    /// <exception cref="GameStoreException">
+    /// Thrown when the image file extension is not supported
+    /// </exception>
+    public Task<ImageUploadResultDto> UploadImage(Stream fileStream, string originalFileName);
+
+    /// <summary>
+    /// Get game image
+    /// </summary>
+    /// <param name="gameKey">Key of the game whose image need to be retrieved</param>
+    /// <returns>Tuple that contains the image file stream and file name</returns>
+    /// <exception cref="NotFoundException">
+    /// Thrown when:
+    /// <list type="bullet">
+    /// <item><description>The game specified by <paramref name="gameKey"/> does not exist</description></item>
+    /// <item><description>Image of the game specified by <paramref name="gameKey"/> not found</description></item>
+    /// </list>
+    /// </exception>
+    public Task<(Stream FileStream, string FileName)> GetImage(string gameKey);
 }

@@ -12,21 +12,26 @@ public class GameService : IGameService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly IStorageService _storageService;
 
     /// <summary>
     /// Constructor for initializing a <see cref="GameService"/> class instance
     /// </summary>
     /// <param name="unitOfWork">Unit of work</param>
     /// <param name="mapper">Mapper</param>
-    public GameService(IUnitOfWork unitOfWork, IMapper mapper)
+    /// <param name="storageService">Storage service</param>
+    public GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService storageService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _storageService = storageService;
     }
 
     public async Task<GameWithGenresDto> CreateAsync(GameCreationDto gameCreationDto)
     {
         await CheckIfGameWithKeyAlreadyExistsAsync(gameCreationDto.Key);
+
+        _storageService.CheckIfGameImageExists(gameCreationDto.ImageFileName);
 
         var newGame = _mapper.Map<Game>(gameCreationDto);
         newGame.Genres = await GetGenresByIdsAsync(gameCreationDto.GenreIds);
@@ -41,6 +46,8 @@ public class GameService : IGameService
     public async Task UpdateAsync(Guid gameId, GameUpdateDto gameUpdateDto)
     {
         var gameToUpdate = await GetGameByIdWithDetailsAsync(gameId);
+
+        _storageService.CheckIfGameImageExists(gameUpdateDto.ImageFileName);
 
         if (gameUpdateDto.Key != gameToUpdate.Key)
         {
@@ -94,6 +101,34 @@ public class GameService : IGameService
         return new MemoryStream(1024 * 128); // 128kb file stub
     }
 
+    public async Task<ImageUploadResultDto> UploadImage(Stream fileStream, string originalFileName)
+    {
+        var imageFileName = await _storageService.StoreGameImageAsync(fileStream, originalFileName);
+
+        return new ImageUploadResultDto
+        {
+            ImageFileName = imageFileName
+        };
+    }
+
+    public async Task<(Stream FileStream, string FileName)> GetImage(string gameKey)
+    {
+        var game = await GetGameByKeyAsync(gameKey);
+
+        Stream fileStream;
+        
+        try
+        {
+            fileStream = _storageService.GetGameImage(game.ImageFileName);
+        }
+        catch (NotFoundException)
+        {
+            throw new NotFoundException($"Image of game with key '{gameKey}' not found.");
+        }
+
+        return (fileStream, game.ImageFileName);
+    }
+
     private async Task CheckIfGameWithKeyAlreadyExistsAsync(string gameKey)
     {
         var game = await _unitOfWork.GameRepository.GetByKeyAsync(gameKey);
@@ -133,6 +168,18 @@ public class GameService : IGameService
         if (game == null)
         {
             ThrowGameNotFound(gameId);
+        }
+
+        return game!;
+    }
+
+    private async Task<Game> GetGameByKeyAsync(string gameKey)
+    {
+        var game = await _unitOfWork.GameRepository.GetByKeyAsync(gameKey);
+
+        if (game == null)
+        {
+            ThrowGameNotFound(gameKey);
         }
 
         return game!;

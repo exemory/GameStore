@@ -22,5 +22,8 @@ public class GameCreationDtoValidator : AbstractValidator<GameCreationDto>
         RuleFor(g => g.Description)
             .NotEmpty()
             .MaximumLength(2000);
+
+        RuleFor(g => g.ImageFileName)
+            .NotEmpty();
     }
 }
