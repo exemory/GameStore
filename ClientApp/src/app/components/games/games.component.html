@@ -5,7 +5,7 @@
 
   <ng-container *ngIf="!loading && !loadingError">
     <div class="game-list">
-      <div *ngFor="let game of games; let i = index" class="game" [routerLink]="[game.key]">
+      <div *ngFor="let game of games; let i = index" class="game" [routerLink]="[game.key]" [style.background-image]="getGameImageUrl(game)">
         <div class="description" (click)="$event.stopPropagation()">
           <div class="buy-section">
             <p class="price">{{game.price | currency}}</p>

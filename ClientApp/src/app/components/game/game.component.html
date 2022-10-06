@@ -4,7 +4,7 @@
   </div>
 
   <ng-container *ngIf="!loading && !loadingError">
-    <div class="image-stub"></div>
+    <img [src]="getGameImageUrl(game)" alt="Game image" class="image">
     <p class="game-name">{{game.name}}</p>
     <div class="buy-section">
       <p class="price">{{game.price | currency}}</p>

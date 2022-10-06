@@ -3,6 +3,8 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {HttpClient, HttpStatusCode} from "@angular/common/http";
 import {GameWithDetails} from "../../interfaces/game-with-details";
 import {NotificationService} from "../../services/notification.service";
+import {Game} from "../../interfaces/game";
+import {environment as env} from "../../../environments/environment";
 
 @Component({
   selector: 'app-game',
@@ -50,4 +52,8 @@ export class GameComponent implements OnInit {
       });
   }
 
+  getGameImageUrl(game: Game): string
+  {
+    return `${env.apiUrl}games/${game.key}/image`;
+  }
 }

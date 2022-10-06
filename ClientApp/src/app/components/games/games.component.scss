@@ -14,7 +14,8 @@
   .game:nth-child(9n + 5),
   .game:nth-child(9n + 9) {
     grid-column-start: span 2;
-    background: #3bc015;
+    background-size: cover;
+    background-position: center;
   }
 
   .game {

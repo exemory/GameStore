@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Game} from "../../interfaces/game";
 import {HttpClient} from "@angular/common/http";
 import {NotificationService} from "../../services/notification.service";
+import {environment as env} from "../../../environments/environment";
 
 @Component({
   selector: 'app-games',
@@ -56,5 +57,10 @@ export class GamesComponent implements OnInit {
           this.ns.notifyError(`Operation failed. ${err.error?.message ?? ''}`);
         }
       });
+  }
+
+  getGameImageUrl(game: Game): string
+  {
+    return `url("${env.apiUrl}games/${game.key}/image")`;
   }
 }
