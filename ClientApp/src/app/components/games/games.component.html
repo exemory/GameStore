@@ -4,6 +4,9 @@
   </div>
 
   <ng-container *ngIf="!loading && !loadingError">
+    <div class="tools">
+      <button mat-raised-button color="primary" class="add-game-button" (click)="openAddGameDialog()">Add Game</button>
+    </div>
     <div class="game-list">
       <div *ngFor="let game of games; let i = index" class="game" [routerLink]="[game.key]" [style.background-image]="getGameImageUrl(game)">
         <div class="description" (click)="$event.stopPropagation()">

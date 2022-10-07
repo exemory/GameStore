@@ -1,0 +1,10 @@
+<mat-form-field class="price-field" [formGroup]="form" appearance="outline">
+  <mat-label>{{label}}</mat-label>
+  <span matPrefix class="price-prefix" *ngIf="showCurrencySymbol">$&nbsp;</span>
+  <input matInput class="price-input" [formControlName]="controlName" [placeholder]="placeholder ?? ''" required
+         (focus)="inputInFocus = true" (blur)="inputInFocus = false" (input)="onInput($event)" #input>
+  <mat-error *ngIf="form.get(controlName)?.hasError('required')">This field is required</mat-error>
+  <mat-error *ngIf="form.get(controlName)?.hasError('min') || form.get(controlName)?.hasError('max')">
+    {{outOfRangeError}}
+  </mat-error>
+</mat-form-field>

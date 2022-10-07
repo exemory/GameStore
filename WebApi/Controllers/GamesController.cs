@@ -1,4 +1,5 @@
-﻿using Business.DataTransferObjects;
+﻿using System.ComponentModel.DataAnnotations;
+using Business.DataTransferObjects;
 using Business.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

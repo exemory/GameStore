@@ -1,0 +1,16 @@
+.price-field {
+  width: 100%;
+
+  .price-input {
+    -moz-appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      display: none;
+    }
+
+    .price-prefix {
+      top: unset;
+    }
+  }
+}
