@@ -47,7 +47,10 @@ public class GameService : IGameService
     {
         var gameToUpdate = await GetGameByIdWithDetailsAsync(gameId);
 
-        _storageService.CheckIfGameImageExists(gameUpdateDto.ImageFileName);
+        if (gameUpdateDto.ImageFileName != null)
+        {
+            _storageService.CheckIfGameImageExists(gameUpdateDto.ImageFileName);
+        }
 
         if (gameUpdateDto.Key != gameToUpdate.Key)
         {
@@ -116,7 +119,7 @@ public class GameService : IGameService
         var game = await GetGameByKeyAsync(gameKey);
 
         Stream fileStream;
-        
+
         try
         {
             fileStream = _storageService.GetGameImage(game.ImageFileName);

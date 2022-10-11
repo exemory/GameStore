@@ -18,7 +18,9 @@ public class AutomapperProfile : Profile
             .ForSourceMember(g => g.PlatformTypeIds, o => o.DoNotValidate());
         CreateMap<GameUpdateDto, Game>(MemberList.Source)
             .ForSourceMember(g => g.GenreIds, o => o.DoNotValidate())
-            .ForSourceMember(g => g.PlatformTypeIds, o => o.DoNotValidate());
+            .ForSourceMember(g => g.PlatformTypeIds, o => o.DoNotValidate())
+            .ForMember(g => g.ImageFileName,
+                o => o.Condition((d, g, v) => v != null));
 
         CreateMap<Comment, CommentDto>();
         CreateMap<CommentCreationDto, Comment>(MemberList.Source);

@@ -5,6 +5,10 @@ import {NotificationService} from "../../services/notification.service";
 import {environment as env} from "../../../environments/environment";
 import {MatDialog} from "@angular/material/dialog";
 import {AddGameDialogComponent} from "./add-game-dialog/add-game-dialog.component";
+import {EditGameDialogComponent} from "./edit-game-dialog/edit-game-dialog.component";
+import {GameUpdateData} from "../../interfaces/game-update-data";
+import {Genre} from "../../interfaces/genre";
+import {PlatformType} from "../../interfaces/platform-type";
 
 @Component({
   selector: 'app-games',
@@ -41,8 +45,44 @@ export class GamesComponent implements OnInit {
     event.stopPropagation();
   }
 
-  openEditGameDialog(game: Game) {
+  getGameImageUrl(game: Game): string {
+    return `url("${env.apiUrl}games/${game.key}/image")`;
+  }
 
+  openAddGameDialog() {
+    const dialogRef = this.dialog.open(AddGameDialogComponent,
+      {
+        maxWidth: '400px',
+        width: '100%'
+      });
+
+    dialogRef.afterClosed().subscribe((game?: Game) => {
+        if (game) {
+          this.games.push(game);
+        }
+      }
+    );
+  }
+
+  openEditGameDialog(game: Game) {
+    const dialogRef = this.dialog.open(EditGameDialogComponent,
+      {
+        maxWidth: '400px',
+        width: '100%',
+        data: game
+      });
+
+    dialogRef.afterClosed().subscribe((update?: { data: GameUpdateData, genres: Genre[], platforms: PlatformType[] }) => {
+        if (update) {
+          game.key = update.data.key;
+          game.name = update.data.name;
+          game.price = update.data.price;
+          game.description = update.data.description;
+
+          game.genres = update.genres.map(g => g.name);
+        }
+      }
+    );
   }
 
   deleteGame(game: Game) {
@@ -60,25 +100,5 @@ export class GamesComponent implements OnInit {
           this.ns.notifyError(`Operation failed. ${err.error?.message ?? ''}`);
         }
       });
-  }
-
-  getGameImageUrl(game: Game): string
-  {
-    return `url("${env.apiUrl}games/${game.key}/image")`;
-  }
-
-  openAddGameDialog() {
-    const dialogRef = this.dialog.open(AddGameDialogComponent,
-      {
-        maxWidth: '400px',
-        width: '100%'
-      });
-
-    dialogRef.afterClosed().subscribe((game?: Game) => {
-        if (game !== undefined) {
-          this.games.push(game);
-        }
-      }
-    );
   }
 }

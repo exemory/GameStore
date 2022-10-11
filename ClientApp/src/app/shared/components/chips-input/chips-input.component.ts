@@ -23,6 +23,7 @@ import {COMMA, ENTER} from "@angular/cdk/keycodes";
 export class ChipsInputComponent<Item> implements OnInit, OnChanges {
 
   @Input() items!: Item[];
+  @Input() selectedItems = <Item[]>[];
   @Input() nameProperty!: string;
   @Input() label!: string;
   @Input() placeholder!: string;
@@ -33,7 +34,6 @@ export class ChipsInputComponent<Item> implements OnInit, OnChanges {
 
   separatorKeysCodes: number[] = [ENTER, COMMA];
 
-  selectedItems = <Item[]>[];
   filteredItems!: Item[];
   inputControl = new FormControl('');
 

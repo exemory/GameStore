@@ -24,6 +24,7 @@ import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {DragDropModule} from "@angular/cdk/drag-drop";
 import { ChipsInputComponent } from './shared/components/chips-input/chips-input.component';
 import {CurrencyInputComponent} from "./shared/components/currency-input/currency-input.component";
+import { EditGameDialogComponent } from './components/games/edit-game-dialog/edit-game-dialog.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import {CurrencyInputComponent} from "./shared/components/currency-input/currenc
     AddGameDialogComponent,
     ChipsInputComponent,
     CurrencyInputComponent,
+    EditGameDialogComponent,
   ],
   imports: [
     BrowserModule,

@@ -188,12 +188,17 @@ public class GameServiceTests
             .Select(i => _fixture.Build<PlatformType>().With(p => p.Id, i).Create())
             .ToList() ?? new List<PlatformType>();
 
-        var expectedGameToUpdate = _mapper.Map<Game>(gameUpdateDto, o =>
-            o.AfterMap((_, g) =>
+        var expectedGameToUpdate = _mapper.Map<GameUpdateDto, Game>(gameUpdateDto, o =>
+            o.AfterMap((d, g) =>
             {
                 g.Id = game.Id;
                 g.Genres = genres;
                 g.PlatformTypes = platformTypes;
+
+                if (d.ImageFileName == null)
+                {
+                    g.ImageFileName = game.ImageFileName;
+                }
             })).ToExpectedObject();
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByIdWithDetailsAsync(game.Id))
@@ -230,6 +235,15 @@ public class GameServiceTests
                 .Without(g => g.Comments)
                 .Create(),
             fixture.Create<GameUpdateDto>()
+        };
+        yield return new object[]
+        {
+            fixture.Build<Game>()
+                .Without(g => g.Comments)
+                .Create(),
+            fixture.Build<GameUpdateDto>()
+                .Without(g => g.ImageFileName)
+                .Create()
         };
         yield return new object[]
         {
@@ -559,7 +573,7 @@ public class GameServiceTests
     [InlineData("1.png")]
     [InlineData("2.jpg")]
     [InlineData("3.jpeg")]
-    public async Task UploadImage_ShouldUploadGame(string originalFileName)
+    public async Task UploadImage_ShouldUploadGameImage(string originalFileName)
     {
         // Arrange
         var fileStream = new MemoryStream(1024);
@@ -602,7 +616,7 @@ public class GameServiceTests
             .Without(g => g.PlatformTypes)
             .Create();
 
-        var expected = ((Stream FileStream, string FileName))(new MemoryStream(1024), game.ImageFileName);
+        var expected = ((Stream FileStream, string FileName)) (new MemoryStream(1024), game.ImageFileName);
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByKeyAsync(game.Key))
             .ReturnsAsync(game);
