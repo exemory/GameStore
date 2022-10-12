@@ -6,6 +6,7 @@
 
 .tools {
   display: flex;
+  flex-wrap: wrap;
   gap: 20px;
   align-items: center;
   border-radius: 5px;
@@ -45,12 +46,6 @@
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   justify-content: center;
   grid-gap: 20px;
-
-  .game:nth-child(9n + 1),
-  .game:nth-child(9n + 5),
-  .game:nth-child(9n + 9) {
-    grid-column-start: span 2;
-  }
 
   .game {
     position: relative;
@@ -139,5 +134,28 @@
 .delete-menu-option {
   &, mat-icon {
     color: #C03221 !important;
+  }
+}
+
+@media screen {
+
+}
+
+@media screen and (min-width: 1292px) {
+  .game-list {
+    .game:nth-child(9n + 1),
+    .game:nth-child(9n + 5),
+    .game:nth-child(9n + 9) {
+      grid-column-start: span 2;
+    }
+  }
+}
+
+@media screen and (min-width: 972px) and (max-width: 1291px) {
+  .game-list {
+    .game:nth-child(4n + 1),
+    .game:nth-child(4n + 4) {
+      grid-column-start: span 2;
+    }
   }
 }
