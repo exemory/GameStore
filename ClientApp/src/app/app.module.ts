@@ -22,10 +22,11 @@ import {MatInputModule} from "@angular/material/input";
 import {MatChipsModule} from "@angular/material/chips";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {DragDropModule} from "@angular/cdk/drag-drop";
-import { ChipsInputComponent } from './shared/components/chips-input/chips-input.component';
+import {ChipsInputComponent} from './shared/components/chips-input/chips-input.component';
 import {CurrencyInputComponent} from "./shared/components/currency-input/currency-input.component";
-import { EditGameDialogComponent } from './components/games/edit-game-dialog/edit-game-dialog.component';
+import {EditGameDialogComponent} from './components/games/edit-game-dialog/edit-game-dialog.component';
 import {MatSelectModule} from "@angular/material/select";
+import {CurrencyPipe} from "@angular/common";
 
 @NgModule({
   declarations: [
@@ -59,7 +60,8 @@ import {MatSelectModule} from "@angular/material/select";
     MatSelectModule
   ],
   providers: [
-    {provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true}
+    {provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true},
+    CurrencyPipe
   ],
   bootstrap: [AppComponent]
 })

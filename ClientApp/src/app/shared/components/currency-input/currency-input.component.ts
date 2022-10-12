@@ -1,5 +1,6 @@
 import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {FormGroup} from "@angular/forms";
+import {CurrencyPipe} from "@angular/common";
 
 @Component({
   selector: 'app-currency-input',
@@ -22,7 +23,8 @@ export class CurrencyInputComponent implements OnInit, AfterViewInit {
     return this.inputInFocus || this.input?.nativeElement.value;
   }
 
-  constructor(private cdr: ChangeDetectorRef) {
+  constructor(private cdr: ChangeDetectorRef,
+              private currencyPipe: CurrencyPipe) {
   }
 
   ngOnInit(): void {
@@ -43,5 +45,23 @@ export class CurrencyInputComponent implements OnInit, AfterViewInit {
     }
 
     this.form.get(this.controlName)?.setValue(patchedString);
+  }
+
+  onFocus() {
+    this.inputInFocus = true;
+  }
+
+  onBlur() {
+    this.inputInFocus = false;
+
+    const control = this.form.get(this.controlName)!;
+
+    if (!control.value || control.errors) {
+      return;
+    }
+
+    const formattedValue = this.currencyPipe.transform(control.value, '', '');
+
+    control.setValue(formattedValue);
   }
 }
