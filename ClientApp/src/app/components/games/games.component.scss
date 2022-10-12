@@ -6,7 +6,32 @@
 
 .tools {
   display: flex;
+  gap: 20px;
   align-items: center;
+  border-radius: 5px;
+  padding: 0 20px;
+  border: 1px solid #e3e3e3;
+
+  .form-field {
+    position: relative;
+    top: 3px;
+    max-width: 220px;
+    width: 100%;
+  }
+
+  .mat-input-element::placeholder,
+  .mat-form-field-label {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .clear-filter-button {
+    color: rgba(0, 0, 0, 0.54);;
+  }
+
+  .additional-selection {
+    opacity: 0.75;
+    font-size: 0.8em;
+  }
 
   .add-game-button {
     margin-left: auto;
@@ -17,7 +42,7 @@
 
 .game-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, 300px);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   justify-content: center;
   grid-gap: 20px;
 
@@ -33,6 +58,7 @@
     cursor: pointer;
     background-size: cover;
     background-position: center;
+    border-radius: 10px;
 
     .actions-button {
       display: none;
@@ -58,6 +84,8 @@
       background-color: rgba(0, 0, 0, 0.5);
       padding: 10px;
       cursor: default;
+      border-bottom-right-radius: inherit;
+      border-bottom-left-radius: inherit;
 
       .buy-section {
         display: flex;
@@ -110,6 +138,6 @@
 
 .delete-menu-option {
   &, mat-icon {
-    color: #C03221;
+    color: #C03221 !important;
   }
 }

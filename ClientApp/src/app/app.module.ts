@@ -17,7 +17,7 @@ import {MatMenuModule} from "@angular/material/menu";
 import {AddGameDialogComponent} from './components/games/add-game-dialog/add-game-dialog.component';
 import {MatDialogModule} from "@angular/material/dialog";
 import {MatFormFieldModule} from "@angular/material/form-field";
-import {ReactiveFormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatInputModule} from "@angular/material/input";
 import {MatChipsModule} from "@angular/material/chips";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
@@ -25,6 +25,7 @@ import {DragDropModule} from "@angular/cdk/drag-drop";
 import { ChipsInputComponent } from './shared/components/chips-input/chips-input.component';
 import {CurrencyInputComponent} from "./shared/components/currency-input/currency-input.component";
 import { EditGameDialogComponent } from './components/games/edit-game-dialog/edit-game-dialog.component';
+import {MatSelectModule} from "@angular/material/select";
 
 @NgModule({
   declarations: [
@@ -53,7 +54,9 @@ import { EditGameDialogComponent } from './components/games/edit-game-dialog/edi
     MatInputModule,
     MatChipsModule,
     MatAutocompleteModule,
-    DragDropModule
+    DragDropModule,
+    FormsModule,
+    MatSelectModule
   ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true}

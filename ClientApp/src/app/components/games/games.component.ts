@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {Game} from "../../interfaces/game";
 import {HttpClient} from "@angular/common/http";
 import {NotificationService} from "../../services/notification.service";
@@ -9,17 +9,25 @@ import {EditGameDialogComponent} from "./edit-game-dialog/edit-game-dialog.compo
 import {GameUpdateData} from "../../interfaces/game-update-data";
 import {Genre} from "../../interfaces/genre";
 import {PlatformType} from "../../interfaces/platform-type";
+import {forkJoin} from "rxjs";
 
 @Component({
   selector: 'app-games',
   templateUrl: './games.component.html',
-  styleUrls: ['./games.component.scss']
+  styleUrls: ['./games.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class GamesComponent implements OnInit {
 
   loading = true;
   loadingError = false;
+
   games!: Game[];
+  genres!: Genre[];
+  platforms!: PlatformType[];
+
+  nameFilter = '';
+  genresFilter = <Genre[]>[];
 
   constructor(private api: HttpClient,
               private ns: NotificationService,
@@ -27,18 +35,26 @@ export class GamesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.api.get<Game[]>('games')
+    forkJoin([this.getGames(), this.getGenres()])
       .subscribe({
-        next: games => {
+        next: ([games, genres]) => {
           this.games = games;
+          this.genres = genres;
           this.loading = false;
-        },
-        error: err => {
+        }, error: err => {
           this.ns.notifyError(`Loading data failed. ${err.error?.message ?? ''}`, true);
           this.loading = false;
           this.loadingError = true;
         }
-      })
+      });
+  }
+
+  private getGames() {
+    return this.api.get<Game[]>('games');
+  }
+
+  private getGenres() {
+    return this.api.get<Genre[]>('genres');
   }
 
   onBuyClick(event: any, game: Game): void {
@@ -100,5 +116,30 @@ export class GamesComponent implements OnInit {
           this.ns.notifyError(`Operation failed. ${err.error?.message ?? ''}`);
         }
       });
+  }
+
+  get filteredGames(): Game[] {
+    const nameFilter = this.nameFilter?.trim().toLowerCase();
+    let filteredGames = this.games;
+
+    if (this.nameFilter) {
+      filteredGames = filteredGames.filter(g => g.name.toLowerCase().includes(nameFilter));
+    }
+
+    if (this.genresFilter.length) {
+      filteredGames = filteredGames.filter(g => this.genresFilter.some(genre => g.genres.includes(genre.name)));
+    }
+
+    return filteredGames;
+  }
+
+  get rootGenres() {
+    const genres = this.genres.filter(g => g.parentId === null);
+    return genres.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  genresByRootGenre(rootGenre: Genre) {
+    const genres = this.genres.filter(g => g.id === rootGenre.id || g.parentId === rootGenre.id);
+    return genres.sort((a, b) => a.name.localeCompare(b.name));
   }
 }

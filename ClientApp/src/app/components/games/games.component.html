@@ -5,10 +5,39 @@
 
   <ng-container *ngIf="!loading && !loadingError">
     <div class="tools">
+      <mat-form-field class="form-field" appearance="standard">
+        <mat-label>Search</mat-label>
+        <input matInput [(ngModel)]="nameFilter" (keydown.escape)="nameFilter=''"
+               autocomplete="off">
+        <button class="clear-filter-button" *ngIf="nameFilter" matSuffix mat-icon-button (click)="nameFilter=''">
+          <mat-icon>clear</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field class="form-field" appearance="standard">
+        <mat-label>Genres</mat-label>
+        <mat-select [(ngModel)]="genresFilter" multiple>
+          <mat-select-trigger>
+            {{genresFilter.length ? genresFilter[0].name : ''}}
+            <span *ngIf="genresFilter.length > 1" class="additional-selection">
+              (+{{genresFilter.length - 1}} {{genresFilter.length === 2 ? 'other' : 'others'}})
+            </span>
+          </mat-select-trigger>
+          <mat-optgroup *ngFor="let rootGenre of rootGenres" [label]="rootGenre.name">
+            <mat-option *ngFor="let genre of genresByRootGenre(rootGenre)" [value]="genre">{{genre.name}}</mat-option>
+          </mat-optgroup>
+        </mat-select>
+        <button class="clear-filter-button" *ngIf="genresFilter.length" matSuffix mat-icon-button
+                (click)="genresFilter = []; $event.stopPropagation()">
+          <mat-icon>clear</mat-icon>
+        </button>
+      </mat-form-field>
+
       <button mat-raised-button color="primary" class="add-game-button" (click)="openAddGameDialog()">Add Game</button>
     </div>
     <div class="game-list">
-      <div *ngFor="let game of games; let i = index" class="game" [routerLink]="[game.key]" [style.background-image]="getGameImageUrl(game)">
+      <div *ngFor="let game of filteredGames; let i = index" class="game" [routerLink]="[game.key]"
+           [style.background-image]="getGameImageUrl(game)">
         <div class="description" (click)="$event.stopPropagation()">
           <div class="buy-section">
             <p class="price">{{game.price | currency}}</p>
@@ -22,7 +51,8 @@
             <a class="name" [routerLink]="[game.key]">{{game.name}}</a>
           </div>
         </div>
-        <button mat-icon-button class="actions-button" [class.visible]="menuTrigger.menuOpen" [matMenuTriggerFor]="gameActionsMenu" #menuTrigger="matMenuTrigger" (click)="$event.stopPropagation()">
+        <button mat-icon-button class="actions-button" [class.visible]="menuTrigger.menuOpen"
+                [matMenuTriggerFor]="gameActionsMenu" #menuTrigger="matMenuTrigger" (click)="$event.stopPropagation()">
           <mat-icon>more_horiz</mat-icon>
         </button>
         <mat-menu #gameActionsMenu="matMenu" class="thread-action-menu" xPosition="before">
