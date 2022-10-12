@@ -1,0 +1,54 @@
+<div *ngIf="loading" class="loading-wrapper">
+  <mat-spinner></mat-spinner>
+</div>
+
+<ng-container *ngIf="!loading">
+  <h2 mat-dialog-title>Edit Game</h2>
+  <div mat-dialog-content>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" id="edit-game-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Key</mat-label>
+        <input matInput formControlName="key" required minlength="2" maxlength="20">
+        <mat-error *ngIf="form.get('key')?.hasError('required')">This field is required</mat-error>
+        <mat-error *ngIf="form.get('key')?.hasError('minlength')">Key must be at least 2 characters long</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" required maxlength="50">
+        <mat-error *ngIf="form.get('key')?.hasError('required')">This field is required</mat-error>
+      </mat-form-field>
+
+      <app-currency-input [form]="form" controlName="price" label="Price" [outOfRangeError]="priceOutOfRangeError"></app-currency-input>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Description</mat-label>
+        <textarea formControlName="description" name="description" matInput required maxlength="2000"></textarea>
+        <mat-error *ngIf="form.get('description')?.hasError('required')">This field is required</mat-error>
+      </mat-form-field>
+
+      <app-chips-input [items]="genres" [selectedItems]="selectedGenres" (selectionChanged)="onGenreSelectionChanged($event)" nameProperty="name"
+                       label="Genres"
+                       placeholder="Add genre..."></app-chips-input>
+
+      <app-chips-input [items]="platformTypes" [selectedItems]="selectedPlatformTypes" (selectionChanged)="onPlatformsSelectionChanged($event)" nameProperty="type"
+                       label="Supported platforms" placeholder="Add platform..."></app-chips-input>
+
+      <div class="upload-image-section">
+        <button mat-raised-button color="primary" (click)="fileInput.click()"
+                [disabled]="imageUploadingInProgress || inProgress" type="button">
+          Choose image
+        </button>
+        <p *ngIf="this.image" class="image-name">{{this.image.name}}</p>
+      </div>
+      <input hidden type="file" accept=".png, .jpg, .jpeg" (change)="handleFileInput($event)" #fileInput>
+    </form>
+  </div>
+  <div mat-dialog-actions align="end">
+    <button mat-stroked-button [disabled]="inProgress" [mat-dialog-close]="undefined">Cancel</button>
+    <button type="submit" form="edit-game-form" [disabled]="form.invalid || inProgress || imageUploadingInProgress" mat-raised-button
+            color="primary">
+      Save
+    </button>
+  </div>
+</ng-container>

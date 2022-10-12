@@ -1,4 +1,5 @@
 using Business.Extensions;
+using Business.Options;
 using Data.Extensions;
 using Serilog;
 using WebApi.Extensions;
@@ -22,6 +23,8 @@ builder.Services.AddDataLayer(c =>
     c.EnableSensitiveDataLogging = builder.Environment.IsDevelopment();
 });
 
+builder.Services.Configure<StorageOptions>(builder.Configuration.GetSection(nameof(StorageOptions)));
+
 builder.Services.AddBusinessLayer();
 
 builder.Services.AddWebApi();
@@ -40,6 +43,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors(b =>
+    b.AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+);
+
 app.UseResponseCaching();
 
 app.UseRouting();
@@ -54,5 +63,6 @@ app.UseEndpoints(endpoints =>
 });
 
 await app.InitializeDb();
+app.InitializeStorageFolders();
 
 app.Run();

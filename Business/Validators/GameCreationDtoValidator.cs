@@ -15,8 +15,15 @@ public class GameCreationDtoValidator : AbstractValidator<GameCreationDto>
             .NotEmpty()
             .MaximumLength(50);
 
+        RuleFor(g => g.Price)
+            .GreaterThanOrEqualTo(0)
+            .LessThanOrEqualTo(1000);
+
         RuleFor(g => g.Description)
             .NotEmpty()
             .MaximumLength(2000);
+
+        RuleFor(g => g.ImageFileName)
+            .NotEmpty();
     }
 }

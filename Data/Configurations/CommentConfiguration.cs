@@ -8,9 +8,6 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
 {
     public void Configure(EntityTypeBuilder<Comment> builder)
     {
-        builder.Property(c => c.Name)
-            .HasMaxLength(50);
-
         builder.Property(c => c.Body)
             .HasMaxLength(2000);
 

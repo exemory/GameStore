@@ -15,12 +15,25 @@ public class GameRepository : Repository<Game>, IGameRepository
     {
     }
 
+    public async Task<IEnumerable<Game>> GetAllWithGenresAsync()
+    {
+        return await Entities.Include(g => g.Genres)
+            .ToListAsync();
+    }
+
     public async Task<Game?> GetByKeyAsync(string key)
     {
         return await Entities.Where(g => g.Key == key)
             .FirstOrDefaultAsync();
     }
-    
+
+    public async Task<Game?> GetByIdWithDetailsAsync(Guid id)
+    {
+        return await Entities.Include(g => g.Genres)
+            .Include(g => g.PlatformTypes)
+            .FirstOrDefaultAsync(g => g.Id == id);
+    }
+
     public async Task<Game?> GetByKeyWithDetailsAsync(string key)
     {
         return await Entities.Include(g => g.Genres)
@@ -29,15 +42,17 @@ public class GameRepository : Repository<Game>, IGameRepository
             .FirstOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<Game>> GetAllByGenreAsync(string genre)
+    public async Task<IEnumerable<Game>> GetAllByGenreWithGenresAsync(string genre)
     {
-        return await Entities.Where(g => g.Genres.Any(g2 => g2.Name == genre))
+        return await Entities.Include(g => g.Genres)
+            .Where(g => g.Genres.Any(g2 => g2.Name == genre))
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Game>> GetAllByPlatformTypesAsync(IEnumerable<string> platformTypes)
+    public async Task<IEnumerable<Game>> GetAllByPlatformTypesWithGenresAsync(IEnumerable<string> platformTypes)
     {
-        return await Entities.Where(g => g.PlatformTypes.All(pt => platformTypes.Contains(pt.Type)))
+        return await Entities.Include(g => g.Genres)
+            .Where(g => g.PlatformTypes.All(pt => platformTypes.Contains(pt.Type)))
             .ToListAsync();
     }
 }

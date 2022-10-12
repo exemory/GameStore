@@ -95,7 +95,7 @@ public class CommentServiceTests
         Func<Task> result = async () => await _sut.CreateAsync(commentCreationDto);
 
         // Assert
-        await result.Should().ThrowAsync<NotFoundException>()
+        await result.Should().ThrowExactlyAsync<NotFoundException>()
             .WithMessage(expectedExceptionMessage);
 
         _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.IsAny<Comment>()), Times.Never);
@@ -118,7 +118,7 @@ public class CommentServiceTests
         Func<Task> result = async () => await _sut.CreateAsync(commentCreationDto);
 
         // Assert
-        await result.Should().ThrowAsync<NotFoundException>()
+        await result.Should().ThrowExactlyAsync<NotFoundException>()
             .WithMessage(expectedExceptionMessage);
 
         _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.IsAny<Comment>()), Times.Never);
@@ -140,7 +140,7 @@ public class CommentServiceTests
         Func<Task> result = async () => await _sut.CreateAsync(commentCreationDto);
 
         // Assert
-        await result.Should().ThrowAsync<GameStoreException>();
+        await result.Should().ThrowExactlyAsync<GameStoreException>();
 
         _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.IsAny<Comment>()), Times.Never);
         _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
@@ -181,6 +181,6 @@ public class CommentServiceTests
         Func<Task> result = async () => await _sut.GetAllByGameKeyAsync(nonexistentGameKey);
 
         // Assert
-        await result.Should().ThrowAsync<NotFoundException>();
+        await result.Should().ThrowExactlyAsync<NotFoundException>();
     }
 }

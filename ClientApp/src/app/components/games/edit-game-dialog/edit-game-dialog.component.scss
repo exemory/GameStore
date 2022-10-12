@@ -1,0 +1,23 @@
+#edit-game-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .mat-form-field-prefix {
+    top: unset !important;
+  }
+
+  .upload-image-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    .image-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+      margin: 0;
+    }
+  }
+}

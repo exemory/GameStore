@@ -1,0 +1,29 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.mat-snack-bar-container {
+  color: white;
+
+  &.success {
+    background-color: #2A9134;
+  }
+
+  &.error {
+    background-color: #C03221;
+  }
+}
+
+mat-error {
+  font-size: 12px;
+}
+
+.loading-wrapper {
+  display: flex;
+  justify-content: center;
+}

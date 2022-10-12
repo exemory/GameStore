@@ -1,0 +1,33 @@
+.app {
+  background-color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  .main {
+    flex: 1;
+    margin-bottom: 50px;
+  }
+
+  .footer {
+    background-color: #e7e7e7;
+    color: #222;
+    min-height: 40px;
+    font-size: 14px;
+
+    .wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      max-width: 1400px;
+      padding: 0 16px;
+      min-height: inherit;
+
+      .copyright {
+        margin: 0;
+        font-weight: 500;
+      }
+    }
+  }
+}

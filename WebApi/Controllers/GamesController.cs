@@ -1,4 +1,5 @@
-﻿using Business.DataTransferObjects;
+﻿using System.ComponentModel.DataAnnotations;
+using Business.DataTransferObjects;
 using Business.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,10 +30,15 @@ public class GamesController : ControllerBase
     /// <returns>Newly created game</returns>
     /// <response code="201">Returns the newly created game</response>
     /// <response code="400">Game with specified key already exists</response>
+    /// <response code="404">
+    /// Game image specified by ImageFileName does not exist / 
+    /// Genres or platform types specified by ids do not exist
+    /// </response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<GameDto>> Create(GameCreationDto gameCreationDto)
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<GameWithGenresDto>> Create(GameCreationDto gameCreationDto)
     {
         var result = await _gameService.CreateAsync(gameCreationDto);
         return CreatedAtAction(nameof(GetByKey), new {gameKey = result.Key}, result);
@@ -45,7 +51,11 @@ public class GamesController : ControllerBase
     /// <param name="gameUpdateDto">Game update data</param>
     /// <response code="204">Game has been updated</response>
     /// <response code="400">Game with specified key already exists</response>
-    /// <response code="404">Game specified by <paramref name="gameId"/> not found</response>
+    /// <response code="404">
+    /// Game specified by <paramref name="gameId"/> not found / 
+    /// Game image specified by ImageFileName does not exist / 
+    /// Genres or platform types specified by ids do not exist
+    /// </response>
     [HttpPut("{gameId:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -78,7 +88,7 @@ public class GamesController : ControllerBase
     /// <response code="200">Returns the array of games</response>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<GameDto>>> GetAll()
+    public async Task<ActionResult<IEnumerable<GameWithGenresDto>>> GetAll()
     {
         var result = await _gameService.GetAllAsync();
         return Ok(result);
@@ -112,5 +122,40 @@ public class GamesController : ControllerBase
     {
         var fileStream = await _gameService.DownloadAsync(gameKey);
         return File(fileStream, "application/octet-stream", "stub.exe");
+    }
+
+    /// <summary>
+    /// Upload game image
+    /// </summary>
+    /// <param name="file">Image file in png or jpg format</param>
+    /// <returns>Result of uploading operation, including image file name</returns>
+    /// <response code="200">Returns result of uploading operation, including image id</response>
+    /// <response code="400">The image file extension is not supported</response>
+    [HttpPost("images")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ImageUploadResultDto>> UploadImage(IFormFile file)
+    {
+        await using var fileStream = file.OpenReadStream();
+        return await _gameService.UploadImage(fileStream, file.FileName);
+    }
+
+    /// <summary>
+    /// Get game image
+    /// </summary>
+    /// <param name="gameKey">Key of the game which image need to be retrieved</param>
+    /// <returns>Image of the game specified by <paramref name="gameKey"/></returns>
+    /// <response code="200">Returns the image of the game specified by <paramref name="gameKey"/></response>
+    /// <response code="404">
+    /// The game specified by <paramref name="gameKey"/> not found / 
+    /// Image of the game specified by <paramref name="gameKey"/> not found
+    /// </response>
+    [HttpGet("{gameKey}/image")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ImageUploadResultDto>> GetImage(string gameKey)
+    {
+        var (fileStream, fileName) = await _gameService.GetImage(gameKey);
+        return File(fileStream, "application/octet-stream", fileName);
     }
 }

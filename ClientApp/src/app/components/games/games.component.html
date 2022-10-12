@@ -1,0 +1,74 @@
+<div class="wrapper">
+  <div *ngIf="loading && !loadingError" class="loading-wrapper">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <ng-container *ngIf="!loading && !loadingError">
+    <div class="tools">
+      <mat-form-field class="form-field" appearance="standard">
+        <mat-label>Search</mat-label>
+        <input matInput [(ngModel)]="nameFilter" (keydown.escape)="nameFilter=''"
+               autocomplete="off">
+        <button class="clear-filter-button" *ngIf="nameFilter" matSuffix mat-icon-button (click)="nameFilter=''">
+          <mat-icon>clear</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field class="form-field" appearance="standard">
+        <mat-label>Genres</mat-label>
+        <mat-select [(ngModel)]="genresFilter" multiple>
+          <mat-select-trigger>
+            {{genresFilter.length ? genresFilter[0].name : ''}}
+            <span *ngIf="genresFilter.length > 1" class="additional-selection">
+              (+{{genresFilter.length - 1}} {{genresFilter.length === 2 ? 'other' : 'others'}})
+            </span>
+          </mat-select-trigger>
+          <mat-optgroup *ngFor="let rootGenre of rootGenres" [label]="rootGenre.name">
+            <mat-option *ngFor="let genre of genresByRootGenre(rootGenre)" [value]="genre">{{genre.name}}</mat-option>
+          </mat-optgroup>
+        </mat-select>
+        <button class="clear-filter-button" *ngIf="genresFilter.length" matSuffix mat-icon-button
+                (click)="genresFilter = []; $event.stopPropagation()">
+          <mat-icon>clear</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" class="add-game-button" (click)="openAddGameDialog()">Add Game</button>
+    </div>
+    <div class="game-list">
+      <div *ngFor="let game of filteredGames; let i = index" class="game" [routerLink]="[game.key]"
+           [style.background-image]="getGameImageUrl(game)">
+        <div class="description" (click)="$event.stopPropagation()">
+          <div class="buy-section">
+            <p class="price">{{game.price | currency}}</p>
+            <button mat-raised-button color="primary" class="buy-button" (click)="onBuyClick($event, game)">
+              <mat-icon>shopping_cart</mat-icon>
+              BUY
+            </button>
+          </div>
+          <div class="description-section">
+            <p class="genres">{{game.genres.join(' / ')}}</p>
+            <a class="name" [routerLink]="[game.key]">{{game.name}}</a>
+          </div>
+        </div>
+        <button mat-icon-button class="actions-button" [class.visible]="menuTrigger.menuOpen"
+                [matMenuTriggerFor]="gameActionsMenu" #menuTrigger="matMenuTrigger" (click)="$event.stopPropagation()">
+          <mat-icon>more_horiz</mat-icon>
+        </button>
+        <mat-menu #gameActionsMenu="matMenu" class="thread-action-menu" xPosition="before">
+          <button mat-menu-item (click)="openEditGameDialog(game)">
+            <mat-icon>edit</mat-icon>
+            <span>Edit</span>
+          </button>
+          <button mat-menu-item class="delete-menu-option" (click)="deleteGame(game)">
+            <mat-icon>delete_forever</mat-icon>
+            <span>Delete</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+    <div *ngIf="!filteredGames.length" class="no-games-matching-filter">
+      <p class="no-games-text">There are no games matching the search criteria</p>
+    </div>
+  </ng-container>
+</div>

@@ -14,6 +14,10 @@ public class GameUpdateDtoValidator : AbstractValidator<GameUpdateDto>
         RuleFor(g => g.Name)
             .NotEmpty()
             .MaximumLength(50);
+        
+        RuleFor(g => g.Price)
+            .GreaterThanOrEqualTo(0)
+            .LessThanOrEqualTo(1000);
 
         RuleFor(g => g.Description)
             .NotEmpty()

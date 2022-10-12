@@ -29,6 +29,6 @@ public interface ICommentService
     /// Get all game's comment by game key
     /// </summary>
     /// <param name="gameKey">Key of the game whose comments need to be retrieved</param>
-    /// <returns>Comments mapped into <see cref="GameDto"/></returns>
+    /// <returns>Comments mapped into <see cref="GameWithGenresDto"/></returns>
     public Task<IEnumerable<CommentDto>> GetAllByGameKeyAsync(string gameKey);
 }

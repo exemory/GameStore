@@ -36,11 +36,6 @@ namespace Data.Migrations
                     b.Property<Guid>("GameId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uniqueidentifier");
 
@@ -66,6 +61,11 @@ namespace Data.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
+                    b.Property<string>("ImageFileName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("Key")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -76,12 +76,18 @@ namespace Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<decimal>("Price")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Key")
                         .IsUnique();
 
                     b.ToTable("Games");
+
+                    b.HasCheckConstraint("CK_Game_Price", "[Price] BETWEEN 0 AND 1000");
                 });
 
             modelBuilder.Entity("Data.Entities.Genre", b =>
@@ -100,10 +106,10 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentId");
-
-                    b.HasIndex("Name", "ParentId")
+                    b.HasIndex("Name")
                         .IsUnique();
+
+                    b.HasIndex("ParentId");
 
                     b.ToTable("Genres");
 
@@ -181,12 +187,6 @@ namespace Data.Migrations
                         {
                             Id = new Guid("54f3b304-1535-418e-bbf0-2e8a4028c371"),
                             Name = "TPS",
-                            ParentId = new Guid("2a1dc5b7-373e-4da3-bd8c-caa3158888f7")
-                        },
-                        new
-                        {
-                            Id = new Guid("7707e09b-6f55-4eaa-bcab-ae1491bbb0db"),
-                            Name = "Misc.",
                             ParentId = new Guid("2a1dc5b7-373e-4da3-bd8c-caa3158888f7")
                         },
                         new
