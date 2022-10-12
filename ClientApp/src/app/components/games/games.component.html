@@ -67,5 +67,8 @@
         </mat-menu>
       </div>
     </div>
+    <div *ngIf="!filteredGames.length" class="no-games-matching-filter">
+      <p class="no-games-text">There are no games matching the search criteria</p>
+    </div>
   </ng-container>
 </div>

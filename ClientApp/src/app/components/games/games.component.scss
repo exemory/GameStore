@@ -131,6 +131,16 @@
   }
 }
 
+.no-games-matching-filter {
+  display: flex;
+  justify-content: center;
+
+  .no-games-text {
+    font-size: 24px;
+    color: rgb(0, 0, 0, 0.6);
+  }
+}
+
 .delete-menu-option {
   &, mat-icon {
     color: #C03221 !important;
