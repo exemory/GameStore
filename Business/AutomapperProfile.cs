@@ -30,6 +30,7 @@ public class AutomapperProfile : Profile
         CreateMap<PlatformType, PlatformTypeDto>();
 
         CreateMap<User, SessionDto>()
+            .ForMember(s => s.UserId, o => o.MapFrom(u => u.Id))
             .ForMember(s => s.UserRoles, o => o.Ignore())
             .ForMember(s => s.AccessToken, o => o.Ignore());
 

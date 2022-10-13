@@ -32,6 +32,8 @@ namespace WebApi.Middlewares
             {
                 context.Response.StatusCode = exception switch
                 {
+                    RegistrationException e => StatusCodes.Status400BadRequest,
+                    AuthenticationException e => StatusCodes.Status401Unauthorized,
                     NotFoundException e => StatusCodes.Status404NotFound,
                     _ => StatusCodes.Status400BadRequest
                 };

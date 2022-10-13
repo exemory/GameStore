@@ -17,17 +17,22 @@ var connectionStrings = builder.Configuration
     .GetSection(nameof(ConnectionStrings))
     .Get<ConnectionStrings>();
 
+var jwtOptions = builder.Configuration
+    .GetSection(nameof(JwtOptions))
+    .Get<JwtOptions>();
+
+builder.Services.Configure<StorageOptions>(builder.Configuration.GetSection(nameof(StorageOptions)));
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
+
 builder.Services.AddDataLayer(c =>
 {
     c.ConnectionString = connectionStrings.DefaultConnection;
     c.EnableSensitiveDataLogging = builder.Environment.IsDevelopment();
 });
 
-builder.Services.Configure<StorageOptions>(builder.Configuration.GetSection(nameof(StorageOptions)));
-
 builder.Services.AddBusinessLayer();
 
-builder.Services.AddWebApi();
+builder.Services.AddWebApi(jwtOptions);
 
 var app = builder.Build();
 
@@ -52,6 +57,9 @@ app.UseCors(b =>
 app.UseResponseCaching();
 
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseMiddleware<IpAddressLoggerMiddleware>();
 app.UseMiddleware<PerformanceLoggerMiddleware>();
