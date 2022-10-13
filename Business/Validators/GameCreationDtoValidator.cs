@@ -1,4 +1,5 @@
-﻿using Business.DataTransferObjects;
+﻿using System.Text.RegularExpressions;
+using Business.DataTransferObjects;
 using FluentValidation;
 
 namespace Business.Validators;
@@ -9,7 +10,9 @@ public class GameCreationDtoValidator : AbstractValidator<GameCreationDto>
     {
         RuleFor(g => g.Key)
             .NotEmpty()
-            .Length(2, 20);
+            .Length(2, 20)
+            .Matches("^[a-z0-9-]*$", RegexOptions.IgnoreCase)
+            .WithMessage($"'{nameof(GameCreationDto.Key)}' must consist only of latin letters and dashes");
 
         RuleFor(g => g.Name)
             .NotEmpty()
