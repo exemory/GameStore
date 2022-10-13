@@ -1,4 +1,5 @@
 ﻿using Business.Interfaces;
+using Business.Options;
 using Business.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,6 +16,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICommentService, CommentService>();
         services.AddScoped<IGenreService, GenreService>();
         services.AddScoped<IPlatformTypeService, PlatformTypeService>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
+
+        services.AddScoped<ISession, Session>();
 
         services.AddAutoMapper(typeof(AutomapperProfile));
         

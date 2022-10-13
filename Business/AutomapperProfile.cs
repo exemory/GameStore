@@ -28,5 +28,12 @@ public class AutomapperProfile : Profile
         CreateMap<Genre, GenreDto>();
 
         CreateMap<PlatformType, PlatformTypeDto>();
+
+        CreateMap<User, SessionDto>()
+            .ForMember(s => s.UserRoles, o => o.Ignore())
+            .ForMember(s => s.AccessToken, o => o.Ignore());
+
+        CreateMap<SignUpDto, User>(MemberList.Source)
+            .ForSourceMember(d => d.Password, o => o.DoNotValidate());
     }
 }
