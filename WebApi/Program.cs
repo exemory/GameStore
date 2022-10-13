@@ -17,21 +17,17 @@ var connectionStrings = builder.Configuration
     .GetSection(nameof(ConnectionStrings))
     .Get<ConnectionStrings>();
 
-var jwtOptions = builder.Configuration
-    .GetSection(nameof(JwtOptions))
-    .Get<JwtOptions>();
-
-builder.Services.Configure<StorageOptions>(builder.Configuration.GetSection(nameof(StorageOptions)));
-builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
-
 builder.Services.AddDataLayer(c =>
 {
     c.ConnectionString = connectionStrings.DefaultConnection;
     c.EnableSensitiveDataLogging = builder.Environment.IsDevelopment();
 });
 
-builder.Services.AddBusinessLayer();
+var storageConfiguration = builder.Configuration.GetSection(nameof(StorageOptions));
+var jwtConfiguration = builder.Configuration.GetSection(nameof(JwtOptions));
+builder.Services.AddBusinessLayer(storageConfiguration, jwtConfiguration);
 
+var jwtOptions = jwtConfiguration.Get<JwtOptions>();
 builder.Services.AddWebApi(jwtOptions);
 
 var app = builder.Build();
