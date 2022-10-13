@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using WebApi.Filters;
 
 namespace WebApi.Extensions;
 
@@ -18,7 +19,6 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddWebApi(this IServiceCollection services, JwtOptions jwtOptions)
     {
-        services.AddControllers();
         services.AddResponseCaching();
 
         services.AddValidatorsFromAssemblyContaining<GameCreationDtoValidator>();
@@ -26,6 +26,11 @@ public static class ServiceCollectionExtensions
         services.AddFluentValidationAutoValidation(o =>
         {
             o.DisableDataAnnotationsValidation = true;
+        });
+        
+        services.AddControllers(o =>
+        {
+            o.Filters.Add<SessionFilter>();
         });
 
         services.AddIdentityCore<User>(options =>

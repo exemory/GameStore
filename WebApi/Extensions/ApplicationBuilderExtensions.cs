@@ -30,6 +30,7 @@ public static class ApplicationBuilderExtensions
         var storageOptions = scope.ServiceProvider.GetRequiredService<IOptions<StorageOptions>>().Value;
 
         Directory.CreateDirectory(storageOptions.GameImagesFolderPath);
+        Directory.CreateDirectory(storageOptions.UserAvatarsFolderPath);
 
         return app;
     }
