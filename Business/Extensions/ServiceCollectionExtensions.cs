@@ -25,6 +25,8 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<ISession, Session>();
 
+        services.AddTransient<IDateTimeProvider, DateTimeProvider>();
+
         services.AddAutoMapper(typeof(AutomapperProfile));
 
         return services;
