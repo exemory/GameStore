@@ -22,7 +22,7 @@ public class AvatarService : IAvatarService
         _logger = logger;
     }
 
-    public async Task UploadAvatarImage(Stream fileStream, string originalFileName)
+    public async Task UploadAvatarImageAsync(Stream fileStream, string originalFileName)
     {
         var user = await _userManager.FindByIdAsync(_session.UserId.ToString());
         if (user == null)
@@ -38,7 +38,7 @@ public class AvatarService : IAvatarService
         await _userManager.UpdateAsync(user);
     }
 
-    public async Task<(Stream FileStream, string FileName)> GetAvatarImage()
+    public async Task<(Stream FileStream, string FileName)> GetAvatarImageAsync()
     {
         var user = await _userManager.FindByIdAsync(_session.UserId.ToString());
         if (user == null)
