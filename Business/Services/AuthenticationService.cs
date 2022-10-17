@@ -63,9 +63,14 @@ namespace Business.Services
 
             var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-            var session = _mapper.Map<User, SessionDto>(user);
-            session.UserRoles = claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
-            session.AccessToken = token;
+            var userInfo = _mapper.Map<User, UserInfoDto>(user);
+            userInfo.UserRoles = claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
+
+            var session = new SessionDto
+            {
+                UserInfo = userInfo,
+                AccessToken = token
+            };
 
             return session;
         }

@@ -29,11 +29,9 @@ public class AutomapperProfile : Profile
 
         CreateMap<PlatformType, PlatformTypeDto>();
 
-        CreateMap<User, SessionDto>()
-            .ForMember(s => s.UserId, o => o.MapFrom(u => u.Id))
-            .ForMember(s => s.HasAvatar, o => o.MapFrom(u => u.Avatar != null))
-            .ForMember(s => s.UserRoles, o => o.Ignore())
-            .ForMember(s => s.AccessToken, o => o.Ignore());
+        CreateMap<User, UserInfoDto>()
+            .ForMember(u => u.HasAvatar, o => o.MapFrom(u => u.Avatar != null))
+            .ForMember(u => u.UserRoles, o => o.Ignore());
 
         CreateMap<SignUpDto, User>(MemberList.Source)
             .ForSourceMember(d => d.Password, o => o.DoNotValidate());
