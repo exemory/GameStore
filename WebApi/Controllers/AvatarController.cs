@@ -30,7 +30,7 @@ public class AvatarController : ControllerBase
     public async Task<ActionResult<ImageUploadResultDto>> UploadImageAvatar(IFormFile file)
     {
         await using var fileStream = file.OpenReadStream();
-        await _avatarService.UploadAvatarImage(fileStream, file.FileName);
+        await _avatarService.UploadAvatarImageAsync(fileStream, file.FileName);
         return CreatedAtAction(nameof(GetImage), null);
     }
 
@@ -48,7 +48,7 @@ public class AvatarController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ImageUploadResultDto>> GetImage()
     {
-        var (fileStream, fileName) = await _avatarService.GetAvatarImage();
+        var (fileStream, fileName) = await _avatarService.GetAvatarImageAsync();
         return File(fileStream, "application/octet-stream", fileName);
     }
 }

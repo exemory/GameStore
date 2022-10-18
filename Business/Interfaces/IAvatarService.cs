@@ -15,7 +15,7 @@ public interface IAvatarService
     /// <exception cref="GameStoreException">
     /// Thrown when the image file extension is not supported
     /// </exception>
-    public Task UploadAvatarImage(Stream fileStream, string originalFileName);
+    public Task UploadAvatarImageAsync(Stream fileStream, string originalFileName);
 
     /// <summary>
     /// Get user avatar image
@@ -31,5 +31,5 @@ public interface IAvatarService
     /// <item><description>The user's avatar not found</description></item>
     /// </list>
     /// </exception>
-    public Task<(Stream FileStream, string FileName)> GetAvatarImage();
+    public Task<(Stream FileStream, string FileName)> GetAvatarImageAsync();
 }

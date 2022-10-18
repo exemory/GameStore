@@ -19,6 +19,7 @@ namespace Business.Services
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
         private readonly JwtOptions _jwtOptions;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
         /// <summary>
         /// Constructor for initializing a <see cref="AuthenticationService"/> class instance
@@ -26,11 +27,14 @@ namespace Business.Services
         /// <param name="userManager">Identity user manager</param>
         /// <param name="mapper">Mapper</param>
         /// <param name="jwtOptions">Jwt configuration options</param>
-        public AuthenticationService(UserManager<User> userManager, IMapper mapper, IOptions<JwtOptions> jwtOptions)
+        /// <param name="dateTimeProvider">Date time provider</param>
+        public AuthenticationService(UserManager<User> userManager, IMapper mapper, IOptions<JwtOptions> jwtOptions,
+            IDateTimeProvider dateTimeProvider)
         {
             _userManager = userManager;
             _mapper = mapper;
             _jwtOptions = jwtOptions.Value;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public async Task SignUpAsync(SignUpDto signUpDto)
@@ -115,12 +119,14 @@ namespace Business.Services
         /// <returns>Jwt token options</returns>
         private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, IEnumerable<Claim> claims)
         {
+            var expirationDate = (_dateTimeProvider.UtcNow + _jwtOptions.Lifetime).UtcDateTime;
+
             var tokenOptions = new JwtSecurityToken
             (
                 issuer: _jwtOptions.Issuer,
                 audience: _jwtOptions.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow + _jwtOptions.Lifetime,
+                expires: expirationDate,
                 signingCredentials: signingCredentials
             );
 
