@@ -23,11 +23,12 @@ builder.Services.AddDataLayer(c =>
     c.EnableSensitiveDataLogging = builder.Environment.IsDevelopment();
 });
 
-builder.Services.Configure<StorageOptions>(builder.Configuration.GetSection(nameof(StorageOptions)));
+var storageConfiguration = builder.Configuration.GetSection(nameof(StorageOptions));
+var jwtConfiguration = builder.Configuration.GetSection(nameof(JwtOptions));
+builder.Services.AddBusinessLayer(storageConfiguration, jwtConfiguration);
 
-builder.Services.AddBusinessLayer();
-
-builder.Services.AddWebApi();
+var jwtOptions = jwtConfiguration.Get<JwtOptions>();
+builder.Services.AddWebApi(jwtOptions);
 
 var app = builder.Build();
 
@@ -52,6 +53,9 @@ app.UseCors(b =>
 app.UseResponseCaching();
 
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseMiddleware<IpAddressLoggerMiddleware>();
 app.UseMiddleware<PerformanceLoggerMiddleware>();
