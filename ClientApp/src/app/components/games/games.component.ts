@@ -142,4 +142,8 @@ export class GamesComponent implements OnInit {
     const genres = this.genres.filter(g => g.id === rootGenre.id || g.parentId === rootGenre.id);
     return genres.sort((a, b) => a.name.localeCompare(b.name));
   }
+
+  get noGamesByFilter() {
+    return (this.nameFilter || this.genresFilter.length) && !this.filteredGames.length;
+  }
 }
