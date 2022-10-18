@@ -21,7 +21,7 @@ public class StorageService : IStorageService
 
     public void CheckIfGameImageExists(string gameImageName)
     {
-        var exists = DoesFileExist(gameImageName, _storageOptions.GameImagesFolderPath);
+        var exists = FileExists(gameImageName, _storageOptions.GameImagesFolderPath);
 
         if (!exists)
         {
@@ -31,7 +31,7 @@ public class StorageService : IStorageService
 
     public async Task<string> StoreGameImageAsync(Stream fileStream, string originalFileName)
     {
-        return await StoreImage(fileStream, originalFileName, _storageOptions.GameImagesFolderPath);
+        return await StoreImageAsync(fileStream, originalFileName, _storageOptions.GameImagesFolderPath);
     }
 
     public Stream GetGameImage(string gameImageName)
@@ -42,7 +42,7 @@ public class StorageService : IStorageService
 
     public void CheckIfUserAvatarExists(string userAvatarName)
     {
-        var exists = DoesFileExist(userAvatarName, _storageOptions.UserAvatarsFolderPath);
+        var exists = FileExists(userAvatarName, _storageOptions.UserAvatarsFolderPath);
 
         if (!exists)
         {
@@ -52,10 +52,10 @@ public class StorageService : IStorageService
 
     public async Task<string> StoreUserAvatarAsync(Stream fileStream, string originalFileName)
     {
-        return await StoreImage(fileStream, originalFileName, _storageOptions.UserAvatarsFolderPath);
+        return await StoreImageAsync(fileStream, originalFileName, _storageOptions.UserAvatarsFolderPath);
     }
 
-    private static bool DoesFileExist(string fileName, string folderPath)
+    private static bool FileExists(string fileName, string folderPath)
     {
         var filePath = Path.Combine(folderPath, fileName);
         return File.Exists(filePath);
@@ -73,13 +73,13 @@ public class StorageService : IStorageService
         return new FileStream(filePath, FileMode.Open);
     }
 
-    private async Task<string> StoreImage(Stream fileStream, string originalFileName, string folderPath)
+    private async Task<string> StoreImageAsync(Stream fileStream, string originalFileName, string folderPath)
     {
         ValidateImageFileExtension(originalFileName);
 
         var fileId = Guid.NewGuid();
         var fileExtension = GetFileExtension(originalFileName);
-        var fileName = $"{fileId}{fileExtension}";
+        var fileName = $"{fileId}.{fileExtension}";
 
         var filePath = Path.Combine(folderPath, fileName);
         await using var imageFileStream = new FileStream(filePath, FileMode.Create);
@@ -90,7 +90,7 @@ public class StorageService : IStorageService
 
     private static string GetFileExtension(string fileName)
     {
-        return Path.GetExtension(fileName);
+        return Path.GetExtension(fileName)[1..];
     }
 
     private void ValidateImageFileExtension(string fileName)
