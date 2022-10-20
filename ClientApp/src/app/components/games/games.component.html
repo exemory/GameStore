@@ -41,7 +41,7 @@
         <div class="description" (click)="$event.stopPropagation()">
           <div class="buy-section">
             <p class="price">{{game.price | currency}}</p>
-            <button mat-raised-button color="primary" class="buy-button" (click)="onBuyClick($event, game)">
+            <button mat-raised-button class="buy-button" color="accent" (click)="onBuyClick($event, game)">
               <mat-icon>shopping_cart</mat-icon>
               BUY
             </button>

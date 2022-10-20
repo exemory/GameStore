@@ -32,5 +32,23 @@
         </ul>
       </nav>
     </div>
+
+    <div *ngIf="!auth.isLoggedIn" class="right-section unauthorized-section">
+      <button mat-raised-button (click)="signIn()">Sign In</button>
+      <button mat-raised-button color="accent">Sign Up</button>
+    </div>
+
+    <div *ngIf="auth.isLoggedIn" class="right-section authorized-section" [matMenuTriggerFor]="menu">
+      <span class="user-name">{{fullUserName}}</span>
+      <img class="user-avatar" [src]="userAvatarUrl" alt="avatar">
+
+      <mat-menu class="user-menu" backdropClass="custom" #menu="matMenu" xPosition="before">
+        <button mat-menu-item (click)="signOut()">
+          <mat-icon>logout</mat-icon>
+          <span>Sign out</span>
+        </button>
+      </mat-menu>
+    </div>
+
   </div>
 </div>

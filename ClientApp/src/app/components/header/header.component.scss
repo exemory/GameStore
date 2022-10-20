@@ -1,8 +1,15 @@
+@use '@angular/material' as mat;
+@use 'sass:map';
+@use '../../../light-theme.scss' as theme;
+
+$color-config: mat.get-color-config(theme.$light-theme);
+$primary-palette: map.get($color-config, 'primary');
+
 .header {
   background-color: #fff;
   height: 64px;
   margin-bottom: 50px;
-  box-shadow: 0 1px 10px 0 rgba(0,0,0,0.5);
+  box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.5);
 
   .wrapper {
     display: flex;
@@ -35,7 +42,6 @@
 
     .menu {
       display: flex;
-      width: 100%;
       align-items: center;
 
       .navigation {
@@ -64,8 +70,33 @@
         }
 
         .active-link {
-          border-bottom-color: #e63946;
+          border-bottom-color: mat.get-color-from-palette($primary-palette, 500);
         }
+      }
+    }
+
+    .right-section {
+      display: flex;
+      gap: 10px;
+      margin-left: auto;
+      align-items: center;
+    }
+
+    .unauthorized-section {
+
+    }
+
+    .authorized-section {
+      cursor: pointer;
+      padding: 5px 0;
+
+      .user-name {
+        color: #222;
+        font-size: 15px;
+      }
+
+      .user-avatar {
+        width: 40px;
       }
     }
   }
