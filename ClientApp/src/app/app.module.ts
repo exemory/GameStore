@@ -29,6 +29,7 @@ import {MatSelectModule} from "@angular/material/select";
 import {CurrencyPipe} from "@angular/common";
 import { SignInDialogComponent } from './components/sign-in-dialog/sign-in-dialog.component';
 import {MatCheckboxModule} from "@angular/material/checkbox";
+import { SignUpDialogComponent } from './components/sign-up-dialog/sign-up-dialog.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import {MatCheckboxModule} from "@angular/material/checkbox";
     CurrencyInputComponent,
     EditGameDialogComponent,
     SignInDialogComponent,
+    SignUpDialogComponent,
   ],
     imports: [
         BrowserModule,

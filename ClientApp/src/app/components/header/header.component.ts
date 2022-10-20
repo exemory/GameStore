@@ -21,6 +21,10 @@ export class HeaderComponent implements OnInit {
     this.auth.openSignInDialog();
   }
 
+  signUp() {
+    this.auth.openSignUpDialog();
+  }
+
   get userAvatarUrl() {
     return this.auth.session?.userInfo.hasAvatar ? '/api/avatar' : 'assets/default-user-avatar.png';
   }

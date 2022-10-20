@@ -6,6 +6,7 @@ import {SignInData} from "../interfaces/sign-in-data";
 import {JwtHelperService} from '@auth0/angular-jwt';
 import {MatDialog} from "@angular/material/dialog";
 import {SignInDialogComponent} from "../components/sign-in-dialog/sign-in-dialog.component";
+import {SignUpDialogComponent} from "../components/sign-up-dialog/sign-up-dialog.component";
 
 @Injectable({
   providedIn: 'root'
@@ -75,8 +76,18 @@ export class AuthService {
     return this._session;
   }
 
-  public openSignInDialog() {
-    const dialogRef = this.dialog.open(SignInDialogComponent,
+  public openSignInDialog(login?: string) {
+    this.dialog.open(SignInDialogComponent,
+      {
+        autoFocus: false,
+        maxWidth: '400px',
+        width: '100%',
+        data: login
+      });
+  }
+
+  openSignUpDialog() {
+    this.dialog.open(SignUpDialogComponent,
       {
         maxWidth: '400px',
         width: '100%'

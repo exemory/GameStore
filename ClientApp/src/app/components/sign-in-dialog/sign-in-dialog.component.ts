@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
 import {AuthService} from "../../services/auth.service";
 import {FormBuilder} from "@angular/forms";
 import {NotificationService} from "../../services/notification.service";
@@ -10,7 +10,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
   templateUrl: './sign-in-dialog.component.html',
   styleUrls: ['./sign-in-dialog.component.scss']
 })
-export class SignInDialogComponent implements OnInit {
+export class SignInDialogComponent implements OnInit, AfterViewInit {
 
   @ViewChild("login") loginField!: ElementRef;
   @ViewChild("password") passwordField!: ElementRef;
@@ -31,10 +31,14 @@ export class SignInDialogComponent implements OnInit {
               private cdr: ChangeDetectorRef,
               private dialogRef: MatDialogRef<SignInDialogComponent>,
               @Inject(MAT_DIALOG_DATA) public username?: string) {
-
   }
 
   ngOnInit(): void {
+  }
+
+  ngAfterViewInit(): void {
+    this.username ? this.passwordField.nativeElement.focus() : this.loginField.nativeElement.focus()
+    this.cdr.detectChanges();
   }
 
   onSubmit(): void {
