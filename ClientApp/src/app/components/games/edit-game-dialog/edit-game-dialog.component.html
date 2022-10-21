@@ -11,6 +11,9 @@
         <input matInput formControlName="key" required minlength="2" maxlength="20">
         <mat-error *ngIf="form.get('key')?.hasError('required')">This field is required</mat-error>
         <mat-error *ngIf="form.get('key')?.hasError('minlength')">Key must be at least 2 characters long</mat-error>
+        <mat-error *ngIf="form.get('key')?.hasError('pattern') && !form.get('key')?.hasError('minlength')">
+          Key must consist only of latin letters, numbers and dashes
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">

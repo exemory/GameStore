@@ -27,7 +27,7 @@ export class EditGameDialogComponent implements OnInit {
   readonly maxPrice = 1000;
 
   form = this.fb.group({
-    key: [''],
+    key: ['', Validators.pattern(/^[a-z0-9-]*$/i)],
     name: [''],
     price: ['', [Validators.required, Validators.min(this.minPrice), Validators.max(this.maxPrice)]],
     description: ['']

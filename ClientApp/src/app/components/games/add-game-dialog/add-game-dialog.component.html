@@ -11,6 +11,9 @@
         <input matInput formControlName="key" required minlength="2" maxlength="20">
         <mat-error *ngIf="form.get('key')?.hasError('required')">This field is required</mat-error>
         <mat-error *ngIf="form.get('key')?.hasError('minlength')">Key must be at least 2 characters long</mat-error>
+        <mat-error *ngIf="form.get('key')?.hasError('pattern') && !form.get('key')?.hasError('minlength')">
+          Key must consist only of latin letters, numbers and dashes
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -19,7 +22,8 @@
         <mat-error *ngIf="form.get('key')?.hasError('required')">This field is required</mat-error>
       </mat-form-field>
 
-      <app-currency-input [form]="form" controlName="price" label="Price" [outOfRangeError]="priceOutOfRangeError"></app-currency-input>
+      <app-currency-input [form]="form" controlName="price" label="Price"
+                          [outOfRangeError]="priceOutOfRangeError"></app-currency-input>
 
       <mat-form-field appearance="outline">
         <mat-label>Description</mat-label>
@@ -28,11 +32,12 @@
       </mat-form-field>
 
       <app-chips-input [items]="genres" (selectionChanged)="onGenreSelectionChanged($event)" nameProperty="name"
-                 label="Genres"
-                 placeholder="Add genre..."></app-chips-input>
+                       label="Genres"
+                       placeholder="Add genre..."></app-chips-input>
 
-      <app-chips-input [items]="platformTypes" (selectionChanged)="onPlatformsSelectionChanged($event)" nameProperty="type"
-                 label="Supported platforms" placeholder="Add platform..."></app-chips-input>
+      <app-chips-input [items]="platformTypes" (selectionChanged)="onPlatformsSelectionChanged($event)"
+                       nameProperty="type"
+                       label="Supported platforms" placeholder="Add platform..."></app-chips-input>
 
       <div class="upload-image-section">
         <button mat-raised-button color="primary" (click)="fileInput.value = ''; fileInput.click()"
