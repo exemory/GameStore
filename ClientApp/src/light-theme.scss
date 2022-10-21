@@ -2,14 +2,28 @@
 
 @include mat.core();
 
-$my-primary: mat.define-palette(mat.$teal-palette);
-$my-accent: mat.define-palette(mat.$lime-palette);
+$primary: mat.define-palette(mat.$teal-palette);
+$accent: mat.define-palette(mat.$lime-palette);
 
 $light-theme: mat.define-light-theme((
   color: (
-    primary: $my-primary,
-    accent: $my-accent,
+    primary: $primary,
+    accent: $accent,
   )
 ));
 
 @include mat.all-component-themes($light-theme);
+
+$warn: map-get($light-theme, warn);
+
+$red: mat.define-palette(mat.$red-palette);
+$green: mat.define-palette(mat.$green-palette);
+
+:root {
+  --color-primary: #{mat.get-color-from-palette($primary)};
+  --color-accent: #{mat.get-color-from-palette($accent)};
+  --color-warn: #{mat.get-color-from-palette($warn)};
+
+  --color-snack-bar-success: #{mat.get-color-from-palette($green, 900)};
+  --color-snack-bar-error: #{mat.get-color-from-palette($red, 900)};
+}

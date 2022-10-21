@@ -142,12 +142,8 @@
 
 .delete-menu-option {
   &, mat-icon {
-    color: #C03221 !important;
+    color: var(--color-warn) !important;
   }
-}
-
-@media screen {
-
 }
 
 @media screen and (min-width: 1292px) {

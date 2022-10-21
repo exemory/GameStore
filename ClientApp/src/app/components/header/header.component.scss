@@ -1,10 +1,3 @@
-@use '@angular/material' as mat;
-@use 'sass:map';
-@use '../../../light-theme.scss' as theme;
-
-$color-config: mat.get-color-config(theme.$light-theme);
-$primary-palette: map.get($color-config, 'primary');
-
 .header {
   background-color: #fff;
   height: 64px;
@@ -70,7 +63,7 @@ $primary-palette: map.get($color-config, 'primary');
         }
 
         .active-link {
-          border-bottom-color: mat.get-color-from-palette($primary-palette, 500);
+          border-bottom-color: var(--color-primary);
         }
       }
     }
