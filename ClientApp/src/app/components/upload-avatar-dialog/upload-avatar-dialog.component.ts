@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {MatDialogRef} from "@angular/material/dialog";
 import {NotificationService} from "../../services/notification.service";
+import {environment as env} from "../../../environments/environment"
 
 @Component({
   selector: 'app-upload-avatar-dialog',
@@ -29,10 +30,11 @@ export class UploadAvatarDialogComponent implements OnInit {
       return;
     }
 
+    const hasExtension = file.name.includes('.');
     const extension = file.name.split('.').pop();
 
-    if (extension != 'png' && extension != 'jpg' && extension != 'jpeg') {
-      this.ns.notifyError('Image format is unsupported');
+    if (!hasExtension || !extension || !env.supportedImageExtensions.includes(extension)) {
+      this.ns.notifyError('Image format is unsupported.');
       return;
     }
 

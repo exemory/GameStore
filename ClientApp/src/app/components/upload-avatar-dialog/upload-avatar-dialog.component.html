@@ -1,7 +1,8 @@
 <h2 mat-dialog-title>Upload avatar</h2>
 <div mat-dialog-content>
   <div class="upload-image-section">
-    <button mat-raised-button color="primary" (click)="fileInput.click()" [disabled]="inProgress" type="button">
+    <button mat-raised-button color="primary" (click)="fileInput.value = ''; fileInput.click()" [disabled]="inProgress"
+            type="button">
       Choose image
     </button>
     <p *ngIf="this.image" class="image-name">{{this.image.name}}</p>

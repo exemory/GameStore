@@ -35,7 +35,7 @@
                  label="Supported platforms" placeholder="Add platform..."></app-chips-input>
 
       <div class="upload-image-section">
-        <button mat-raised-button color="primary" (click)="fileInput.click()"
+        <button mat-raised-button color="primary" (click)="fileInput.value = ''; fileInput.click()"
                 [disabled]="imageUploadingInProgress || inProgress" type="button">
           Choose image
         </button>

@@ -10,6 +10,7 @@ import {Game} from "../../../interfaces/game";
 import {ImageUploadResult} from "../../../interfaces/image-upload-result";
 import {GameWithDetails} from "../../../interfaces/game-with-details";
 import {GameUpdateData} from "../../../interfaces/game-update-data";
+import {environment as env} from "../../../../environments/environment";
 
 @Component({
   selector: 'app-edit-game-dialog',
@@ -131,6 +132,14 @@ export class EditGameDialogComponent implements OnInit {
     const file = event.target.files.item(0);
 
     if (!file) {
+      return;
+    }
+
+    const hasExtension = file.name.includes('.');
+    const extension = file.name.split('.').pop();
+
+    if (!hasExtension || !extension || !env.supportedImageExtensions.includes(extension)) {
+      this.ns.notifyError('Image format is unsupported.');
       return;
     }
 

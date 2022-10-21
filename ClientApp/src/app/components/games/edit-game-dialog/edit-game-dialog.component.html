@@ -19,7 +19,8 @@
         <mat-error *ngIf="form.get('key')?.hasError('required')">This field is required</mat-error>
       </mat-form-field>
 
-      <app-currency-input [form]="form" controlName="price" label="Price" [outOfRangeError]="priceOutOfRangeError"></app-currency-input>
+      <app-currency-input [form]="form" controlName="price" label="Price"
+                          [outOfRangeError]="priceOutOfRangeError"></app-currency-input>
 
       <mat-form-field appearance="outline">
         <mat-label>Description</mat-label>
@@ -27,15 +28,17 @@
         <mat-error *ngIf="form.get('description')?.hasError('required')">This field is required</mat-error>
       </mat-form-field>
 
-      <app-chips-input [items]="genres" [selectedItems]="selectedGenres" (selectionChanged)="onGenreSelectionChanged($event)" nameProperty="name"
+      <app-chips-input [items]="genres" [selectedItems]="selectedGenres"
+                       (selectionChanged)="onGenreSelectionChanged($event)" nameProperty="name"
                        label="Genres"
                        placeholder="Add genre..."></app-chips-input>
 
-      <app-chips-input [items]="platformTypes" [selectedItems]="selectedPlatformTypes" (selectionChanged)="onPlatformsSelectionChanged($event)" nameProperty="type"
+      <app-chips-input [items]="platformTypes" [selectedItems]="selectedPlatformTypes"
+                       (selectionChanged)="onPlatformsSelectionChanged($event)" nameProperty="type"
                        label="Supported platforms" placeholder="Add platform..."></app-chips-input>
 
       <div class="upload-image-section">
-        <button mat-raised-button color="primary" (click)="fileInput.click()"
+        <button mat-raised-button color="primary" (click)="fileInput.value = ''; fileInput.click()"
                 [disabled]="imageUploadingInProgress || inProgress" type="button">
           Choose image
         </button>
@@ -46,7 +49,8 @@
   </div>
   <div mat-dialog-actions align="end">
     <button mat-stroked-button [disabled]="inProgress" [mat-dialog-close]="undefined">Cancel</button>
-    <button type="submit" form="edit-game-form" [disabled]="form.invalid || inProgress || imageUploadingInProgress" mat-raised-button
+    <button type="submit" form="edit-game-form" [disabled]="form.invalid || inProgress || imageUploadingInProgress"
+            mat-raised-button
             color="primary">
       Save
     </button>
