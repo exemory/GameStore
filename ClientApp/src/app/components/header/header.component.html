@@ -40,9 +40,13 @@
 
     <div *ngIf="auth.isLoggedIn" class="right-section authorized-section" [matMenuTriggerFor]="menu">
       <span class="user-name">{{fullUserName}}</span>
-      <img class="user-avatar" [src]="userAvatarUrl" alt="avatar">
+      <img class="user-avatar" [src]="avatarUrl" alt="avatar">
 
       <mat-menu class="user-menu" backdropClass="custom" #menu="matMenu" xPosition="before">
+        <button mat-menu-item (click)="uploadAvatar()">
+          <mat-icon>account_circle</mat-icon>
+          <span>Upload avatar</span>
+        </button>
         <button mat-menu-item (click)="signOut()">
           <mat-icon>logout</mat-icon>
           <span>Sign out</span>

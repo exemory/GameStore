@@ -21,6 +21,14 @@ export class ApiInterceptor implements HttpInterceptor {
 
     request = request.clone({url: `${env.apiUrl}${request.url}`});
 
+    if (this.auth.isLoggedIn) {
+      const token = this.auth.session?.accessToken!;
+
+      request = request.clone({
+        headers: request.headers.set('Authorization', `Bearer ${token}`)
+      });
+    }
+
     return next.handle(request).pipe(
       catchError(err => {
         if (err.status === HttpStatusCode.Unauthorized && this.auth.isLoggedIn) {

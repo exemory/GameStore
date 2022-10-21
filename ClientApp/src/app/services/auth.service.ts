@@ -77,7 +77,7 @@ export class AuthService {
   }
 
   public openSignInDialog(login?: string) {
-    this.dialog.open(SignInDialogComponent,
+    return this.dialog.open(SignInDialogComponent,
       {
         autoFocus: false,
         maxWidth: '400px',
@@ -87,7 +87,7 @@ export class AuthService {
   }
 
   openSignUpDialog() {
-    this.dialog.open(SignUpDialogComponent,
+    return this.dialog.open(SignUpDialogComponent,
       {
         maxWidth: '400px',
         width: '100%'

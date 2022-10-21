@@ -30,6 +30,7 @@ import {CurrencyPipe} from "@angular/common";
 import { SignInDialogComponent } from './components/sign-in-dialog/sign-in-dialog.component';
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import { SignUpDialogComponent } from './components/sign-up-dialog/sign-up-dialog.component';
+import { UploadAvatarDialogComponent } from './components/upload-avatar-dialog/upload-avatar-dialog.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import { SignUpDialogComponent } from './components/sign-up-dialog/sign-up-dialo
     EditGameDialogComponent,
     SignInDialogComponent,
     SignUpDialogComponent,
+    UploadAvatarDialogComponent,
   ],
     imports: [
         BrowserModule,

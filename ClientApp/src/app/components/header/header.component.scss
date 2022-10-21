@@ -97,6 +97,10 @@ $primary-palette: map.get($color-config, 'primary');
 
       .user-avatar {
         width: 40px;
+        height: 40px;
+        object-fit: cover;
+        object-position: 50% 50%;
+        border-radius: 20px;
       }
     }
   }

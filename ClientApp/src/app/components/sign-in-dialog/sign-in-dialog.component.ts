@@ -54,7 +54,7 @@ export class SignInDialogComponent implements OnInit, AfterViewInit {
     this.auth.signIn(formValue.login!, formValue.password!, formValue.remember!)
       .subscribe({
         next: () => {
-          this.dialogRef.close();
+          this.dialogRef.close(true);
         },
         error: err => {
           this.inProgress = false;
