@@ -29,6 +29,8 @@ export class GamesComponent implements OnInit {
   nameFilter = '';
   genresFilter = <Genre[]>[];
 
+  updatedGames: { [gameId: string]: number } = {};
+
   constructor(private api: HttpClient,
               private ns: NotificationService,
               private dialog: MatDialog) {
@@ -40,6 +42,9 @@ export class GamesComponent implements OnInit {
         next: ([games, genres]) => {
           this.games = games;
           this.genres = genres;
+
+          this.games.forEach(g => this.updatedGames[g.id] = new Date().getTime());
+
           this.loading = false;
         }, error: err => {
           this.ns.notifyError(`Loading data failed. ${err.error?.message ?? ''}`, true);
@@ -62,7 +67,7 @@ export class GamesComponent implements OnInit {
   }
 
   getGameImageUrl(game: Game): string {
-    return `url("${env.apiUrl}games/${game.key}/image")`;
+    return `url("${env.apiUrl}games/${game.key}/image?${this.updatedGames[game.id]}")`;
   }
 
   openAddGameDialog() {
@@ -96,6 +101,8 @@ export class GamesComponent implements OnInit {
           game.description = update.data.description;
 
           game.genres = update.genres.map(g => g.name);
+
+          this.updatedGames[game.id]++;
         }
       }
     );
