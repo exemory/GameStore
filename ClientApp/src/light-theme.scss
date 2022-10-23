@@ -24,6 +24,8 @@ $green: mat.define-palette(mat.$green-palette);
   --color-accent: #{mat.get-color-from-palette($accent)};
   --color-warn: #{mat.get-color-from-palette($warn)};
 
-  --color-snack-bar-success: #{mat.get-color-from-palette($green, 900)};
-  --color-snack-bar-error: #{mat.get-color-from-palette($red, 900)};
+  --color-snack-bar-success: #{mat.get-color-from-palette($green, 700)};
+  --color-snack-bar-error: #{mat.get-color-from-palette($red, 700)};
+
+  --color-disabled-text: #{mat.get-color-from-palette(mat.$light-theme-foreground-palette, disabled)};
 }

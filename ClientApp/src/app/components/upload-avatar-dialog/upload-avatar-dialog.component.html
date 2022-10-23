@@ -1,13 +1,24 @@
-<h2 mat-dialog-title>Upload avatar</h2>
+<h2 mat-dialog-title class="dialog-title">Upload avatar</h2>
 <div mat-dialog-content>
   <div class="upload-image-section">
-    <button mat-raised-button color="primary" (click)="fileInput.value = ''; fileInput.click()" [disabled]="inProgress"
-            type="button">
+
+    <div class="dropzone" [class.avatar-selected]="imageSrc" appDnd (fileDropped)="onFileDropped($event)">
+      <ng-container *ngIf="!imageSrc">
+        <mat-icon class="upload-file-icon">upload_file</mat-icon>
+        <p class="drop-text">Drag and drop image here</p>
+      </ng-container>
+
+      <ng-container *ngIf="imageSrc">
+        <img class="avatar-preview" [src]="imageSrc" alt="avatar preview">
+      </ng-container>
+    </div>
+
+    <button mat-raised-button color="primary" class="choose-image-button"
+            (click)="fileInput.value = ''; fileInput.click()" [disabled]="inProgress" type="button">
       Choose image
     </button>
-    <p *ngIf="this.image" class="image-name">{{this.image.name}}</p>
   </div>
-  <input hidden type="file" accept=".png, .jpg, .jpeg" (change)="handleFileInput($event)" #fileInput>
+  <input hidden type="file" accept=".png, .jpg, .jpeg" (change)="onFileSelect($event)" #fileInput>
 </div>
 
 <div mat-dialog-actions align="end">

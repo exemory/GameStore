@@ -12,6 +12,7 @@ import {environment as env} from "../../../environments/environment"
 export class UploadAvatarDialogComponent implements OnInit {
 
   image?: File;
+  imageSrc?: string | ArrayBuffer | null;
 
   inProgress = false;
 
@@ -23,9 +24,17 @@ export class UploadAvatarDialogComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  handleFileInput(event: any) {
+  onFileSelect(event: any) {
+    if (!event.target.files.length) {
+      return;
+    }
+
     const file = event.target.files.item(0) as File;
 
+    this.onFileInput(file);
+  }
+
+  onFileInput(file: File) {
     if (!file) {
       return;
     }
@@ -39,6 +48,19 @@ export class UploadAvatarDialogComponent implements OnInit {
     }
 
     this.image = file;
+
+    this.updateImagePreview();
+  }
+
+  private updateImagePreview() {
+    if (!this.image) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = e => this.imageSrc = reader.result;
+
+    reader.readAsDataURL(this.image);
   }
 
   upload() {
@@ -66,5 +88,13 @@ export class UploadAvatarDialogComponent implements OnInit {
           this.ns.notifyError(`Uploading file failed. ${err.error?.message ?? ''}`);
         }
       });
+  }
+
+  onFileDropped(fileList: FileList) {
+    if (!fileList.length) {
+      return;
+    }
+
+    this.onFileInput(fileList[0]);
   }
 }

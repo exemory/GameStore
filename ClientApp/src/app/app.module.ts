@@ -31,6 +31,7 @@ import { SignInDialogComponent } from './components/sign-in-dialog/sign-in-dialo
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import { SignUpDialogComponent } from './components/sign-up-dialog/sign-up-dialog.component';
 import { UploadAvatarDialogComponent } from './components/upload-avatar-dialog/upload-avatar-dialog.component';
+import { DndDirective } from './shared/directives/dnd.directive';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import { UploadAvatarDialogComponent } from './components/upload-avatar-dialog/u
     SignInDialogComponent,
     SignUpDialogComponent,
     UploadAvatarDialogComponent,
+    DndDirective,
   ],
     imports: [
         BrowserModule,
