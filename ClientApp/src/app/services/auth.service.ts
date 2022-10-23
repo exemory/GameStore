@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {tap} from "rxjs";
+import {BehaviorSubject, tap} from "rxjs";
 import {Session} from "../interfaces/session";
 import {SignInData} from "../interfaces/sign-in-data";
 import {JwtHelperService} from '@auth0/angular-jwt';
@@ -16,6 +16,8 @@ export class AuthService {
   private jwtHelper = new JwtHelperService();
   private _session?: Session;
 
+  isLoggedIn = new BehaviorSubject(false);
+
   constructor(private api: HttpClient,
               private dialog: MatDialog) {
     const session = this.storedSession;
@@ -30,6 +32,7 @@ export class AuthService {
     }
 
     this._session = session;
+    this.isLoggedIn.next(true);
   }
 
   public signIn(login: string, password: string, remember: boolean) {
@@ -37,6 +40,7 @@ export class AuthService {
       .pipe(
         tap(session => {
           this._session = session;
+          this.isLoggedIn.next(true);
 
           if (remember) {
             this.storeSession(session);
@@ -66,10 +70,7 @@ export class AuthService {
   public signOut() {
     this._session = undefined;
     this.removeSession();
-  }
-
-  get isLoggedIn(): boolean {
-    return !!this._session;
+    this.isLoggedIn.next(false);
   }
 
   get session(): Session | undefined {
@@ -77,7 +78,7 @@ export class AuthService {
   }
 
   public openSignInDialog(login?: string) {
-    return this.dialog.open(SignInDialogComponent,
+    this.dialog.open(SignInDialogComponent,
       {
         autoFocus: false,
         maxWidth: '400px',
@@ -87,7 +88,7 @@ export class AuthService {
   }
 
   openSignUpDialog() {
-    return this.dialog.open(SignUpDialogComponent,
+    this.dialog.open(SignUpDialogComponent,
       {
         maxWidth: '400px',
         width: '100%'

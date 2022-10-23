@@ -21,9 +21,13 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.auth.isLoggedIn) {
-      this.loadUserAvatar();
-    }
+    this.auth.isLoggedIn.subscribe({
+      next: isLoggedIn => {
+        if (isLoggedIn) {
+          this.loadUserAvatar();
+        }
+      }
+    });
   }
 
   loadUserAvatar() {
@@ -44,14 +48,7 @@ export class HeaderComponent implements OnInit {
   }
 
   signIn() {
-    this.auth.openSignInDialog()
-      .afterClosed().subscribe({
-      next: isAuthorized => {
-        if (isAuthorized) {
-          this.loadUserAvatar();
-        }
-      }
-    })
+    this.auth.openSignInDialog();
   }
 
   signUp() {

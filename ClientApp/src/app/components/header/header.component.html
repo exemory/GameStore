@@ -33,12 +33,12 @@
       </nav>
     </div>
 
-    <div *ngIf="!auth.isLoggedIn" class="right-section unauthorized-section">
+    <div *ngIf="!(auth.isLoggedIn | async)" class="right-section unauthorized-section">
       <button mat-raised-button (click)="signIn()">Sign In</button>
       <button mat-raised-button color="accent" (click)="signUp()">Sign Up</button>
     </div>
 
-    <div *ngIf="auth.isLoggedIn" class="right-section authorized-section" [matMenuTriggerFor]="menu">
+    <div *ngIf="auth.isLoggedIn | async" class="right-section authorized-section" [matMenuTriggerFor]="menu">
       <span class="user-name">{{fullUserName}}</span>
       <img class="user-avatar" [src]="avatarUrl" alt="avatar">
 

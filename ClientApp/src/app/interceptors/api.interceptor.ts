@@ -21,7 +21,7 @@ export class ApiInterceptor implements HttpInterceptor {
 
     request = request.clone({url: `${env.apiUrl}${request.url}`});
 
-    if (this.auth.isLoggedIn) {
+    if (this.auth.isLoggedIn.getValue()) {
       const token = this.auth.session?.accessToken!;
 
       request = request.clone({
@@ -31,7 +31,7 @@ export class ApiInterceptor implements HttpInterceptor {
 
     return next.handle(request).pipe(
       catchError(err => {
-        if (err.status === HttpStatusCode.Unauthorized && this.auth.isLoggedIn) {
+        if (err.status === HttpStatusCode.Unauthorized && this.auth.isLoggedIn.getValue()) {
           this.auth.signOut();
           this.ns.notifyError("Session expired, please sign in again");
           return EMPTY;
