@@ -2,8 +2,19 @@
 
 @include mat.core();
 
+$peach-palette: (
+  100: #f38472,
+  500: #d7563c,
+  700: #b63e26,
+  contrast: (
+    100: rgba(black, 0.87),
+    500: white,
+    700: white,
+  )
+);
+
 $primary: mat.define-palette(mat.$teal-palette);
-$accent: mat.define-palette(mat.$lime-palette);
+$accent: mat.define-palette($peach-palette);
 
 $light-theme: mat.define-light-theme((
   color: (
