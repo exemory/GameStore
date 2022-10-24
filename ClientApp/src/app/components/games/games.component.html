@@ -41,7 +41,7 @@
         <div class="description" (click)="$event.stopPropagation()">
           <div class="buy-section">
             <p class="price">{{game.price | currency}}</p>
-            <button mat-raised-button color="primary" class="buy-button" (click)="onBuyClick($event, game)">
+            <button mat-raised-button class="buy-button" color="accent" (click)="onBuyClick($event, game)">
               <mat-icon>shopping_cart</mat-icon>
               BUY
             </button>
@@ -67,7 +67,7 @@
         </mat-menu>
       </div>
     </div>
-    <div *ngIf="!filteredGames.length" class="no-games-matching-filter">
+    <div *ngIf="noGamesByFilter" class="no-games-matching-filter">
       <p class="no-games-text">There are no games matching the search criteria</p>
     </div>
   </ng-container>

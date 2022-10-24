@@ -11,11 +11,11 @@ body {
   color: white;
 
   &.success {
-    background-color: #2A9134;
+    background-color: var(--color-snack-bar-success);
   }
 
   &.error {
-    background-color: #C03221;
+    background-color: var(--color-snack-bar-error);
   }
 }
 

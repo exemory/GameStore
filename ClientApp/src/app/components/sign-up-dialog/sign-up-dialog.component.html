@@ -1,0 +1,74 @@
+<h2 mat-dialog-title>Sign Up</h2>
+<div mat-dialog-content>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" id="sign-up-form">
+
+    <mat-form-field appearance="outline">
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="username" maxlength="15">
+      <mat-icon matSuffix>login</mat-icon>
+      <mat-error *ngIf="form.get('username')?.hasError('required')">This field is required</mat-error>
+      <mat-error *ngIf="form.get('username')?.hasError('minlength')">
+        Username must be at least 3 characters long
+      </mat-error>
+      <mat-error
+        *ngIf="form.get('username')?.hasError('pattern') && !form.get('username')?.hasError('minlength')">
+        Username contains illegal characters
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput placeholder="mail@example.com" formControlName="email" required email>
+      <mat-icon matSuffix>alternate_email</mat-icon>
+      <mat-error *ngIf="form.get('email')?.hasError('required')">This field is required</mat-error>
+      <mat-error *ngIf="form.get('email')?.hasError('email')">Email address is invalid</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>First name</mat-label>
+      <input matInput formControlName="firstName" maxlength="50">
+      <mat-icon matSuffix>face</mat-icon>
+      <mat-error *ngIf="form.get('firstName')?.hasError('required')">This field is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Last name</mat-label>
+      <input matInput formControlName="lastName" maxlength="50">
+      <mat-icon matSuffix>face</mat-icon>
+      <mat-error *ngIf="form.get('lastName')?.hasError('required')">This field is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Password</mat-label>
+      <input matInput [type]="hidePassword ? 'password' : 'text'"
+             formControlName="password">
+      <button class="show-hide-password" type="button" mat-icon-button matSuffix
+              (click)="hidePassword = !hidePassword">
+        <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
+      <mat-error *ngIf="form.get('password')?.hasError('required')">This field is required</mat-error>
+      <mat-error *ngIf="form.get('password')?.hasError('minlength')">
+        Passord must be at least 8 characters long
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Confirm password</mat-label>
+      <input matInput [type]="hideConfirmPassword ? 'password' : 'text'"
+             formControlName="confirmPassword" [errorStateMatcher]="confirmPasswordStateMatcher">
+      <button class="show-hide-password" type="button" mat-icon-button matSuffix
+              (click)="hideConfirmPassword = !hideConfirmPassword">
+        <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
+      <mat-error *ngIf="form.hasError('passwordMismatch')">Passwords must match</mat-error>
+    </mat-form-field>
+  </form>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-stroked-button [disabled]="inProgress" [mat-dialog-close]="undefined">Cancel</button>
+  <button type="submit" form="sign-up-form" [disabled]="form.invalid || inProgress" mat-raised-button
+          color="primary">
+    Sign Up
+  </button>
+</div>

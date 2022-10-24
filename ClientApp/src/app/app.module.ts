@@ -27,6 +27,11 @@ import {CurrencyInputComponent} from "./shared/components/currency-input/currenc
 import {EditGameDialogComponent} from './components/games/edit-game-dialog/edit-game-dialog.component';
 import {MatSelectModule} from "@angular/material/select";
 import {CurrencyPipe} from "@angular/common";
+import { SignInDialogComponent } from './components/sign-in-dialog/sign-in-dialog.component';
+import {MatCheckboxModule} from "@angular/material/checkbox";
+import { SignUpDialogComponent } from './components/sign-up-dialog/sign-up-dialog.component';
+import { UploadAvatarDialogComponent } from './components/upload-avatar-dialog/upload-avatar-dialog.component';
+import { DndDirective } from './shared/directives/dnd.directive';
 
 @NgModule({
   declarations: [
@@ -38,27 +43,32 @@ import {CurrencyPipe} from "@angular/common";
     ChipsInputComponent,
     CurrencyInputComponent,
     EditGameDialogComponent,
+    SignInDialogComponent,
+    SignUpDialogComponent,
+    UploadAvatarDialogComponent,
+    DndDirective,
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    MatProgressSpinnerModule,
-    HttpClientModule,
-    MatSnackBarModule,
-    MatButtonModule,
-    MatIconModule,
-    MatMenuModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    ReactiveFormsModule,
-    MatInputModule,
-    MatChipsModule,
-    MatAutocompleteModule,
-    DragDropModule,
-    FormsModule,
-    MatSelectModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        MatProgressSpinnerModule,
+        HttpClientModule,
+        MatSnackBarModule,
+        MatButtonModule,
+        MatIconModule,
+        MatMenuModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        ReactiveFormsModule,
+        MatInputModule,
+        MatChipsModule,
+        MatAutocompleteModule,
+        DragDropModule,
+        FormsModule,
+        MatSelectModule,
+        MatCheckboxModule
+    ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true},
     CurrencyPipe

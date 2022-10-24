@@ -1,0 +1,42 @@
+﻿@use '@angular/material' as mat;
+
+@include mat.core();
+
+$peach-palette: (
+  100: #f38472,
+  500: #d7563c,
+  700: #b63e26,
+  contrast: (
+    100: rgba(black, 0.87),
+    500: white,
+    700: white,
+  )
+);
+
+$primary: mat.define-palette(mat.$teal-palette);
+$accent: mat.define-palette($peach-palette);
+
+$light-theme: mat.define-light-theme((
+  color: (
+    primary: $primary,
+    accent: $accent,
+  )
+));
+
+@include mat.all-component-themes($light-theme);
+
+$warn: map-get($light-theme, warn);
+
+$red: mat.define-palette(mat.$red-palette);
+$green: mat.define-palette(mat.$green-palette);
+
+:root {
+  --color-primary: #{mat.get-color-from-palette($primary)};
+  --color-accent: #{mat.get-color-from-palette($accent)};
+  --color-warn: #{mat.get-color-from-palette($warn)};
+
+  --color-snack-bar-success: #{mat.get-color-from-palette($green, 700)};
+  --color-snack-bar-error: #{mat.get-color-from-palette($red, 700)};
+
+  --color-disabled-text: #{mat.get-color-from-palette(mat.$light-theme-foreground-palette, disabled)};
+}

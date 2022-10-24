@@ -10,6 +10,7 @@ import {ImageUploadResult} from "../../../interfaces/image-upload-result";
 import {GameCreationData} from "../../../interfaces/game-creation-data";
 import {Game} from "../../../interfaces/game";
 import {requiredFileValidator} from "../../../shared/validators/required-file-validator";
+import {environment as env} from "../../../../environments/environment";
 
 @Component({
   selector: 'app-add-game-dialog',
@@ -26,7 +27,7 @@ export class AddGameDialogComponent implements OnInit {
   readonly maxPrice = 1000;
 
   form = this.fb.group({
-    key: [''],
+    key: ['', Validators.pattern(/^[a-z0-9-]*$/i)],
     name: [''],
     price: ['', [Validators.required, Validators.min(this.minPrice), Validators.max(this.maxPrice)]],
     description: ['']
@@ -107,6 +108,14 @@ export class AddGameDialogComponent implements OnInit {
     const file = event.target.files.item(0);
 
     if (!file) {
+      return;
+    }
+
+    const hasExtension = file.name.includes('.');
+    const extension = file.name.split('.').pop();
+
+    if (!hasExtension || !extension || !env.supportedImageExtensions.includes(extension)) {
+      this.ns.notifyError('Image format is unsupported.');
       return;
     }
 

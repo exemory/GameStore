@@ -11,7 +11,7 @@
   align-items: center;
   border-radius: 5px;
   padding: 0 20px;
-  border: 1px solid #e3e3e3;
+  border: 1px solid #ddd;
 
   .form-field {
     position: relative;
@@ -95,7 +95,6 @@
         }
 
         .buy-button {
-          background-color: #c54e35;
           width: 100px;
         }
       }
@@ -137,18 +136,14 @@
 
   .no-games-text {
     font-size: 24px;
-    color: rgb(0, 0, 0, 0.6);
+    color: var(--color-disabled-text);
   }
 }
 
 .delete-menu-option {
   &, mat-icon {
-    color: #C03221 !important;
+    color: var(--color-warn) !important;
   }
-}
-
-@media screen {
-
 }
 
 @media screen and (min-width: 1292px) {
