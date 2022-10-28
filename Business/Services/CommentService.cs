@@ -29,12 +29,7 @@ public class CommentService : ICommentService
 
     public async Task<CommentDto> CreateAsync(CommentCreationDto commentCreationDto)
     {
-        await CheckIfGameExistsAsync(commentCreationDto.GameId);
-
-        if (commentCreationDto.ParentId != null)
-        {
-            await CheckParentCommentAsync(commentCreationDto.ParentId.Value, commentCreationDto.GameId);
-        }
+        await CheckBeforeCommentCreationAsync(commentCreationDto.GameId, commentCreationDto.ParentId);
 
         var newComment = _mapper.Map<CommentCreationDto, Comment>(commentCreationDto);
         newComment.UserId = _session.UserId!.Value;
@@ -43,6 +38,16 @@ public class CommentService : ICommentService
         await _unitOfWork.SaveAsync();
 
         return _mapper.Map<CommentDto>(newComment);
+    }
+
+    private async Task CheckBeforeCommentCreationAsync(Guid gameId, Guid? parentCommentId)
+    {
+        await CheckIfGameExistsAsync(gameId);
+
+        if (parentCommentId != null)
+        {
+            await CheckParentCommentAsync(parentCommentId.Value, gameId);
+        }
     }
 
     public async Task<IEnumerable<CommentDto>> GetAllByGameKeyAsync(string gameKey)
@@ -54,6 +59,16 @@ public class CommentService : ICommentService
     }
 
     public async Task EditAsync(Guid commentId, CommentUpdateDto commentUpdateDto)
+    {
+        var comment = await GetCommentForEditingAsync(commentId);
+
+        _mapper.Map(commentUpdateDto, comment);
+
+        _unitOfWork.CommentRepository.Update(comment);
+        await _unitOfWork.SaveAsync();
+    }
+
+    private async Task<Comment> GetCommentForEditingAsync(Guid commentId)
     {
         var comment = await GetCommentByIdAsync(commentId);
 
@@ -67,13 +82,20 @@ public class CommentService : ICommentService
             throw new AccessDeniedException("You can only edit your own comments.");
         }
 
-        _mapper.Map(commentUpdateDto, comment);
+        return comment;
+    }
 
+    public async Task DeleteAsync(Guid commentId)
+    {
+        var comment = await GetCommentForDeletingAsync(commentId);
+
+        comment.Deleted = true;
+        
         _unitOfWork.CommentRepository.Update(comment);
         await _unitOfWork.SaveAsync();
     }
 
-    public async Task DeleteAsync(Guid commentId)
+    private async Task<Comment> GetCommentForDeletingAsync(Guid commentId)
     {
         var comment = await GetCommentByIdAsync(commentId);
 
@@ -87,30 +109,34 @@ public class CommentService : ICommentService
             throw new GameStoreException($"The comment with id '{commentId}' has already been deleted.");
         }
 
-        comment.Deleted = true;
-        
-        _unitOfWork.CommentRepository.Update(comment);
-        await _unitOfWork.SaveAsync();
+        return comment;
     }
 
     public async Task RestoreAsync(Guid commentId)
     {
-        var comment = await GetCommentByIdAsync(commentId);
-        
-        if (comment.UserId != _session.UserId)
-        {
-            throw new AccessDeniedException("You can only restore your own comments.");
-        }
-        
-        if (!comment.Deleted)
-        {
-            throw new GameStoreException($"The comment with id '{commentId}' is not deleted.");
-        }
+        var comment = await GetCommentForRestoringAsync(commentId);
 
         comment.Deleted = false;
         
         _unitOfWork.CommentRepository.Update(comment);
         await _unitOfWork.SaveAsync();
+    }
+
+    private async Task<Comment> GetCommentForRestoringAsync(Guid commentId)
+    {
+        var comment = await GetCommentByIdAsync(commentId);
+
+        if (comment.UserId != _session.UserId)
+        {
+            throw new AccessDeniedException("You can only restore your own comments.");
+        }
+
+        if (!comment.Deleted)
+        {
+            throw new GameStoreException($"The comment with id '{commentId}' is not deleted.");
+        }
+
+        return comment;
     }
 
     private async Task CheckIfGameExistsAsync(Guid gameId)
