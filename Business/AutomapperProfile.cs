@@ -24,6 +24,7 @@ public class AutomapperProfile : Profile
 
         CreateMap<Comment, CommentDto>();
         CreateMap<CommentCreationDto, Comment>(MemberList.Source);
+        CreateMap<CommentUpdateDto, Comment>(MemberList.Source);
 
         CreateMap<Genre, GenreDto>();
 

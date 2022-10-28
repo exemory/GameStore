@@ -12,6 +12,6 @@ public class CommentCreationDtoValidator : AbstractValidator<CommentCreationDto>
 
         RuleFor(c => c.Body)
             .NotEmpty()
-            .MaximumLength(2000);
+            .MaximumLength(600);
     }
 }
