@@ -197,7 +197,9 @@ public class CommentServiceTests
     public async Task EditAsync_ShouldEditComment()
     {
         // Arrange
-        var comment = _fixture.Create<Comment>();
+        var comment = _fixture.Build<Comment>()
+            .With(c => c.Deleted, false)
+            .Create();
         var commentUpdateDto = _fixture.Create<CommentUpdateDto>();
         var expectedCommentToUpdate = _mapper.Map(commentUpdateDto, comment.DeepClone()).ToExpectedObject();
 
@@ -236,12 +238,38 @@ public class CommentServiceTests
             u.CommentRepository.Update(It.IsAny<Comment>()), Times.Never);
         _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
     }
+    
+    [Fact]
+    public async Task EditAsync_ShouldFail_WhenCommentMarkedAsDeleted()
+    {
+        // Arrange
+        var comment = _fixture.Build<Comment>()
+            .With(c => c.Deleted, true)
+            .Create();
+        var commentUpdateDto = _fixture.Create<CommentUpdateDto>();
+
+        _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
+            .ReturnsAsync(comment);
+        _sessionMock.Setup(s => s.UserId).Returns(comment.UserId);
+
+        // Act
+        var result = () => _sut.EditAsync(comment.Id, commentUpdateDto);
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<NotFoundException>();
+
+        _unitOfWorkMock.Verify(u =>
+            u.CommentRepository.Update(It.IsAny<Comment>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
+    }
 
     [Fact]
     public async Task EditAsync_ShouldFail_WhenUserTriesToEditOtherUsersComment()
     {
         // Arrange
-        var comment = _fixture.Create<Comment>();
+        var comment = _fixture.Build<Comment>()
+            .With(c => c.Deleted, false)
+            .Create();
         var commentUpdateDto = _fixture.Create<CommentUpdateDto>();
         var userId = _fixture.Create<Guid>();
 

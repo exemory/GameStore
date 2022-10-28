@@ -57,6 +57,11 @@ public class CommentService : ICommentService
     {
         var comment = await GetCommentByIdAsync(commentId);
 
+        if (comment.Deleted)
+        {
+            ThrowCommentNotFound(commentId);
+        }
+
         if (comment.UserId != _session.UserId)
         {
             throw new AccessDeniedException("You can only edit your own comments.");
