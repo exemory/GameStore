@@ -30,7 +30,7 @@ public class AvatarService : IAvatarService
             _logger.LogError("Authorized user with id '{UserId}' does not exist", _session.UserId);
             throw new AccessDeniedException("User is not authorized.");
         }
-        
+
         var imageFileName = await _storageService.StoreUserAvatarAsync(fileStream, originalFileName);
 
         user.Avatar = imageFileName;
@@ -38,18 +38,13 @@ public class AvatarService : IAvatarService
         await _userManager.UpdateAsync(user);
     }
 
-    public async Task<(Stream FileStream, string FileName)> GetAvatarImageAsync()
+    public async Task<(Stream FileStream, string FileName)> GetAvatarImageAsync(string? username = null)
     {
-        var user = await _userManager.FindByIdAsync(_session.UserId.ToString());
-        if (user == null)
-        {
-            _logger.LogError("Authorized user with id '{UserId}' does not exist", _session.UserId);
-            throw new AccessDeniedException("User is not authorized.");
-        }
+        var user = await GetUserAsync(username);
 
         if (user.Avatar == null)
         {
-            throw new NotFoundException("User has not avatar.");
+            throw new NotFoundException("User does not have avatar.");
         }
 
         Stream fileStream;
@@ -65,5 +60,48 @@ public class AvatarService : IAvatarService
         }
 
         return (fileStream, user.Avatar);
+    }
+
+    private async Task<User> GetUserAsync(string? username)
+    {
+        if (username != null)
+        {
+            return await GetUserByUsernameAsync(username);
+        }
+
+        return await GetAuthorizedUserAsync();
+    }
+
+    private async Task<User> GetAuthorizedUserAsync()
+    {
+        if (!_session.IsAuthorized)
+        {
+            ThrowUserIsNotAuthorized();
+        }
+
+        var user = await _userManager.FindByIdAsync(_session.UserId.ToString());
+        if (user == null)
+        {
+            _logger.LogError("Authorized user with id '{UserId}' does not exist", _session.UserId);
+            ThrowUserIsNotAuthorized();
+        }
+
+        return user!;
+    }
+
+    private async Task<User> GetUserByUsernameAsync(string username)
+    {
+        var user = await _userManager.FindByNameAsync(username);
+        if (user == null)
+        {
+            throw new NotFoundException($"User with username '{username}' not found.");
+        }
+
+        return user;
+    }
+
+    private static void ThrowUserIsNotAuthorized()
+    {
+        throw new AccessDeniedException("User is not authorized.");
     }
 }
