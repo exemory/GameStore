@@ -61,3 +61,56 @@
   font-size: 16px;
   white-space: pre-wrap;
 }
+
+.comment-list {
+  list-style: none;
+
+  &.root-list {
+    padding-left: 0;
+  }
+
+  .comment {
+    padding: 5px;
+    margin: 5px 0;
+
+    .comment-info {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 10px;
+
+      .avatar {
+        width: 35px;
+        height: 35px;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+
+      .username,
+      .date {
+        margin: 0;
+      }
+
+      .date {
+        color: var(--color-disabled-text);
+        font-size: 12px;
+      }
+    }
+
+    .body {
+      margin: 0 0 5px;
+    }
+
+    &.root-comment {
+      margin: 25px 0;
+    }
+
+    &.root-has-children {
+      margin-bottom: 5px;
+    }
+
+    .link-button {
+      margin-left: -3px;
+    }
+  }
+}
