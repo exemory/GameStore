@@ -105,12 +105,13 @@ public class AvatarServiceTests
     }
 
     [Fact]
-    public async Task GetAvatarImageAsync_ShouldReturnAvatarImage()
+    public async Task GetAvatarImageAsync_ShouldReturnAvatarImage_WhenUsernameIsNotSpecified()
     {
         // Arrange
         var user = _fixture.Create<User>();
         var fileStream = new MemoryStream();
 
+        _session.IsAuthorized.Returns(true);
         _session.UserId.Returns(user.Id);
         _userManager.FindByIdAsync(user.Id.ToString()).Returns(user);
         _storageService.GetUserAvatar(user.Avatar!).Returns(fileStream);
@@ -126,11 +127,62 @@ public class AvatarServiceTests
     }
 
     [Fact]
-    public async Task GetAvatarImageAsync_ShouldFail_WhenUserDoesNotExist()
+    public async Task GetAvatarImageAsync_ShouldReturnAvatarImage_WhenUsernameIsSpecified()
+    {
+        // Arrange
+        var user = _fixture.Create<User>();
+        var fileStream = new MemoryStream();
+
+        _userManager.FindByNameAsync(user.UserName).Returns(user);
+        _storageService.GetUserAvatar(user.Avatar!).Returns(fileStream);
+
+        // Act
+        var result = await _sut.GetAvatarImageAsync(user.UserName);
+
+        // Assert
+        result.FileName.Should().Be(user.Avatar);
+        result.FileStream.Should().BeSameAs(fileStream);
+
+        _storageService.Received(1).GetUserAvatar(user.Avatar!);
+    }
+
+    [Fact]
+    public async Task GetUserAsync_ShouldFail_WhenUserDoesNotExist()
+    {
+        // Arrange
+        var nonexistentUsername = _fixture.Create<string>();
+        var expectedExceptionMessage = $"User with username '{nonexistentUsername}' not found.";
+
+        _userManager.FindByNameAsync(nonexistentUsername).ReturnsNull();
+
+        // Act
+        Func<Task> result = async () => await _sut.GetAvatarImageAsync(nonexistentUsername);
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<NotFoundException>()
+            .WithMessage(expectedExceptionMessage);
+    }
+
+    [Fact]
+    public async Task GetAvatarImageAsync_ShouldFail_WhenUserIsNotAuthorized()
+    {
+        // Arrange
+        _session.IsAuthorized.Returns(false);
+
+        // Act
+        Func<Task> result = async () => await _sut.GetAvatarImageAsync();
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<AccessDeniedException>();
+    }
+
+    [Fact]
+    public async Task GetAvatarImageAsync_ShouldFail_WhenAuthorizedUserDoesNotExist()
     {
         // Arrange
         var nonexistentUserId = _fixture.Create<Guid>();
 
+        _session.IsAuthorized.Returns(true);
         _session.UserId.Returns(nonexistentUserId);
         _userManager.FindByIdAsync(nonexistentUserId.ToString()).ReturnsNull();
 
@@ -148,8 +200,9 @@ public class AvatarServiceTests
         var user = _fixture.Build<User>()
             .Without(u => u.Avatar)
             .Create();
-        const string expectedExceptionMessage = "User has not avatar.";
+        const string expectedExceptionMessage = "User does not have avatar.";
 
+        _session.IsAuthorized.Returns(true);
         _session.UserId.Returns(user.Id);
         _userManager.FindByIdAsync(user.Id.ToString()).Returns(user);
 
@@ -162,12 +215,13 @@ public class AvatarServiceTests
     }
 
     [Fact]
-    public async Task GetAvatarImage_ShouldFail_UserAvatarImageNotFound()
+    public async Task GetAvatarImage_ShouldFail_WhenUserAvatarImageNotFound()
     {
         // Arrange
         var user = _fixture.Create<User>();
         const string expectedExceptionMessage = "User's avatar not found.";
 
+        _session.IsAuthorized.Returns(true);
         _session.UserId.Returns(user.Id);
         _userManager.FindByIdAsync(user.Id.ToString()).Returns(user);
         _storageService.GetUserAvatar(user.Avatar!).Throws<NotFoundException>();
