@@ -9,6 +9,8 @@ using Data.Interfaces;
 using ExpectedObjects;
 using FluentAssertions;
 using Force.DeepCloner;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -22,12 +24,16 @@ public class CommentServiceTests
     private readonly Fixture _fixture = new();
     private readonly IMapper _mapper = UnitTestHelper.CreateMapper();
     private readonly Mock<ISession> _sessionMock = new();
+    private readonly Mock<UserManager<User>> _userManagerMock =
+            new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
+    private readonly Mock<ILogger<CommentService>> _loggerMock = new();
 
     public CommentServiceTests()
     {
-        _sut = new CommentService(_unitOfWorkMock.Object, _mapper, _sessionMock.Object);
         _fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
         _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+        
+        _sut = new CommentService(_unitOfWorkMock.Object, _mapper, _sessionMock.Object, _userManagerMock.Object, _loggerMock.Object);
     }
 
     [Fact]
@@ -37,16 +43,18 @@ public class CommentServiceTests
         var commentCreationDto = _fixture.Build<CommentCreationDto>()
             .Without(c => c.ParentId)
             .Create();
-        var userId = _fixture.Create<Guid>();
+        var user = _fixture.Create<User>();
         var mappedComment = _mapper.Map<Comment>(commentCreationDto);
-        mappedComment.UserId = userId;
+        mappedComment.User = user;
         var expectedToCreate = mappedComment.ToExpectedObject();
         var expected = _mapper.Map<CommentDto>(mappedComment);
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByIdAsync(commentCreationDto.GameId))
             .ReturnsAsync(_fixture.Create<Game>());
         _unitOfWorkMock.Setup(u => u.CommentRepository.Add(It.IsAny<Comment>()));
-        _sessionMock.Setup(s => s.UserId).Returns(userId);
+        _sessionMock.Setup(s => s.UserId).Returns(user.Id);
+        _userManagerMock.Setup(u => u.FindByIdAsync(user.Id.ToString()))
+            .ReturnsAsync(user.DeepClone());
 
         // Act
         var result = await _sut.CreateAsync(commentCreationDto);
@@ -67,9 +75,9 @@ public class CommentServiceTests
         var parentComment = _fixture.Build<Comment>()
             .With(c => c.GameId, commentCreationDto.GameId)
             .Create();
-        var userId = _fixture.Create<Guid>();
+        var user = _fixture.Create<User>();
         var mappedComment = _mapper.Map<Comment>(commentCreationDto);
-        mappedComment.UserId = userId;
+        mappedComment.User = user;
         var expectedToCreate = mappedComment.ToExpectedObject();
         var expected = _mapper.Map<CommentDto>(mappedComment);
 
@@ -77,7 +85,9 @@ public class CommentServiceTests
             .ReturnsAsync(_fixture.Create<Game>());
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(commentCreationDto.ParentId!.Value))
             .ReturnsAsync(parentComment);
-        _sessionMock.Setup(s => s.UserId).Returns(userId);
+        _sessionMock.Setup(s => s.UserId).Returns(user.Id);
+        _userManagerMock.Setup(u => u.FindByIdAsync(user.Id.ToString()))
+            .ReturnsAsync(user.DeepClone());
 
         // Act
         var result = await _sut.CreateAsync(commentCreationDto);
@@ -150,6 +160,30 @@ public class CommentServiceTests
 
         // Assert
         await result.Should().ThrowExactlyAsync<GameStoreException>();
+
+        _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.IsAny<Comment>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
+    }
+    
+    [Fact]
+    public async Task CreateAsync_ShouldFail_WhenAuthorizedUserNotFound()
+    {
+        // Arrange
+        var game = _fixture.Create<Game>();
+        var commentCreationDto = _fixture.Build<CommentCreationDto>()
+            .Without(c => c.ParentId)
+            .Create();
+        var nonexistentUserId = _fixture.Create<Guid>();
+
+        _unitOfWorkMock.Setup(u => u.GameRepository.GetByIdAsync(commentCreationDto.GameId))
+            .ReturnsAsync(game);
+        _sessionMock.Setup(s => s.UserId).Returns(nonexistentUserId);
+
+        // Act
+        Func<Task> result = async () => await _sut.CreateAsync(commentCreationDto);
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<AccessDeniedException>();
 
         _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.IsAny<Comment>()), Times.Never);
         _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);

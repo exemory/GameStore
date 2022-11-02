@@ -19,6 +19,7 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
     {
         return await Entities.Include(c => c.User)
             .Where(c => c.Game.Key == gameKey && !c.Deleted)
+            .OrderByDescending(c => c.CreationDate)
             .ToListAsync();
     }
 }

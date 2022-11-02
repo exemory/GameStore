@@ -23,6 +23,9 @@ public interface ICommentService
     /// <exception cref="GameStoreException">
     /// Thrown when parent comment does not belong to the specified game
     /// </exception>
+    /// <exception cref="AccessDeniedException">
+    /// Thrown when the authorized user not found
+    /// </exception>
     public Task<CommentDto> CreateAsync(CommentCreationDto commentCreationDto);
 
     /// <summary>

@@ -4,6 +4,8 @@ using Business.Exceptions;
 using Business.Interfaces;
 using Data.Entities;
 using Data.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace Business.Services;
 
@@ -13,6 +15,8 @@ public class CommentService : ICommentService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly ISession _session;
+    private readonly UserManager<User> _userManager;
+    private readonly ILogger<CommentService> _logger;
 
     /// <summary>
     /// Constructor for initializing a <see cref="CommentService"/> class instance
@@ -20,19 +24,26 @@ public class CommentService : ICommentService
     /// <param name="unitOfWork">Unit of work</param>
     /// <param name="mapper">Mapper</param>
     /// <param name="session">Current user's session</param>
-    public CommentService(IUnitOfWork unitOfWork, IMapper mapper, ISession session)
+    /// <param name="userManager">Identity user manager</param>
+    /// <param name="logger">Logger</param>
+    public CommentService(IUnitOfWork unitOfWork, IMapper mapper, ISession session, UserManager<User> userManager,
+        ILogger<CommentService> logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _session = session;
+        _userManager = userManager;
+        _logger = logger;
     }
 
     public async Task<CommentDto> CreateAsync(CommentCreationDto commentCreationDto)
     {
         await CheckBeforeCommentCreationAsync(commentCreationDto.GameId, commentCreationDto.ParentId);
 
+        var user = await GetAuthorizedUserAsync();
+
         var newComment = _mapper.Map<CommentCreationDto, Comment>(commentCreationDto);
-        newComment.UserId = _session.UserId!.Value;
+        newComment.User = user;
 
         _unitOfWork.CommentRepository.Add(newComment);
         await _unitOfWork.SaveAsync();
@@ -48,6 +59,19 @@ public class CommentService : ICommentService
         {
             await CheckParentCommentAsync(parentCommentId.Value, gameId);
         }
+    }
+
+    private async Task<User> GetAuthorizedUserAsync()
+    {
+        var user = await _userManager.FindByIdAsync(_session.UserId.ToString());
+
+        if (user == null)
+        {
+            _logger.LogError("Authorized user with id '{UserId}' does not exist", _session.UserId);
+            throw new AccessDeniedException("User is not authorized.");
+        }
+
+        return user;
     }
 
     public async Task<IEnumerable<CommentDto>> GetAllByGameKeyAsync(string gameKey)
@@ -90,7 +114,7 @@ public class CommentService : ICommentService
         var comment = await GetCommentForDeletingAsync(commentId);
 
         comment.Deleted = true;
-        
+
         _unitOfWork.CommentRepository.Update(comment);
         await _unitOfWork.SaveAsync();
     }
@@ -117,7 +141,7 @@ public class CommentService : ICommentService
         var comment = await GetCommentForRestoringAsync(commentId);
 
         comment.Deleted = false;
-        
+
         _unitOfWork.CommentRepository.Update(comment);
         await _unitOfWork.SaveAsync();
     }

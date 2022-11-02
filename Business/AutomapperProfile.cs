@@ -35,7 +35,8 @@ public class AutomapperProfile : Profile
             .ForMember(u => u.HasAvatar, o => o.MapFrom(u => u.Avatar != null))
             .ForMember(u => u.UserRoles, o => o.Ignore());
 
-        CreateMap<User, CommentUserInfoDto>();
+        CreateMap<User, CommentUserInfoDto>()
+            .ForMember(u => u.HasAvatar, o => o.MapFrom(u => u.Avatar != null));
 
         CreateMap<SignUpDto, User>(MemberList.Source)
             .ForSourceMember(d => d.Password, o => o.DoNotValidate());

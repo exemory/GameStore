@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Business.Services;
 
+/// <inheritdoc />
 public class AvatarService : IAvatarService
 {
     private readonly IStorageService _storageService;
@@ -13,6 +14,13 @@ public class AvatarService : IAvatarService
     private readonly ISession _session;
     private readonly ILogger<AvatarService> _logger;
 
+    /// <summary>
+    /// Constructor for initializing a <see cref="AvatarService"/> class instance
+    /// </summary>
+    /// <param name="storageService">Storage service</param>
+    /// <param name="userManager">Identity user manager</param>
+    /// <param name="session">Current user's session</param>
+    /// <param name="logger">Logger</param>
     public AvatarService(IStorageService storageService, UserManager<User> userManager, ISession session,
         ILogger<AvatarService> logger)
     {
