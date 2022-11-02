@@ -29,6 +29,19 @@
 
     <hr class="divider">
 
+    <div class="create-comment-section">
+      <form class="create-comment-form" [formGroup]="createCommentForm" (ngSubmit)="createCommentSubmit()">
+        <mat-form-field class="body-field" appearance="outline">
+          <mat-label>Comment</mat-label>
+          <textarea formControlName="body" matInput maxlength="600" #content></textarea>
+        </mat-form-field>
+
+        <button class="send-button" type="submit" [disabled]="sendingComment || !content.value.trim()" mat-raised-button color="primary">
+          Send
+        </button>
+      </form>
+    </div>
+
     <ul class="comment-list root-list">
       <ng-container *ngTemplateOutlet="commentList; context:{ $implicit: rootComments }"></ng-container>
     </ul>

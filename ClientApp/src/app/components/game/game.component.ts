@@ -8,6 +8,8 @@ import {environment as env} from "../../../environments/environment";
 import {Comment} from "../../interfaces/comment";
 import {forkJoin} from "rxjs";
 import {timeSince} from "../../shared/helpers/timeSince";
+import {FormBuilder, Validators} from "@angular/forms";
+import {CommentCreationData} from "../../interfaces/comment-creation-data";
 
 @Component({
   selector: 'app-game',
@@ -19,12 +21,18 @@ export class GameComponent implements OnInit {
   loading = true;
   loadingError = false;
   game!: GameWithDetails;
-  comments!: Comment[]
+  comments!: Comment[];
+
+  sendingComment = false;
+  createCommentForm = this.fb.group({
+    body: ['', [Validators.max(600)]]
+  });
 
   constructor(private route: ActivatedRoute,
               private api: HttpClient,
               private ns: NotificationService,
-              private router: Router) {
+              private router: Router,
+              private fb: FormBuilder) {
   }
 
   ngOnInit(): void {
@@ -41,6 +49,7 @@ export class GameComponent implements OnInit {
         next: ([game, comments]) => {
           this.game = game;
           this.comments = comments
+          console.log(comments);
           this.loading = false;
         },
         error: err => {
@@ -85,7 +94,7 @@ export class GameComponent implements OnInit {
 
   }
 
-  timeSince(comment: Comment){
+  timeSince(comment: Comment) {
     return timeSince(comment.creationDate);
   }
 
@@ -94,6 +103,36 @@ export class GameComponent implements OnInit {
   }
 
   getCommentUserAvatarUrl(comment: Comment) {
-    return `${env.apiUrl}avatar?username=${comment.userInfo.username}`;
+    return comment.userInfo.hasAvatar ? `${env.apiUrl}avatar?username=${comment.userInfo.username}` :
+      'assets/default-user-avatar.png';
+  }
+
+  createCommentSubmit() {
+    if (this.createCommentForm.invalid) {
+      return;
+    }
+
+    const formValue = this.createCommentForm.value;
+
+    if (!formValue.body?.trim()) {
+      return;
+    }
+
+    const data: CommentCreationData = {
+      gameId: this.game.id,
+      body: formValue.body?.trim()
+    }
+
+    this.api.post<Comment>('comments', data)
+      .subscribe({
+        next: comment => {
+          this.comments.unshift(comment);
+          this.createCommentForm.reset();
+          this.ns.notifySuccess('Comment has been added.');
+        },
+        error: err => {
+          this.ns.notifyError(`Operation failed. ${err.error?.message ?? ''}`);
+        }
+      })
   }
 }
