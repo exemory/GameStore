@@ -32,6 +32,7 @@ import {MatCheckboxModule} from "@angular/material/checkbox";
 import { SignUpDialogComponent } from './components/sign-up-dialog/sign-up-dialog.component';
 import { UploadAvatarDialogComponent } from './components/upload-avatar-dialog/upload-avatar-dialog.component';
 import { DndDirective } from './shared/directives/dnd.directive';
+import { TimeSincePipe } from './shared/pipes/time-since.pipe';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { DndDirective } from './shared/directives/dnd.directive';
     SignUpDialogComponent,
     UploadAvatarDialogComponent,
     DndDirective,
+    TimeSincePipe,
   ],
     imports: [
         BrowserModule,

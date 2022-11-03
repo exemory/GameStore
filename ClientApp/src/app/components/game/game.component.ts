@@ -7,7 +7,6 @@ import {Game} from "../../interfaces/game";
 import {environment as env} from "../../../environments/environment";
 import {Comment} from "../../interfaces/comment";
 import {forkJoin} from "rxjs";
-import {timeSince} from "../../shared/helpers/timeSince";
 import {FormBuilder, Validators} from "@angular/forms";
 import {CommentCreationData} from "../../interfaces/comment-creation-data";
 import {AuthService} from "../../services/auth.service";
@@ -103,10 +102,6 @@ export class GameComponent implements OnInit {
 
   reply(comment: Comment) {
 
-  }
-
-  timeSince(comment: Comment) {
-    return timeSince(comment.creationDate);
   }
 
   getFullUserNameFromComment(comment: Comment) {

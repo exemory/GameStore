@@ -66,7 +66,7 @@
     <div class="comment-info">
       <img class="avatar" [src]="getCommentUserAvatarUrl(comment)" alt="user avatar">
       <p class="username">{{getFullUserNameFromComment(comment)}}</p>
-      <p class="date">{{timeSince(comment)}}</p>
+      <p class="date">{{comment.creationDate | timeSince}}</p>
       <button class="actions-button" *ngIf="isCurrentUserAuthorIfComment(comment) && comment !== editingComment"
               mat-icon-button
               [class.visible]="menuTrigger.menuOpen"
