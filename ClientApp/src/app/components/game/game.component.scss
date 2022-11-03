@@ -126,6 +126,8 @@
 
     .body {
       margin: 0 0 5px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
     }
 
     &.root-comment {
@@ -153,6 +155,17 @@
 
       .avatar {
         filter: grayscale(100%);
+      }
+    }
+
+    .edit-comment-form {
+      display: flex;
+      flex-direction: column;
+
+      .buttons-container {
+        align-self: flex-end;
+        display: flex;
+        gap: 10px;
       }
     }
   }

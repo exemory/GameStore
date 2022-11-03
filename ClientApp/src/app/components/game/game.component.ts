@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {HttpClient, HttpStatusCode} from "@angular/common/http";
 import {GameWithDetails} from "../../interfaces/game-with-details";
@@ -11,6 +11,7 @@ import {timeSince} from "../../shared/helpers/timeSince";
 import {FormBuilder, Validators} from "@angular/forms";
 import {CommentCreationData} from "../../interfaces/comment-creation-data";
 import {AuthService} from "../../services/auth.service";
+import {CommentUpdateData} from "../../interfaces/comment-update-data";
 
 @Component({
   selector: 'app-game',
@@ -18,6 +19,8 @@ import {AuthService} from "../../services/auth.service";
   styleUrls: ['./game.component.scss']
 })
 export class GameComponent implements OnInit {
+
+  @ViewChild('editBody') editCommentBody!: ElementRef;
 
   loading = true;
   loadingError = false;
@@ -27,8 +30,14 @@ export class GameComponent implements OnInit {
 
   sendingComment = false;
   createCommentForm = this.fb.group({
-    body: ['', [Validators.max(600)]]
+    body: ['', Validators.maxLength(600)]
   });
+
+  editingComment?: Comment;
+  editCommentForm = this.fb.group({
+    body: ['', Validators.maxLength(600)]
+  });
+  savingComment = false;
 
   constructor(private route: ActivatedRoute,
               private api: HttpClient,
@@ -179,6 +188,46 @@ export class GameComponent implements OnInit {
   }
 
   editComment(comment: Comment) {
-    console.log(comment)
+    this.editCommentForm.patchValue({
+      body: comment.body
+    });
+    this.editingComment = comment;
+
+    setTimeout(() => this.editCommentBody.nativeElement.focus());
+  }
+
+  cancelCommentEditing() {
+    this.editingComment = undefined;
+  }
+
+  saveEditedComment() {
+    if (this.editCommentForm.invalid || !this.editingComment) {
+      return;
+    }
+
+    const formValue = this.editCommentForm.value;
+
+    if (!formValue.body?.trim()) {
+      return;
+    }
+
+    const data: CommentUpdateData = {
+      body: formValue.body?.trim()
+    }
+
+    this.savingComment = true;
+
+    this.api.put<Comment>(`comments/${this.editingComment!.id}`, data)
+      .subscribe({
+        next: () => {
+          this.editingComment!.body = data.body;
+          this.cancelCommentEditing();
+          this.savingComment = false;
+        },
+        error: err => {
+          this.savingComment = false;
+          this.ns.notifyError(`Operation failed. ${err.error?.message ?? ''}`);
+        }
+      });
   }
 }
