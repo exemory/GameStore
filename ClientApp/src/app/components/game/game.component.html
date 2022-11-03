@@ -36,7 +36,8 @@
           <textarea formControlName="body" matInput maxlength="600" #content></textarea>
         </mat-form-field>
 
-        <button class="send-button" type="submit" [disabled]="sendingComment || !content.value.trim()" mat-raised-button color="primary">
+        <button class="send-button" type="submit" [disabled]="sendingComment || !content.value.trim()" mat-raised-button
+                color="primary">
           Send
         </button>
       </form>
@@ -59,13 +60,43 @@
 
 <ng-template #commentTemplate let-comment>
   <div class="comment"
-       [ngClass]="{'root-comment': comment.parentId === null, 'root-has-children': rootAndHasChildren(comment)}">
+       [ngClass]="{'root-comment': comment.parentId === null,
+       'root-has-children': rootAndHasChildren(comment),
+       'deleted': isCommentDeleted(comment)}">
     <div class="comment-info">
       <img class="avatar" [src]="getCommentUserAvatarUrl(comment)" alt="user avatar">
       <p class="username">{{getFullUserNameFromComment(comment)}}</p>
       <p class="date">{{timeSince(comment)}}</p>
+      <button class="actions-button" *ngIf="isCurrentUserAuthorIfComment(comment)" mat-icon-button
+              [class.visible]="menuTrigger.menuOpen"
+              [matMenuTriggerFor]="commentActionsMenu" [matMenuTriggerData]="{$implicit: comment}"
+              #menuTrigger="matMenuTrigger" (click)="$event.stopPropagation()">
+        <mat-icon>more_horiz</mat-icon>
+      </button>
     </div>
     <p class="body">{{comment.body}}</p>
-    <button class="link-button" (click)="reply(comment)">Reply</button>
+    <button class="link-button reply-button" (click)="reply(comment)">Reply</button>
   </div>
 </ng-template>
+
+<mat-menu #commentActionsMenu="matMenu" class="thread-action-menu" xPosition="before">
+  <ng-template matMenuContent let-comment>
+    <ng-container *ngIf="!isCommentDeleted(comment) else deletedCommentActions">
+      <button mat-menu-item (click)="editComment(comment)">
+        <mat-icon>edit</mat-icon>
+        <span>Edit</span>
+      </button>
+      <button mat-menu-item class="delete-menu-option" (click)="deleteComment(comment)">
+        <mat-icon>delete</mat-icon>
+        <span>Delete</span>
+      </button>
+    </ng-container>
+
+    <ng-template #deletedCommentActions>
+      <button mat-menu-item (click)="restoreComment(comment)">
+        <mat-icon>restore</mat-icon>
+        <span>Restore</span>
+      </button>
+    </ng-template>
+  </ng-template>
+</mat-menu>

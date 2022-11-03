@@ -140,12 +140,6 @@
   }
 }
 
-.delete-menu-option {
-  &, mat-icon {
-    color: var(--color-warn) !important;
-  }
-}
-
 @media screen and (min-width: 1292px) {
   .game-list {
     .game:nth-child(9n + 1),

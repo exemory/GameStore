@@ -40,3 +40,9 @@ mat-error {
     text-decoration: underline;
   }
 }
+
+.delete-menu-option {
+  &, mat-icon {
+    color: var(--color-warn) !important;
+  }
+}

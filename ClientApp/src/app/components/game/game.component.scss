@@ -94,6 +94,7 @@
       align-items: center;
       margin-bottom: 10px;
       gap: 10px;
+      min-height: 40px;
 
       .avatar {
         width: 35px;
@@ -111,6 +112,16 @@
         color: var(--color-disabled-text);
         font-size: 12px;
       }
+
+      .actions-button {
+        display: none;
+        color: var(--color-disabled-text);
+        margin-left: auto;
+
+        &.visible {
+          display: block;
+        }
+      }
     }
 
     .body {
@@ -125,8 +136,24 @@
       margin-bottom: 5px;
     }
 
-    .link-button {
+    .reply-button {
       margin-left: -3px;
+    }
+
+    &:hover .actions-button {
+      display: block !important;
+    }
+
+    &.deleted {
+      color: var(--color-disabled-text);
+
+      .reply-button {
+        display: none;
+      }
+
+      .avatar {
+        filter: grayscale(100%);
+      }
     }
   }
 }
