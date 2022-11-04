@@ -19,7 +19,8 @@ import {CommentUpdateData} from "../../interfaces/comment-update-data";
 })
 export class GameComponent implements OnInit {
 
-  @ViewChild('editBody') editCommentBody!: ElementRef;
+  @ViewChild('editCommentBody') editCommentBody!: ElementRef;
+  @ViewChild('replyCommentBody') replyCommentBody!: ElementRef;
 
   loading = true;
   loadingError = false;
@@ -37,6 +38,12 @@ export class GameComponent implements OnInit {
     body: ['', Validators.maxLength(600)]
   });
   savingComment = false;
+
+  replyingComment?: Comment;
+  replyCommentForm = this.fb.group({
+    body: ['', Validators.maxLength(600)]
+  });
+  sendingReplyComment = false;
 
   constructor(private route: ActivatedRoute,
               private api: HttpClient,
@@ -100,10 +107,6 @@ export class GameComponent implements OnInit {
     return comment.parentId === null && this.getChildren(comment).length;
   }
 
-  reply(comment: Comment) {
-
-  }
-
   getFullUserNameFromComment(comment: Comment) {
     return `${comment.userInfo.firstName} ${comment.userInfo.lastName}`;
   }
@@ -156,6 +159,14 @@ export class GameComponent implements OnInit {
   }
 
   deleteComment(comment: Comment) {
+    if (this.isCommentEditing(comment)) {
+      this.cancelCommentEditing();
+    }
+
+    if (this.isCommentReplying(comment)) {
+      this.cancelCommentReply();
+    }
+
     this.api.delete(`comments/${comment.id}`)
       .subscribe({
         next: () => {
@@ -183,6 +194,7 @@ export class GameComponent implements OnInit {
   }
 
   editComment(comment: Comment) {
+    this.cancelCommentReply();
     this.editCommentForm.patchValue({
       body: comment.body
     });
@@ -193,6 +205,26 @@ export class GameComponent implements OnInit {
 
   cancelCommentEditing() {
     this.editingComment = undefined;
+  }
+
+  replyComment(comment: Comment) {
+    this.cancelCommentEditing();
+    this.replyingComment = comment;
+
+    setTimeout(() => this.replyCommentBody.nativeElement.focus());
+  }
+
+  cancelCommentReply() {
+    this.replyCommentForm.reset();
+    this.replyingComment = undefined;
+  }
+
+  isCommentEditing(comment: Comment) {
+    return comment === this.editingComment;
+  }
+
+  isCommentReplying(comment: Comment) {
+    return comment === this.replyingComment;
   }
 
   saveEditedComment() {
@@ -221,6 +253,41 @@ export class GameComponent implements OnInit {
         },
         error: err => {
           this.savingComment = false;
+          this.ns.notifyError(`Operation failed. ${err.error?.message ?? ''}`);
+        }
+      });
+  }
+
+  postReplyComment(comment: Comment) {
+    if (this.replyCommentForm.invalid) {
+      return;
+    }
+
+    const formValue = this.replyCommentForm.value;
+
+    if (!formValue.body?.trim()) {
+      return;
+    }
+
+    const data: CommentCreationData = {
+      gameId: this.game.id,
+      body: formValue.body?.trim(),
+      parentId: comment.id
+    }
+
+    this.sendingReplyComment = true;
+
+    this.api.post<Comment>('comments', data)
+      .subscribe({
+        next: comment => {
+          this.comments.unshift(comment);
+          this.cancelCommentReply();
+          this.sendingReplyComment = false;
+
+          this.ns.notifySuccess('Comment has been added.');
+        },
+        error: err => {
+          this.sendingReplyComment = false;
           this.ns.notifyError(`Operation failed. ${err.error?.message ?? ''}`);
         }
       });

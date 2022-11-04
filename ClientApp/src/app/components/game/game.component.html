@@ -38,7 +38,7 @@
 
         <button class="send-button" type="submit" [disabled]="sendingComment || !content.value.trim()" mat-raised-button
                 color="primary">
-          Send
+          Post
         </button>
       </form>
     </div>
@@ -67,7 +67,8 @@
       <img class="avatar" [src]="getCommentUserAvatarUrl(comment)" alt="user avatar">
       <p class="username">{{getFullUserNameFromComment(comment)}}</p>
       <p class="date">{{comment.creationDate | timeSince}}</p>
-      <button class="actions-button" *ngIf="isCurrentUserAuthorIfComment(comment) && comment !== editingComment"
+      <button class="actions-button"
+              *ngIf="isCurrentUserAuthorIfComment(comment)"
               mat-icon-button
               [class.visible]="menuTrigger.menuOpen"
               [matMenuTriggerFor]="commentActionsMenu" [matMenuTriggerData]="{$implicit: comment}"
@@ -75,24 +76,24 @@
         <mat-icon>more_horiz</mat-icon>
       </button>
     </div>
-    <ng-container *ngIf="comment !== editingComment else editComment">
-
+    <ng-container *ngIf="!isCommentEditing(comment) else editCommentTemplate">
       <p class="body">{{comment.body}}</p>
-      <button class="link-button reply-button" (click)="reply(comment)">Reply</button>
+      <button *ngIf="!isCommentReplying(comment)" class="link-button reply-button" (click)="replyComment(comment)">Reply
+      </button>
     </ng-container>
-    <ng-template #editComment>
+    <ng-template #editCommentTemplate>
       <form class="edit-comment-form" [formGroup]="editCommentForm" (ngSubmit)="saveEditedComment()">
         <mat-form-field class="body-field" appearance="outline">
           <mat-label>Comment</mat-label>
           <textarea formControlName="body" matInput maxlength="600" rows="6" (keydown.escape)="cancelCommentEditing()"
-                    #editBody></textarea>
+                    #editCommentBody></textarea>
         </mat-form-field>
 
         <div class="buttons-container">
-          <button class="cancel-edit-button" type="button" mat-raised-button (click)="cancelCommentEditing()">
+          <button type="button" mat-raised-button (click)="cancelCommentEditing()">
             Cancel
           </button>
-          <button class="save-edited-comment-button" type="submit" [disabled]="savingComment || !editBody.value.trim()"
+          <button type="submit" [disabled]="savingComment || !editCommentBody.value.trim()"
                   mat-raised-button
                   color="primary">
             Save
@@ -100,6 +101,26 @@
         </div>
       </form>
     </ng-template>
+    <ng-container *ngIf="isCommentReplying(comment)">
+      <form class="reply-comment-form" [formGroup]="replyCommentForm" (ngSubmit)="postReplyComment(comment)">
+        <mat-form-field class="body-field" appearance="outline">
+          <mat-label>Reply</mat-label>
+          <textarea formControlName="body" matInput maxlength="600" rows="6" (keydown.escape)="cancelCommentReply()"
+                    #replyCommentBody></textarea>
+        </mat-form-field>
+
+        <div class="buttons-container">
+          <button type="button" mat-raised-button (click)="cancelCommentReply()">
+            Cancel
+          </button>
+          <button type="submit" [disabled]="sendingReplyComment || !replyCommentBody.value.trim()"
+                  mat-raised-button
+                  color="primary">
+            Post
+          </button>
+        </div>
+      </form>
+    </ng-container>
   </div>
 </ng-template>
 

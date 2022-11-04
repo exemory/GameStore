@@ -158,7 +158,8 @@
       }
     }
 
-    .edit-comment-form {
+    .edit-comment-form,
+    .reply-comment-form {
       display: flex;
       flex-direction: column;
 
@@ -167,6 +168,10 @@
         display: flex;
         gap: 10px;
       }
+    }
+
+    .reply-comment-form {
+      margin: 15px 0 0 40px;
     }
   }
 }
