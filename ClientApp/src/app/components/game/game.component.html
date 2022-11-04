@@ -4,51 +4,57 @@
   </div>
 
   <ng-container *ngIf="!loading && !loadingError">
-    <img [src]="getGameImageUrl(game)" alt="Game image" class="image">
     <p class="game-name">{{game.name}}</p>
-    <div class="buy-section">
-      <p class="price">{{game.price | currency}}</p>
-      <button mat-raised-button color="accent" class="buy-button">
-        <mat-icon>shopping_cart</mat-icon>
-        BUY
-      </button>
+    <div class="container">
+      <div>
+        <img [src]="getGameImageUrl(game)" alt="Game image" class="image">
+        <div class="buy-section">
+          <p class="price">{{game.price | currency}}</p>
+          <button mat-raised-button color="accent" class="buy-button">
+            <mat-icon>shopping_cart</mat-icon>
+            BUY
+          </button>
+        </div>
+
+        <hr class="divider">
+
+        <div class="genre-list">
+          <p *ngFor="let genre of game.genres" class="genre">{{genre}}</p>
+        </div>
+        <div class="platform-list">
+          <p *ngFor="let platform of game.platformTypes" class="platform">{{platform}}</p>
+        </div>
+
+        <hr class="divider hide">
+      </div>
+
+      <div>
+        <p class="description">{{game.description}}</p>
+
+        <hr class="divider">
+
+        <div class="create-comment-section">
+          <form class="create-comment-form" (ngSubmit)="createCommentSubmit()" #form="ngForm">
+            <mat-form-field class="body-field" appearance="outline">
+              <mat-label>Comment</mat-label>
+              <textarea [(ngModel)]="commentCreationData.body" name="body" matInput maxlength="600" rows="6"
+                        #body></textarea>
+            </mat-form-field>
+
+            <button class="send-button" type="submit"
+                    [disabled]="sendingCreateRequest || form.invalid || !body.value.trim()"
+                    mat-raised-button
+                    color="primary">
+              Post
+            </button>
+          </form>
+        </div>
+
+        <ul class="comment-list root-list">
+          <ng-container *ngTemplateOutlet="commentList; context:{ $implicit: rootComments }"></ng-container>
+        </ul>
+      </div>
     </div>
-
-    <hr class="divider">
-
-    <div class="genre-list">
-      <p *ngFor="let genre of game.genres" class="genre">{{genre}}</p>
-    </div>
-    <div class="platform-list">
-      <p *ngFor="let platform of game.platformTypes" class="platform">{{platform}}</p>
-    </div>
-
-    <hr class="divider">
-
-    <p class="description">{{game.description}}</p>
-
-    <hr class="divider">
-
-    <div class="create-comment-section">
-      <form class="create-comment-form" (ngSubmit)="createCommentSubmit()" #form="ngForm">
-        <mat-form-field class="body-field" appearance="outline">
-          <mat-label>Comment</mat-label>
-          <textarea [(ngModel)]="commentCreationData.body" name="body" matInput maxlength="600" rows="6"
-                    #body></textarea>
-        </mat-form-field>
-
-        <button class="send-button" type="submit"
-                [disabled]="sendingCreateRequest || form.invalid || !body.value.trim()"
-                mat-raised-button
-                color="primary">
-          Post
-        </button>
-      </form>
-    </div>
-
-    <ul class="comment-list root-list">
-      <ng-container *ngTemplateOutlet="commentList; context:{ $implicit: rootComments }"></ng-container>
-    </ul>
   </ng-container>
 </div>
 

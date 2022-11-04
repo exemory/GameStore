@@ -4,14 +4,22 @@
   padding: 0 16px;
 }
 
+.container {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  column-gap: 40px;
+}
+
 .image {
   max-width: 100%;
-  margin-bottom: 50px;
+  min-height: 500px;
+  object-fit: cover;
+  margin-bottom: 30px;
 }
 
 .game-name {
   font-size: 30px;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   color: #222;
 }
 
@@ -19,12 +27,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 
   .price {
     font-size: 28px;
     font-weight: 300;
     color: #222;
+    margin: 0;
   }
 
   .buy-button {
@@ -35,6 +44,10 @@
 .divider {
   border: 1px solid #999;
   margin-bottom: 20px;
+
+  &.hide {
+    display: none;
+  }
 }
 
 .genre-list,
@@ -173,5 +186,21 @@
     .reply-comment-form {
       margin: 15px 0 0 40px;
     }
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .container {
+    column-gap: 25px;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+
+  .divider.hide {
+    display: block;
   }
 }
