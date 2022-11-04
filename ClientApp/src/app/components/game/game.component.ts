@@ -7,7 +7,7 @@ import {Game} from "../../interfaces/game";
 import {environment as env} from "../../../environments/environment";
 import {Comment} from "../../interfaces/comment";
 import {forkJoin} from "rxjs";
-import {FormBuilder, Validators} from "@angular/forms";
+import {FormBuilder} from "@angular/forms";
 import {CommentCreationData} from "../../interfaces/comment-creation-data";
 import {AuthService} from "../../services/auth.service";
 import {CommentUpdateData} from "../../interfaces/comment-update-data";
@@ -28,22 +28,18 @@ export class GameComponent implements OnInit {
   comments!: Comment[];
   deletedComments = <Comment[]>[];
 
-  sendingComment = false;
-  createCommentForm = this.fb.group({
-    body: ['', Validators.maxLength(600)]
-  });
+  sendingCreateRequest = false;
+  commentCreationData!: CommentCreationData;
 
   editingComment?: Comment;
-  editCommentForm = this.fb.group({
-    body: ['', Validators.maxLength(600)]
-  });
-  savingComment = false;
+  commentUpdateData: CommentUpdateData = {
+    body: ''
+  }
+  sendingUpdateRequest = false;
 
   replyingComment?: Comment;
-  replyCommentForm = this.fb.group({
-    body: ['', Validators.maxLength(600)]
-  });
-  sendingReplyComment = false;
+  commentReplyData!: CommentCreationData;
+  sendingReplyRequest = false;
 
   constructor(private route: ActivatedRoute,
               private api: HttpClient,
@@ -67,6 +63,9 @@ export class GameComponent implements OnInit {
         next: ([game, comments]) => {
           this.game = game;
           this.comments = comments
+
+          this.initData();
+
           this.loading = false;
         },
         error: err => {
@@ -81,6 +80,18 @@ export class GameComponent implements OnInit {
           this.ns.notifyError(`Loading data failed. ${err.error?.message ?? ''}`, true);
         }
       });
+  }
+
+  private initData() {
+    this.commentCreationData = {
+      gameId: this.game.id,
+      body: ''
+    }
+
+    this.commentReplyData = {
+      gameId: this.game.id,
+      body: ''
+    }
   }
 
   private getGame(gameKey: string) {
@@ -125,34 +136,21 @@ export class GameComponent implements OnInit {
   }
 
   createCommentSubmit() {
-    if (this.createCommentForm.invalid) {
-      return;
-    }
+    this.commentCreationData.body = this.commentCreationData.body.trim();
 
-    const formValue = this.createCommentForm.value;
+    this.sendingCreateRequest = true;
 
-    if (!formValue.body?.trim()) {
-      return;
-    }
-
-    const data: CommentCreationData = {
-      gameId: this.game.id,
-      body: formValue.body?.trim()
-    }
-
-    this.sendingComment = true;
-
-    this.api.post<Comment>('comments', data)
+    this.api.post<Comment>('comments', this.commentCreationData)
       .subscribe({
         next: comment => {
           this.comments.unshift(comment);
-          this.createCommentForm.reset();
-          this.sendingComment = false;
+          this.commentCreationData.body = '';
+          this.sendingCreateRequest = false;
 
-          this.ns.notifySuccess('Comment has been added.');
+          this.ns.notifySuccess('Comment has been posted.');
         },
         error: err => {
-          this.sendingComment = false;
+          this.sendingCreateRequest = false;
           this.ns.notifyError(`Operation failed. ${err.error?.message ?? ''}`);
         }
       });
@@ -195,9 +193,7 @@ export class GameComponent implements OnInit {
 
   editComment(comment: Comment) {
     this.cancelCommentReply();
-    this.editCommentForm.patchValue({
-      body: comment.body
-    });
+    this.commentUpdateData.body = comment.body;
     this.editingComment = comment;
 
     setTimeout(() => this.editCommentBody.nativeElement.focus());
@@ -215,7 +211,7 @@ export class GameComponent implements OnInit {
   }
 
   cancelCommentReply() {
-    this.replyCommentForm.reset();
+    this.commentReplyData.body = '';
     this.replyingComment = undefined;
   }
 
@@ -227,67 +223,42 @@ export class GameComponent implements OnInit {
     return comment === this.replyingComment;
   }
 
-  saveEditedComment() {
-    if (this.editCommentForm.invalid || !this.editingComment) {
-      return;
-    }
+  saveEditedComment(comment: Comment) {
+    this.commentUpdateData.body = this.commentUpdateData.body.trim();
 
-    const formValue = this.editCommentForm.value;
+    this.sendingUpdateRequest = true;
 
-    if (!formValue.body?.trim()) {
-      return;
-    }
-
-    const data: CommentUpdateData = {
-      body: formValue.body?.trim()
-    }
-
-    this.savingComment = true;
-
-    this.api.put<Comment>(`comments/${this.editingComment!.id}`, data)
+    this.api.put<Comment>(`comments/${comment.id}`, this.commentUpdateData)
       .subscribe({
         next: () => {
-          this.editingComment!.body = data.body;
+          comment.body = this.commentUpdateData.body;
           this.cancelCommentEditing();
-          this.savingComment = false;
+          this.sendingUpdateRequest = false;
         },
         error: err => {
-          this.savingComment = false;
+          this.sendingUpdateRequest = false;
           this.ns.notifyError(`Operation failed. ${err.error?.message ?? ''}`);
         }
       });
   }
 
   postReplyComment(comment: Comment) {
-    if (this.replyCommentForm.invalid) {
-      return;
-    }
+    this.commentReplyData.body = this.commentReplyData.body.trim();
+    this.commentReplyData.parentId = comment.id;
 
-    const formValue = this.replyCommentForm.value;
+    this.sendingReplyRequest = true;
 
-    if (!formValue.body?.trim()) {
-      return;
-    }
-
-    const data: CommentCreationData = {
-      gameId: this.game.id,
-      body: formValue.body?.trim(),
-      parentId: comment.id
-    }
-
-    this.sendingReplyComment = true;
-
-    this.api.post<Comment>('comments', data)
+    this.api.post<Comment>('comments', this.commentReplyData)
       .subscribe({
         next: comment => {
           this.comments.unshift(comment);
           this.cancelCommentReply();
-          this.sendingReplyComment = false;
+          this.sendingReplyRequest = false;
 
-          this.ns.notifySuccess('Comment has been added.');
+          this.ns.notifySuccess('Comment has been posted.');
         },
         error: err => {
-          this.sendingReplyComment = false;
+          this.sendingReplyRequest = false;
           this.ns.notifyError(`Operation failed. ${err.error?.message ?? ''}`);
         }
       });

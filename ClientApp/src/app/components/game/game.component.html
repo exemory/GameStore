@@ -30,13 +30,16 @@
     <hr class="divider">
 
     <div class="create-comment-section">
-      <form class="create-comment-form" [formGroup]="createCommentForm" (ngSubmit)="createCommentSubmit()">
+      <form class="create-comment-form" (ngSubmit)="createCommentSubmit()" #form="ngForm">
         <mat-form-field class="body-field" appearance="outline">
           <mat-label>Comment</mat-label>
-          <textarea formControlName="body" matInput maxlength="600" rows="6" #content></textarea>
+          <textarea [(ngModel)]="commentCreationData.body" name="body" matInput maxlength="600" rows="6"
+                    #body></textarea>
         </mat-form-field>
 
-        <button class="send-button" type="submit" [disabled]="sendingComment || !content.value.trim()" mat-raised-button
+        <button class="send-button" type="submit"
+                [disabled]="sendingCreateRequest || form.invalid || !body.value.trim()"
+                mat-raised-button
                 color="primary">
           Post
         </button>
@@ -82,10 +85,11 @@
       </button>
     </ng-container>
     <ng-template #editCommentTemplate>
-      <form class="edit-comment-form" [formGroup]="editCommentForm" (ngSubmit)="saveEditedComment()">
+      <form class="edit-comment-form" (ngSubmit)="saveEditedComment(comment)" #form="ngForm">
         <mat-form-field class="body-field" appearance="outline">
           <mat-label>Comment</mat-label>
-          <textarea formControlName="body" matInput maxlength="600" rows="6" (keydown.escape)="cancelCommentEditing()"
+          <textarea [(ngModel)]="commentUpdateData.body" name="body" matInput maxlength="600" rows="6"
+                    (keydown.escape)="cancelCommentEditing()"
                     #editCommentBody></textarea>
         </mat-form-field>
 
@@ -93,7 +97,7 @@
           <button type="button" mat-raised-button (click)="cancelCommentEditing()">
             Cancel
           </button>
-          <button type="submit" [disabled]="savingComment || !editCommentBody.value.trim()"
+          <button type="submit" [disabled]="sendingUpdateRequest || form.invalid || !editCommentBody.value.trim()"
                   mat-raised-button
                   color="primary">
             Save
@@ -102,10 +106,11 @@
       </form>
     </ng-template>
     <ng-container *ngIf="isCommentReplying(comment)">
-      <form class="reply-comment-form" [formGroup]="replyCommentForm" (ngSubmit)="postReplyComment(comment)">
+      <form class="reply-comment-form" (ngSubmit)="postReplyComment(comment)" #form="ngForm">
         <mat-form-field class="body-field" appearance="outline">
           <mat-label>Reply</mat-label>
-          <textarea formControlName="body" matInput maxlength="600" rows="6" (keydown.escape)="cancelCommentReply()"
+          <textarea [(ngModel)]="commentReplyData.body" name="body" matInput maxlength="600" rows="6"
+                    (keydown.escape)="cancelCommentReply()"
                     #replyCommentBody></textarea>
         </mat-form-field>
 
@@ -113,7 +118,7 @@
           <button type="button" mat-raised-button (click)="cancelCommentReply()">
             Cancel
           </button>
-          <button type="submit" [disabled]="sendingReplyComment || !replyCommentBody.value.trim()"
+          <button type="submit" [disabled]="sendingReplyRequest || form.invalid || !replyCommentBody.value.trim()"
                   mat-raised-button
                   color="primary">
             Post
