@@ -135,7 +135,12 @@ export class GameComponent implements OnInit {
     return this.deletedComments.includes(comment);
   }
 
-  createCommentSubmit() {
+  postCreatedComment() {
+    if (!this.auth.isLoggedIn.value) {
+      this.auth.openSignInDialog();
+      return;
+    }
+
     this.commentCreationData.body = this.commentCreationData.body.trim();
 
     this.sendingCreateRequest = true;
@@ -204,6 +209,11 @@ export class GameComponent implements OnInit {
   }
 
   replyComment(comment: Comment) {
+    if (!this.auth.isLoggedIn.value) {
+      this.auth.openSignInDialog();
+      return;
+    }
+
     this.cancelCommentEditing();
     this.replyingComment = comment;
 

@@ -63,4 +63,9 @@ export class SignInDialogComponent implements OnInit, AfterViewInit {
         }
       });
   }
+
+  signUp() {
+    this.dialogRef.close();
+    this.auth.openSignUpDialog();
+  }
 }

@@ -34,7 +34,7 @@
         <hr class="divider">
 
         <div class="create-comment-section">
-          <form class="create-comment-form" (ngSubmit)="createCommentSubmit()" #form="ngForm">
+          <form class="create-comment-form" (ngSubmit)="postCreatedComment()" #form="ngForm">
             <mat-form-field class="body-field" appearance="outline">
               <mat-label>Comment</mat-label>
               <textarea [(ngModel)]="commentCreationData.body" name="body" matInput maxlength="600" rows="6"

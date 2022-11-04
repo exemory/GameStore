@@ -91,4 +91,9 @@ export class SignUpDialogComponent implements OnInit {
         }
       });
   }
+
+  signIn() {
+    this.dialogRef.close();
+    this.auth.openSignInDialog();
+  }
 }
