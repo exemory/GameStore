@@ -17,7 +17,9 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
     
     public async Task<IEnumerable<Comment>> GetAllByGameKeyAsync(string gameKey)
     {
-        return await Entities.Where(c => c.Game.Key == gameKey)
+        return await Entities.Include(c => c.User)
+            .Where(c => c.Game.Key == gameKey && !c.Deleted)
+            .OrderByDescending(c => c.CreationDate)
             .ToListAsync();
     }
 }

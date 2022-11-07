@@ -3,13 +3,10 @@ using FluentValidation;
 
 namespace Business.Validators;
 
-public class CommentCreationDtoValidator : AbstractValidator<CommentCreationDto>
+public class CommentUpdateDtoValidator : AbstractValidator<CommentUpdateDto>
 {
-    public CommentCreationDtoValidator()
+    public CommentUpdateDtoValidator()
     {
-        RuleFor(c => c.GameId)
-            .NotEmpty();
-
         RuleFor(c => c.Body)
             .NotEmpty()
             .MaximumLength(600);

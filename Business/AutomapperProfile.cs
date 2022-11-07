@@ -22,8 +22,10 @@ public class AutomapperProfile : Profile
             .ForMember(g => g.ImageFileName,
                 o => o.Condition((d, g, v) => v != null));
 
-        CreateMap<Comment, CommentDto>();
+        CreateMap<Comment, CommentDto>()
+            .ForMember(c => c.UserInfo, o => o.MapFrom(c => c.User));
         CreateMap<CommentCreationDto, Comment>(MemberList.Source);
+        CreateMap<CommentUpdateDto, Comment>(MemberList.Source);
 
         CreateMap<Genre, GenreDto>();
 
@@ -32,6 +34,9 @@ public class AutomapperProfile : Profile
         CreateMap<User, UserInfoDto>()
             .ForMember(u => u.HasAvatar, o => o.MapFrom(u => u.Avatar != null))
             .ForMember(u => u.UserRoles, o => o.Ignore());
+
+        CreateMap<User, CommentUserInfoDto>()
+            .ForMember(u => u.HasAvatar, o => o.MapFrom(u => u.Avatar != null));
 
         CreateMap<SignUpDto, User>(MemberList.Source)
             .ForSourceMember(d => d.Password, o => o.DoNotValidate());

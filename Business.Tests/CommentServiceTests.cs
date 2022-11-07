@@ -2,11 +2,15 @@
 using AutoMapper;
 using Business.DataTransferObjects;
 using Business.Exceptions;
+using Business.Interfaces;
 using Business.Services;
 using Data.Entities;
 using Data.Interfaces;
 using ExpectedObjects;
 using FluentAssertions;
+using Force.DeepCloner;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -19,12 +23,17 @@ public class CommentServiceTests
 
     private readonly Fixture _fixture = new();
     private readonly IMapper _mapper = UnitTestHelper.CreateMapper();
+    private readonly Mock<ISession> _sessionMock = new();
+    private readonly Mock<UserManager<User>> _userManagerMock =
+            new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
+    private readonly Mock<ILogger<CommentService>> _loggerMock = new();
 
     public CommentServiceTests()
     {
-        _sut = new CommentService(_unitOfWorkMock.Object, _mapper);
         _fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
         _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+        
+        _sut = new CommentService(_unitOfWorkMock.Object, _mapper, _sessionMock.Object, _userManagerMock.Object, _loggerMock.Object);
     }
 
     [Fact]
@@ -34,13 +43,18 @@ public class CommentServiceTests
         var commentCreationDto = _fixture.Build<CommentCreationDto>()
             .Without(c => c.ParentId)
             .Create();
+        var user = _fixture.Create<User>();
         var mappedComment = _mapper.Map<Comment>(commentCreationDto);
+        mappedComment.User = user;
         var expectedToCreate = mappedComment.ToExpectedObject();
         var expected = _mapper.Map<CommentDto>(mappedComment);
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByIdAsync(commentCreationDto.GameId))
             .ReturnsAsync(_fixture.Create<Game>());
         _unitOfWorkMock.Setup(u => u.CommentRepository.Add(It.IsAny<Comment>()));
+        _sessionMock.Setup(s => s.UserId).Returns(user.Id);
+        _userManagerMock.Setup(u => u.FindByIdAsync(user.Id.ToString()))
+            .ReturnsAsync(user.DeepClone());
 
         // Act
         var result = await _sut.CreateAsync(commentCreationDto);
@@ -61,7 +75,9 @@ public class CommentServiceTests
         var parentComment = _fixture.Build<Comment>()
             .With(c => c.GameId, commentCreationDto.GameId)
             .Create();
+        var user = _fixture.Create<User>();
         var mappedComment = _mapper.Map<Comment>(commentCreationDto);
+        mappedComment.User = user;
         var expectedToCreate = mappedComment.ToExpectedObject();
         var expected = _mapper.Map<CommentDto>(mappedComment);
 
@@ -69,6 +85,9 @@ public class CommentServiceTests
             .ReturnsAsync(_fixture.Create<Game>());
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(commentCreationDto.ParentId!.Value))
             .ReturnsAsync(parentComment);
+        _sessionMock.Setup(s => s.UserId).Returns(user.Id);
+        _userManagerMock.Setup(u => u.FindByIdAsync(user.Id.ToString()))
+            .ReturnsAsync(user.DeepClone());
 
         // Act
         var result = await _sut.CreateAsync(commentCreationDto);
@@ -145,6 +164,30 @@ public class CommentServiceTests
         _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.IsAny<Comment>()), Times.Never);
         _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
     }
+    
+    [Fact]
+    public async Task CreateAsync_ShouldFail_WhenAuthorizedUserNotFound()
+    {
+        // Arrange
+        var game = _fixture.Create<Game>();
+        var commentCreationDto = _fixture.Build<CommentCreationDto>()
+            .Without(c => c.ParentId)
+            .Create();
+        var nonexistentUserId = _fixture.Create<Guid>();
+
+        _unitOfWorkMock.Setup(u => u.GameRepository.GetByIdAsync(commentCreationDto.GameId))
+            .ReturnsAsync(game);
+        _sessionMock.Setup(s => s.UserId).Returns(nonexistentUserId);
+
+        // Act
+        Func<Task> result = async () => await _sut.CreateAsync(commentCreationDto);
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<AccessDeniedException>();
+
+        _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.IsAny<Comment>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
+    }
 
     [Fact]
     public async Task GetAllByGameKeyAsync_ShouldReturnAllCommentsRelatedToGame()
@@ -182,5 +225,282 @@ public class CommentServiceTests
 
         // Assert
         await result.Should().ThrowExactlyAsync<NotFoundException>();
+    }
+
+    [Fact]
+    public async Task EditAsync_ShouldEditComment()
+    {
+        // Arrange
+        var comment = _fixture.Build<Comment>()
+            .With(c => c.Deleted, false)
+            .Create();
+        var commentUpdateDto = _fixture.Create<CommentUpdateDto>();
+        var expectedCommentToUpdate = _mapper.Map(commentUpdateDto, comment.DeepClone()).ToExpectedObject();
+
+        _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
+            .ReturnsAsync(comment);
+        _sessionMock.Setup(s => s.UserId).Returns(comment.UserId);
+
+        // Act
+        await _sut.EditAsync(comment.Id, commentUpdateDto);
+
+        // Assert
+        _unitOfWorkMock.Verify(u =>
+            u.CommentRepository.Update(It.Is<Comment>(c => expectedCommentToUpdate.Equals(c))), Times.Once);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task EditAsync_ShouldFail_WhenCommentDoesNotExist()
+    {
+        // Arrange
+        var nonexistentCommentId = _fixture.Create<Guid>();
+        var commentUpdateDto = _fixture.Create<CommentUpdateDto>();
+        var userId = _fixture.Create<Guid>();
+
+        _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(nonexistentCommentId))
+            .ReturnsAsync((Comment?) null);
+        _sessionMock.Setup(s => s.UserId).Returns(userId);
+
+        // Act
+        var result = () => _sut.EditAsync(nonexistentCommentId, commentUpdateDto);
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<NotFoundException>();
+
+        _unitOfWorkMock.Verify(u =>
+            u.CommentRepository.Update(It.IsAny<Comment>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
+    }
+    
+    [Fact]
+    public async Task EditAsync_ShouldFail_WhenCommentMarkedAsDeleted()
+    {
+        // Arrange
+        var comment = _fixture.Build<Comment>()
+            .With(c => c.Deleted, true)
+            .Create();
+        var commentUpdateDto = _fixture.Create<CommentUpdateDto>();
+
+        _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
+            .ReturnsAsync(comment);
+        _sessionMock.Setup(s => s.UserId).Returns(comment.UserId);
+
+        // Act
+        var result = () => _sut.EditAsync(comment.Id, commentUpdateDto);
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<NotFoundException>();
+
+        _unitOfWorkMock.Verify(u =>
+            u.CommentRepository.Update(It.IsAny<Comment>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
+    }
+
+    [Fact]
+    public async Task EditAsync_ShouldFail_WhenUserTriesToEditOtherUsersComment()
+    {
+        // Arrange
+        var comment = _fixture.Build<Comment>()
+            .With(c => c.Deleted, false)
+            .Create();
+        var commentUpdateDto = _fixture.Create<CommentUpdateDto>();
+        var userId = _fixture.Create<Guid>();
+
+        _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
+            .ReturnsAsync(comment);
+        _sessionMock.Setup(s => s.UserId).Returns(userId);
+
+        // Act
+        var result = () => _sut.EditAsync(comment.Id, commentUpdateDto);
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<AccessDeniedException>();
+
+        _unitOfWorkMock.Verify(u =>
+            u.CommentRepository.Update(It.IsAny<Comment>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldMarkCommentAsDeleted()
+    {
+        // Arrange
+        var comment = _fixture.Build<Comment>()
+            .With(c => c.Deleted, false)
+            .Create();
+        var updatedComment = comment.DeepClone();
+        updatedComment.Deleted = true;
+        var expectedCommentToUpdate = updatedComment.ToExpectedObject();
+
+        _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
+            .ReturnsAsync(comment);
+        _sessionMock.Setup(s => s.UserId).Returns(comment.UserId);
+
+        // Act
+        await _sut.DeleteAsync(comment.Id);
+
+        // Assert
+        _unitOfWorkMock.Verify(u =>
+            u.CommentRepository.Update(It.Is<Comment>(c => expectedCommentToUpdate.Equals(c))), Times.Once);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldFail_WhenCommentDoesNotExist()
+    {
+        // Arrange
+        var nonexistentCommentId = _fixture.Create<Guid>();
+
+        _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(nonexistentCommentId))
+            .ReturnsAsync((Comment?) null);
+
+        // Act
+        var result = () => _sut.DeleteAsync(nonexistentCommentId);
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<NotFoundException>();
+
+        _unitOfWorkMock.Verify(u =>
+            u.CommentRepository.Update(It.IsAny<Comment>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldFail_WhenUserTriesToDeleteOtherUsersComment()
+    {
+        // Arrange
+        var comment = _fixture.Build<Comment>()
+            .With(c => c.Deleted, false)
+            .Create();
+        var userId = _fixture.Create<Guid>();
+
+        _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
+            .ReturnsAsync(comment);
+        _sessionMock.Setup(s => s.UserId).Returns(userId);
+
+        // Act
+        var result = () => _sut.DeleteAsync(comment.Id);
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<AccessDeniedException>();
+
+        _unitOfWorkMock.Verify(u =>
+            u.CommentRepository.Update(It.IsAny<Comment>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldFail_WhenCommentHasAlreadyBeenDeleted()
+    {
+        // Arrange
+        var comment = _fixture.Build<Comment>()
+            .With(c => c.Deleted, true)
+            .Create();
+
+        _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
+            .ReturnsAsync(comment);
+        _sessionMock.Setup(s => s.UserId).Returns(comment.UserId);
+
+        // Act
+        var result = () => _sut.DeleteAsync(comment.Id);
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<GameStoreException>();
+
+        _unitOfWorkMock.Verify(u =>
+            u.CommentRepository.Update(It.IsAny<Comment>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
+    }
+
+    [Fact]
+    public async Task RestoreAsync_ShouldRestoreComment()
+    {
+        // Arrange
+        var comment = _fixture.Build<Comment>()
+            .With(c => c.Deleted, true)
+            .Create();
+        var updatedComment = comment.DeepClone();
+        updatedComment.Deleted = false;
+        var expectedCommentToUpdate = updatedComment.ToExpectedObject();
+
+        _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
+            .ReturnsAsync(comment);
+        _sessionMock.Setup(s => s.UserId).Returns(comment.UserId);
+
+        // Act
+        await _sut.RestoreAsync(comment.Id);
+
+        // Assert
+        _unitOfWorkMock.Verify(u =>
+            u.CommentRepository.Update(It.Is<Comment>(c => expectedCommentToUpdate.Equals(c))), Times.Once);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task RestoreAsync_ShouldFail_WhenCommentDoesNotExist()
+    {
+        // Arrange
+        var nonexistentCommentId = _fixture.Create<Guid>();
+
+        _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(nonexistentCommentId))
+            .ReturnsAsync((Comment?) null);
+
+        // Act
+        var result = () => _sut.RestoreAsync(nonexistentCommentId);
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<NotFoundException>();
+
+        _unitOfWorkMock.Verify(u =>
+            u.CommentRepository.Update(It.IsAny<Comment>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
+    }
+
+    [Fact]
+    public async Task RestoreAsync_ShouldFail_WhenUserTriesToRestoreOtherUsersComment()
+    {
+        // Arrange
+        var comment = _fixture.Build<Comment>()
+            .With(c => c.Deleted, true)
+            .Create();
+        var userId = _fixture.Create<Guid>();
+
+        _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
+            .ReturnsAsync(comment);
+        _sessionMock.Setup(s => s.UserId).Returns(userId);
+
+        // Act
+        var result = () => _sut.RestoreAsync(comment.Id);
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<AccessDeniedException>();
+
+        _unitOfWorkMock.Verify(u =>
+            u.CommentRepository.Update(It.IsAny<Comment>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
+    }
+
+    [Fact]
+    public async Task RestoreAsync_ShouldFail_WhenCommentIsNotDeleted()
+    {
+        // Arrange
+        var comment = _fixture.Build<Comment>()
+            .With(c => c.Deleted, false)
+            .Create();
+
+        _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
+            .ReturnsAsync(comment);
+        _sessionMock.Setup(s => s.UserId).Returns(comment.UserId);
+
+        // Act
+        var result = () => _sut.RestoreAsync(comment.Id);
+
+        // Assert
+        await result.Should().ThrowExactlyAsync<GameStoreException>();
+
+        _unitOfWorkMock.Verify(u =>
+            u.CommentRepository.Update(It.IsAny<Comment>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
     }
 }

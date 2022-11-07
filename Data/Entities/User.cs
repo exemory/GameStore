@@ -7,5 +7,7 @@ namespace Data.Entities
         public string FirstName { get; set; } = default!;
         public string LastName { get; set; } = default!;
         public string? Avatar { get; set; }
+
+        public IEnumerable<Comment> Comments { get; set; } = default!;
     }
 }
