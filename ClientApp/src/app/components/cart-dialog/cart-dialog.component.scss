@@ -1,0 +1,113 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .cart-header {
+    font-size: 20px;
+  }
+
+  .car-items-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    min-height: 80px;
+    display: flex;
+    justify-content: center;
+
+    .cart-empty-text {
+      color: var(--color-disabled-text);
+      font-size: 18px;
+      text-align: center;
+      align-self: center;
+    }
+
+    .items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+
+      .item-container {
+        display: flex;
+        gap: 20px;
+
+        .game-image {
+          width: 80px;
+          height: 80px;
+          object-fit: cover;
+          border-radius: 5px;
+        }
+
+        .name-price-container {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          flex-grow: 2;
+
+          .game-name {
+            font-size: 16px;
+          }
+
+          .price-quantity-container {
+            display: flex;
+            align-items: center;
+
+            .price {
+              font-size: 16px;
+              min-width: 100px;
+              margin: 0;
+            }
+
+            .quantity-control {
+              display: flex;
+              align-items: center;
+
+              .quantity-button {
+                font-size: 20px;
+                border: 1px solid var(--color-disabled-text);
+                width: 24px !important;
+                height: 24px !important;
+                line-height: 22px !important;
+
+                .mat-icon {
+                  width: 16px !important;
+                  height: 16px !important;
+                  line-height: 16px !important;
+                }
+                .material-icons {
+                  font-size: 16px !important;
+                }
+              }
+
+              .quantity-label {
+                font-size: 15px;
+                min-width: 36px;
+                margin: 0;
+                text-align: center;
+              }
+            }
+          }
+        }
+
+        .remove-item {
+          align-self: center;
+        }
+      }
+    }
+  }
+
+  .total-price {
+    align-self: flex-end;
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  .actions {
+    display: flex;
+    gap: 20px;
+    align-self: flex-end;
+  }
+}
+
+

@@ -10,6 +10,7 @@ import {GameUpdateData} from "../../interfaces/game-update-data";
 import {Genre} from "../../interfaces/genre";
 import {PlatformType} from "../../interfaces/platform-type";
 import {forkJoin} from "rxjs";
+import {CartService} from "../../services/cart.service";
 
 @Component({
   selector: 'app-games',
@@ -33,7 +34,8 @@ export class GamesComponent implements OnInit {
 
   constructor(private api: HttpClient,
               private ns: NotificationService,
-              private dialog: MatDialog) {
+              private dialog: MatDialog,
+              private cart: CartService) {
   }
 
   ngOnInit(): void {
@@ -152,5 +154,9 @@ export class GamesComponent implements OnInit {
 
   get noGamesByFilter() {
     return (this.nameFilter || this.genresFilter.length) && !this.filteredGames.length;
+  }
+
+  addGameToCart(game: Game) {
+    this.cart.addGame(game)
   }
 }

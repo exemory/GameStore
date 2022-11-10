@@ -33,8 +33,14 @@
       </nav>
     </div>
 
+    <div class="cart">
+      <button mat-icon-button color="primary" (click)="cart.openCartDialog()">
+        <mat-icon fontSet="material-icons-outlined" [matBadge]="cart.itemCount | async" [matBadgeHidden]="cart.isEmpty" matBadgeSize="small" matBadgeColor="accent">shopping_cart</mat-icon>
+      </button>
+    </div>
+
     <div *ngIf="!(auth.isLoggedIn | async)" class="right-section unauthorized-section">
-      <button mat-raised-button (click)="signIn()">Sign In</button>
+      <button mat-stroked-button (click)="signIn()">Sign In</button>
       <button mat-raised-button color="accent" (click)="signUp()">Sign Up</button>
     </div>
 
@@ -44,15 +50,14 @@
 
       <mat-menu class="user-menu" backdropClass="custom" #menu="matMenu" xPosition="before">
         <button mat-menu-item (click)="uploadAvatar()">
-          <mat-icon>account_circle</mat-icon>
+          <mat-icon fontSet="material-icons-outlined">account_circle</mat-icon>
           <span>Upload avatar</span>
         </button>
         <button mat-menu-item (click)="signOut()">
-          <mat-icon>logout</mat-icon>
+          <mat-icon fontSet="material-icons-outlined">logout</mat-icon>
           <span>Sign out</span>
         </button>
       </mat-menu>
     </div>
-
   </div>
 </div>

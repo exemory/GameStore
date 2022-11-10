@@ -4,6 +4,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {UploadAvatarDialogComponent} from "../upload-avatar-dialog/upload-avatar-dialog.component";
 import {HttpClient} from "@angular/common/http";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
+import {CartService} from "../../services/cart.service";
 
 @Component({
   selector: 'app-header',
@@ -17,7 +18,8 @@ export class HeaderComponent implements OnInit {
   constructor(public auth: AuthService,
               private dialog: MatDialog,
               private api: HttpClient,
-              private sanitizer: DomSanitizer) {
+              private sanitizer: DomSanitizer,
+              public cart: CartService) {
   }
 
   ngOnInit(): void {
