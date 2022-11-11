@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
 import {Game} from "../interfaces/game";
 import {BehaviorSubject} from "rxjs";
-import {MatDialog} from "@angular/material/dialog";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {CartDialogComponent} from "../components/cart-dialog/cart-dialog.component";
+import {CompletionOrderDialogComponent} from "../components/completion-order-dialog/completion-order-dialog.component";
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +12,13 @@ export class CartService {
 
   private readonly cartItemsKey = "cartItems";
 
-  private readonly _items: { game: Game, quantity: number }[] = [];
+  private _items: { game: Game, quantity: number }[] = [];
 
   public items = new BehaviorSubject(this._items);
   public itemCount = new BehaviorSubject(0);
   public totalPrice = new BehaviorSubject(0);
+
+  private cartDialog?: MatDialogRef<CartDialogComponent>;
 
   constructor(private dialog: MatDialog) {
     this._items = this.restoreCartItems();
@@ -97,8 +100,13 @@ export class CartService {
     return this.getItemByGameId(game.id);
   }
 
+  clear() {
+    this._items = [];
+    this.items.next(this._items);
+  }
+
   openCartDialog() {
-    this.dialog.open(CartDialogComponent,
+    this.cartDialog = this.dialog.open(CartDialogComponent,
       {
         maxWidth: '500px',
         width: '100%',
@@ -106,5 +114,26 @@ export class CartService {
         position: {right: "right"},
         autoFocus: false
       });
+  }
+
+  openCompletionOrderDialog() {
+    const x = this.dialog.open(CompletionOrderDialogComponent,
+      {
+        maxWidth: '400px',
+        width: '100%',
+        autoFocus: false
+      }
+    );
+
+    x.afterClosed().subscribe({
+      next: orderConfirmed => {
+        if (!orderConfirmed) {
+          return;
+        }
+
+        this.clear();
+        this.cartDialog?.close();
+      }
+    })
   }
 }

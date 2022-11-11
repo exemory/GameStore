@@ -35,6 +35,7 @@ import {DndDirective} from './shared/directives/dnd.directive';
 import {TimeSincePipe} from './shared/pipes/time-since.pipe';
 import {CartDialogComponent} from './components/cart-dialog/cart-dialog.component';
 import {MatBadgeModule} from "@angular/material/badge";
+import {CompletionOrderDialogComponent} from './components/completion-order-dialog/completion-order-dialog.component';
 
 @NgModule({
   declarations: [
@@ -52,29 +53,30 @@ import {MatBadgeModule} from "@angular/material/badge";
     DndDirective,
     TimeSincePipe,
     CartDialogComponent,
+    CompletionOrderDialogComponent,
   ],
-    imports: [
-        BrowserModule,
-        AppRoutingModule,
-        BrowserAnimationsModule,
-        MatProgressSpinnerModule,
-        HttpClientModule,
-        MatSnackBarModule,
-        MatButtonModule,
-        MatIconModule,
-        MatMenuModule,
-        MatDialogModule,
-        MatFormFieldModule,
-        ReactiveFormsModule,
-        MatInputModule,
-        MatChipsModule,
-        MatAutocompleteModule,
-        DragDropModule,
-        FormsModule,
-        MatSelectModule,
-        MatCheckboxModule,
-        MatBadgeModule
-    ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    MatProgressSpinnerModule,
+    HttpClientModule,
+    MatSnackBarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    ReactiveFormsModule,
+    MatInputModule,
+    MatChipsModule,
+    MatAutocompleteModule,
+    DragDropModule,
+    FormsModule,
+    MatSelectModule,
+    MatCheckboxModule,
+    MatBadgeModule
+  ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true},
     CurrencyPipe

@@ -13,7 +13,7 @@
 
   <div class="actions">
     <button mat-stroked-button color="primary" (click)="closeCart()">Continue shopping</button>
-    <button mat-raised-button color="accent" [disabled]="cart.isEmpty">Checkout</button>
+    <button mat-raised-button color="accent" [disabled]="cart.isEmpty" (click)="checkout()">Checkout</button>
   </div>
 </div>
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MatDialogRef} from "@angular/material/dialog";
 import {CartService} from "../../services/cart.service";
 import {Game} from "../../interfaces/game";
@@ -12,7 +12,8 @@ import {environment as env} from "../../../environments/environment";
 export class CartDialogComponent implements OnInit {
 
   constructor(private dialogRef: MatDialogRef<CartDialogComponent>,
-              public cart: CartService) { }
+              public cart: CartService) {
+  }
 
   ngOnInit(): void {
   }
@@ -45,5 +46,9 @@ export class CartDialogComponent implements OnInit {
     }
 
     this.cart.updateQuantity(game, newQuantity);
+  }
+
+  checkout() {
+    this.cart.openCompletionOrderDialog();
   }
 }

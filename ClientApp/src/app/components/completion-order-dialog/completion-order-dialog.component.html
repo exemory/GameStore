@@ -1,0 +1,56 @@
+<h2 mat-dialog-title>Compliting the order</h2>
+<div mat-dialog-content>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" id="completing-order-form">
+    <mat-form-field appearance="outline">
+      <mat-label>First name</mat-label>
+      <input matInput formControlName="firstName" maxlength="50" #firstName>
+      <mat-icon fontSet="material-icons-outlined" matSuffix>face</mat-icon>
+      <mat-error *ngIf="form.get('firstName')?.hasError('required')">This field is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Last name</mat-label>
+      <input matInput formControlName="lastName" maxlength="50">
+      <mat-icon fontSet="material-icons-outlined" matSuffix>face</mat-icon>
+      <mat-error *ngIf="form.get('lastName')?.hasError('required')">This field is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput placeholder="mail@example.com" formControlName="email" required #email>
+      <mat-icon fontSet="material-icons-outlined" matSuffix>alternate_email</mat-icon>
+      <mat-error *ngIf="form.get('email')?.hasError('required')">This field is required</mat-error>
+      <mat-error *ngIf="form.get('email')?.hasError('email')">Email address is invalid</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Phone</mat-label>
+      <input matInput placeholder="+380951234567" formControlName="phone" required>
+      <mat-icon fontSet="material-icons-outlined" matSuffix>call</mat-icon>
+      <mat-error *ngIf="form.get('phone')?.hasError('required')">This field is required</mat-error>
+      <mat-error *ngIf="form.get('phone')?.hasError('phone')">Phone number is invalid</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Payment type</mat-label>
+      <mat-select formControlName="paymentType">
+        <mat-option [value]="'card'">Card</mat-option>
+        <mat-option [value]="'cash'">Cash</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('paymentType')?.hasError('required')">This field is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Comments</mat-label>
+      <textarea formControlName="comments" matInput maxlength="600"></textarea>
+    </mat-form-field>
+  </form>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-stroked-button [disabled]="inProgress" [mat-dialog-close]="undefined">Cancel</button>
+  <button type="submit" form="completing-order-form" [disabled]="form.invalid || inProgress" mat-raised-button
+          color="primary">
+    Checkout
+  </button>
+</div>
