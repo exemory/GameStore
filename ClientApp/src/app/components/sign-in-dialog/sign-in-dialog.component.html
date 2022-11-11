@@ -18,6 +18,10 @@
 
     <mat-checkbox formControlName="remember" class="remember-me">Remember me</mat-checkbox>
   </form>
+  <div class="sign-up-section">
+    <span>Do not have an account yet? </span>
+    <button class="link-button" (click)="signUp()">Sign up</button>
+  </div>
 </div>
 <div mat-dialog-actions align="end">
   <button mat-stroked-button [disabled]="inProgress" [mat-dialog-close]="undefined">Cancel</button>

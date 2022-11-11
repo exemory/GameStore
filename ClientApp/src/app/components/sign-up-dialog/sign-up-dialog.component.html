@@ -1,7 +1,6 @@
 <h2 mat-dialog-title>Sign Up</h2>
 <div mat-dialog-content>
   <form [formGroup]="form" (ngSubmit)="onSubmit()" id="sign-up-form">
-
     <mat-form-field appearance="outline">
       <mat-label>Username</mat-label>
       <input matInput formControlName="username" maxlength="15">
@@ -63,6 +62,10 @@
       <mat-error *ngIf="form.hasError('passwordMismatch')">Passwords must match</mat-error>
     </mat-form-field>
   </form>
+  <div class="sign-in-section">
+    <span>Already have an account? </span>
+    <button class="link-button" (click)="signIn()">Sign in</button>
+  </div>
 </div>
 
 <div mat-dialog-actions align="end">

@@ -122,7 +122,6 @@ export class EditGameDialogComponent implements OnInit {
         error: err => {
           this.inProgress = false;
           this.dialogRef.disableClose = false;
-          console.log(err);
           this.ns.notifyError(`Operation failed. ${err.error?.message ?? ''}`);
         }
       })

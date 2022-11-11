@@ -27,3 +27,23 @@ mat-error {
   display: flex;
   justify-content: center;
 }
+
+.link-button {
+  background: none;
+  border: none;
+  padding: 3px;
+  margin: -3px;
+  color: #2175ff;
+  cursor: pointer;
+  font-size: 14px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.delete-menu-option {
+  &, mat-icon {
+    color: var(--color-warn) !important;
+  }
+}
