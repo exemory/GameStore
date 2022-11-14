@@ -55,4 +55,10 @@ public class GameRepository : Repository<Game>, IGameRepository
             .Where(g => g.PlatformTypes.All(pt => platformTypes.Contains(pt.Type)))
             .ToListAsync();
     }
+
+    public async Task<ICollection<Game>> GetByIds(IEnumerable<Guid> gameIds)
+    {
+        return await Entities.Where(g => gameIds.Contains(g.Id))
+            .ToListAsync();
+    }
 }

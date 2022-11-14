@@ -16,6 +16,8 @@ public class GameStoreContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
     public DbSet<Comment> Comments { get; set; } = default!;
     public DbSet<Genre> Genres { get; set; } = default!;
     public DbSet<PlatformType> PlatformTypes { get; set; } = default!;
+    public DbSet<Order> Orders { get; set; } = default!;
+    public DbSet<OrderItem> OrderItems { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -26,5 +28,7 @@ public class GameStoreContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
         builder.ApplyConfiguration(new GenreConfiguration());
         builder.ApplyConfiguration(new PlatformTypeConfiguration());
         builder.ApplyConfiguration(new UserConfiguration());
+        builder.ApplyConfiguration(new OrderConfiguration());
+        builder.ApplyConfiguration(new OrderItemConfiguration());
     }
 }
