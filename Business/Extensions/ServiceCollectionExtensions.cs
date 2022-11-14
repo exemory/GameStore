@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPlatformTypeService, PlatformTypeService>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IAvatarService, AvatarService>();
+        services.AddScoped<IOrderService, OrderService>();
 
         services.AddScoped<ISession, Session>();
 
