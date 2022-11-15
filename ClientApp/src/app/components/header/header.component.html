@@ -35,7 +35,7 @@
 
     <div class="cart">
       <button mat-icon-button color="primary" (click)="cart.openCartDialog()">
-        <mat-icon fontSet="material-icons-outlined" [matBadge]="cart.itemCount | async" [matBadgeHidden]="cart.isEmpty" matBadgeSize="small" matBadgeColor="accent">shopping_cart</mat-icon>
+        <mat-icon fontSet="material-icons-outlined" [matBadge]="cartItemsCount | async" [matBadgeHidden]="cart.isEmpty" matBadgeSize="small" matBadgeColor="accent">shopping_cart</mat-icon>
       </button>
     </div>
 

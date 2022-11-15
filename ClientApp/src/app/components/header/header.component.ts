@@ -5,6 +5,7 @@ import {UploadAvatarDialogComponent} from "../upload-avatar-dialog/upload-avatar
 import {HttpClient} from "@angular/common/http";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {CartService} from "../../services/cart.service";
+import {map} from "rxjs";
 
 @Component({
   selector: 'app-header',
@@ -12,6 +13,10 @@ import {CartService} from "../../services/cart.service";
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
+
+  cartItemsCount = this.cart.items.pipe(
+    map(i => i.reduce((sum, item) => sum + item.quantity, 0))
+  );
 
   avatarUrl?: SafeUrl | string = 'assets/default-user-avatar.png';
 

@@ -3,6 +3,7 @@ import {MatDialogRef} from "@angular/material/dialog";
 import {CartService} from "../../services/cart.service";
 import {Game} from "../../interfaces/game";
 import {environment as env} from "../../../environments/environment";
+import {map} from "rxjs";
 
 @Component({
   selector: 'app-cart',
@@ -10,6 +11,10 @@ import {environment as env} from "../../../environments/environment";
   styleUrls: ['./cart-dialog.component.scss']
 })
 export class CartDialogComponent implements OnInit {
+
+  cartTotalPrice = this.cart.items.pipe(
+    map(i => i.reduce((total, item) => total + item.quantity * item.game.price, 0))
+  );
 
   constructor(private dialogRef: MatDialogRef<CartDialogComponent>,
               public cart: CartService) {

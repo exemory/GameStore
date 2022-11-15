@@ -15,8 +15,6 @@ export class CartService {
   private _items: { game: Game, quantity: number }[] = [];
 
   public items = new BehaviorSubject(this._items);
-  public itemCount = new BehaviorSubject(0);
-  public totalPrice = new BehaviorSubject(0);
 
   private cartDialog?: MatDialogRef<CartDialogComponent>;
 
@@ -26,8 +24,6 @@ export class CartService {
 
     this.items.subscribe(items => {
       this.storeCartItems(items);
-      this.itemCount.next(this.getItemsCount(items));
-      this.totalPrice.next(this.getTotalPrice(items));
     });
   }
 
@@ -47,20 +43,12 @@ export class CartService {
     return JSON.parse(items);
   }
 
-  private getTotalPrice(items: { game: Game, quantity: number }[]) {
-    return items.reduce((total, item) => total + item.quantity * item.game.price, 0);
-  }
-
-  private getItemsCount(items: { game: Game, quantity: number }[]) {
-    return items.reduce((sum, item) => sum + item.quantity, 0);
-  }
-
   private getItemByGameId(gameId: string) {
     return this._items.find(g => g.game.id === gameId);
   }
 
   get isEmpty() {
-    return this.itemCount.value === 0;
+    return this._items.length === 0;
   }
 
   addGame(game: Game) {

@@ -9,7 +9,7 @@
     </div>
   </div>
 
-  <p class="total-price">Total {{cart.totalPrice | async | currency}}</p>
+  <p class="total-price">Total {{cartTotalPrice | async | currency}}</p>
 
   <div class="actions">
     <button mat-stroked-button color="primary" (click)="closeCart()">Continue shopping</button>
