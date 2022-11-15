@@ -1,15 +1,31 @@
-import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  ViewEncapsulation
+} from '@angular/core';
 import {FormBuilder, Validators} from "@angular/forms";
 import {AuthService} from "../../services/auth.service";
 import {NotificationService} from "../../services/notification.service";
 import {MatDialogRef} from "@angular/material/dialog";
+import {PaymentType} from "../../enums/payment-type";
+import {HttpClient} from "@angular/common/http";
+import {OrderCreationData} from "../../interfaces/order-creation-data";
+import {OrderItem} from "../../interfaces/order-item";
+import {CartService} from "../../services/cart.service";
 
 @Component({
   selector: 'app-complete-order-dialog',
   templateUrl: './completion-order-dialog.component.html',
-  styleUrls: ['./completion-order-dialog.component.scss']
+  styleUrls: ['./completion-order-dialog.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class CompletionOrderDialogComponent implements OnInit, AfterViewInit {
+  public paymentType = PaymentType;
+
   @ViewChild('firstName') firstNameElementRef!: ElementRef;
   @ViewChild('email') emailElementRef!: ElementRef;
 
@@ -28,6 +44,7 @@ export class CompletionOrderDialogComponent implements OnInit, AfterViewInit {
     ]],
     phone: ['', [
       Validators.required,
+      Validators.pattern(/^\+\d{11,16}$/)
     ]],
     paymentType: ['', [
       Validators.required
@@ -41,7 +58,9 @@ export class CompletionOrderDialogComponent implements OnInit, AfterViewInit {
               private auth: AuthService,
               private cdr: ChangeDetectorRef,
               private ns: NotificationService,
-              private dialogRef: MatDialogRef<CompletionOrderDialogComponent>) {
+              private dialogRef: MatDialogRef<CompletionOrderDialogComponent>,
+              private api: HttpClient,
+              private cart: CartService) {
     this.initFields();
   }
 
@@ -73,7 +92,33 @@ export class CompletionOrderDialogComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.ns.notifySuccess("Order confirmed");
-    this.dialogRef.close(true);
+    const formValue = this.form.value;
+
+    const orderItems: OrderItem[] = this.cart.items.value.map(
+      i => <OrderItem>{
+        gameId: i.game.id,
+        quantity: i.quantity
+      });
+
+    const data: OrderCreationData = {
+      firstName: formValue.firstName!.trim(),
+      lastName: formValue.lastName!.trim(),
+      email: formValue.email!,
+      phone: formValue.phone!,
+      paymentType: formValue.paymentType!,
+      comments: formValue.comments ? formValue.comments : undefined,
+      items: orderItems
+    };
+
+    this.api.post('orders', data)
+      .subscribe({
+        next: () => {
+          this.ns.notifySuccess("Order confirmed.");
+          this.dialogRef.close(true);
+        },
+        error: err => {
+          this.ns.notifyError(`Operation failed. ${err.error?.message ?? ''}`);
+        }
+      });
   }
 }

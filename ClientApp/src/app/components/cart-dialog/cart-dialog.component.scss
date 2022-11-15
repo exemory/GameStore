@@ -55,13 +55,14 @@
 
             .price {
               font-size: 16px;
-              min-width: 100px;
+              min-width: 70px;
               margin: 0;
             }
 
             .quantity-control {
               display: flex;
               align-items: center;
+              margin-left: 20px;
 
               .quantity-button {
                 font-size: 20px;
@@ -75,6 +76,7 @@
                   height: 16px !important;
                   line-height: 16px !important;
                 }
+
                 .material-icons {
                   font-size: 16px !important;
                 }
@@ -86,6 +88,12 @@
                 margin: 0;
                 text-align: center;
               }
+            }
+
+            .total-items-price {
+              font-size: 16px;
+              min-width: 130px;
+              margin: 0 0 0 auto;
             }
           }
         }

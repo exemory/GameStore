@@ -96,10 +96,10 @@ export class EditGameDialogComponent implements OnInit {
     }
 
     const data: GameUpdateData = {
-      key: this.form.get('key')?.value!,
-      name: this.form.get('name')?.value!,
-      price: +this.form.get('price')?.value!,
-      description: this.form.get('description')?.value!,
+      key: this.form.get('key')!.value!,
+      name: this.form.get('name')!.value!,
+      price: +this.form.get('price')!.value!.replace(',', '')!,
+      description: this.form.get('description')!.value!,
       imageFileName: this.imageId!,
 
       genreIds: this.selectedGenres.map(g => g.id),
@@ -108,6 +108,8 @@ export class EditGameDialogComponent implements OnInit {
 
     this.dialogRef.disableClose = true;
     this.inProgress = true;
+
+    console.log(data)
 
     this.api.put<Game>(`games/${this.game.id}`, data)
       .subscribe({

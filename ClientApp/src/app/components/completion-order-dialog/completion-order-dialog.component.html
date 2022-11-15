@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Compliting the order</h2>
+<h2 mat-dialog-title>Completing the order</h2>
 <div mat-dialog-content>
   <form [formGroup]="form" (ngSubmit)="onSubmit()" id="completing-order-form">
     <mat-form-field appearance="outline">
@@ -17,7 +17,7 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Email</mat-label>
-      <input matInput placeholder="mail@example.com" formControlName="email" required #email>
+      <input matInput placeholder="mail@example.com" formControlName="email" #email>
       <mat-icon fontSet="material-icons-outlined" matSuffix>alternate_email</mat-icon>
       <mat-error *ngIf="form.get('email')?.hasError('required')">This field is required</mat-error>
       <mat-error *ngIf="form.get('email')?.hasError('email')">Email address is invalid</mat-error>
@@ -25,17 +25,29 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Phone</mat-label>
-      <input matInput placeholder="+380951234567" formControlName="phone" required>
+      <input type="tel" matInput placeholder="+380951234567" formControlName="phone">
       <mat-icon fontSet="material-icons-outlined" matSuffix>call</mat-icon>
       <mat-error *ngIf="form.get('phone')?.hasError('required')">This field is required</mat-error>
-      <mat-error *ngIf="form.get('phone')?.hasError('phone')">Phone number is invalid</mat-error>
+      <mat-error *ngIf="form.get('phone')?.hasError('pattern')">Phone number is invalid</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Payment type</mat-label>
       <mat-select formControlName="paymentType">
-        <mat-option [value]="'card'">Card</mat-option>
-        <mat-option [value]="'cash'">Cash</mat-option>
+        <mat-select-trigger class="select-trigger">
+          <mat-icon class="icon" fontSet="material-icons-outlined">
+            {{form.value.paymentType === paymentType.Card ? 'credit_card' : 'payments'}}
+          </mat-icon>
+          <span class="selected-payment-type">{{form.value.paymentType}}</span>
+        </mat-select-trigger>
+        <mat-option [value]="paymentType.Card">
+          <mat-icon fontSet="material-icons-outlined">credit_card</mat-icon>
+          <span>Card</span>
+        </mat-option>
+        <mat-option [value]="paymentType.Cash">
+          <mat-icon fontSet="material-icons-outlined">payments</mat-icon>
+          <span>Cash</span>
+        </mat-option>
       </mat-select>
       <mat-error *ngIf="form.get('paymentType')?.hasError('required')">This field is required</mat-error>
     </mat-form-field>
@@ -50,7 +62,7 @@
 <div mat-dialog-actions align="end">
   <button mat-stroked-button [disabled]="inProgress" [mat-dialog-close]="undefined">Cancel</button>
   <button type="submit" form="completing-order-form" [disabled]="form.invalid || inProgress" mat-raised-button
-          color="primary">
+          color="accent">
     Checkout
   </button>
 </div>

@@ -67,11 +67,11 @@ export class CartService {
     const item = this.getItemByGameId(game.id);
 
     if (item) {
-      item.quantity++;
-    } else {
-      this._items.push({game, quantity: 1});
+      this.updateQuantity(item.game, item.quantity + 1);
+      return
     }
 
+    this._items.push({game, quantity: 1});
     this.items.next(this._items);
   }
 
@@ -85,6 +85,10 @@ export class CartService {
   }
 
   updateQuantity(game: Game, quantity: number) {
+    if (quantity <= 0 || quantity > 100) {
+      return;
+    }
+
     const item = this.getItemByGameId(game.id)
 
     if (item) {
@@ -94,6 +98,16 @@ export class CartService {
     }
 
     this.items.next(this._items);
+  }
+
+  increaseQuantity(game: Game, value: number) {
+    const item = this.getItemByGameId(game.id);
+
+    if (!item) {
+      return;
+    }
+
+    this.updateQuantity(item.game, item.quantity + value);
   }
 
   getItem(game: Game) {
@@ -108,7 +122,7 @@ export class CartService {
   openCartDialog() {
     this.cartDialog = this.dialog.open(CartDialogComponent,
       {
-        maxWidth: '500px',
+        maxWidth: '550px',
         width: '100%',
         height: '100%',
         position: {right: "right"},

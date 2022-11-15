@@ -22,30 +22,12 @@ export class CartDialogComponent implements OnInit {
     return `${env.apiUrl}games/${game.key}/image`;
   }
 
-  onQuantityInput(game: Game, event: any) {
-    const quantity = +event.target.value;
-
-    this.cart.updateQuantity(game, quantity);
-  }
-
   closeCart() {
     this.dialogRef.close();
   }
 
-  increaseQuantity(game: Game, num: number) {
-    const item = this.cart.getItem(game);
-
-    if (!item) {
-      return;
-    }
-
-    const newQuantity = item.quantity + num;
-
-    if (newQuantity < 1 || newQuantity > 100) {
-      return;
-    }
-
-    this.cart.updateQuantity(game, newQuantity);
+  increaseQuantity(game: Game, value: number) {
+    this.cart.increaseQuantity(game, value);
   }
 
   checkout() {
