@@ -28,7 +28,13 @@ public class OrderCreationDtoValidator : AbstractValidator<OrderCreationDto>
             .NotEmpty()
             .IsEnumName(typeof(PaymentType), false);
 
+        RuleFor(o => o.Items)
+            .Cascade(CascadeMode.Stop)
+            .NotNull()
+            .Must(i => i.Any()).WithMessage("'{PropertyName}' must not be empty.");
+
         RuleForEach(o => o.Items)
+            .NotNull()
             .SetValidator(new OrderItemDtoValidator());
     }
 }
