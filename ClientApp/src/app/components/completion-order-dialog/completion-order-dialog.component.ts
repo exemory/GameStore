@@ -110,6 +110,9 @@ export class CompletionOrderDialogComponent implements OnInit, AfterViewInit {
       items: orderItems
     };
 
+    this.inProgress = true;
+    this.dialogRef.disableClose = true;
+
     this.api.post('orders', data)
       .subscribe({
         next: () => {
@@ -117,6 +120,8 @@ export class CompletionOrderDialogComponent implements OnInit, AfterViewInit {
           this.dialogRef.close(true);
         },
         error: err => {
+          this.inProgress = false;
+          this.dialogRef.disableClose = false;
           this.ns.notifyError(`Operation failed. ${err.error?.message ?? ''}`);
         }
       });
