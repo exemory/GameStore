@@ -2,7 +2,7 @@
 
 namespace Business.Tests
 {
-    public class AutomapperTests
+    public class AutomapperTests : TestsBase
     {
         [Fact]
         public void ValidateConfiguration()

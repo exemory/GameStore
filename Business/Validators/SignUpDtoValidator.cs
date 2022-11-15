@@ -17,11 +17,11 @@ namespace Business.Validators
 
             RuleFor(d => d.FirstName)
                 .NotEmpty()
-                .Length(1, 50);
+                .MaximumLength(50);
 
             RuleFor(d => d.LastName)
                 .NotEmpty()
-                .Length(1, 50);
+                .MaximumLength(50);
 
             RuleFor(d => d.Password)
                 .NotNull()

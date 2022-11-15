@@ -20,7 +20,7 @@ public class AutomapperProfile : Profile
             .ForSourceMember(g => g.GenreIds, o => o.DoNotValidate())
             .ForSourceMember(g => g.PlatformTypeIds, o => o.DoNotValidate())
             .ForMember(g => g.ImageFileName,
-                o => o.Condition((d, g, v) => v != null));
+                o => o.Condition((_, _, v) => v != null));
 
         CreateMap<Comment, CommentDto>()
             .ForMember(c => c.UserInfo, o => o.MapFrom(c => c.User));
@@ -40,5 +40,8 @@ public class AutomapperProfile : Profile
 
         CreateMap<SignUpDto, User>(MemberList.Source)
             .ForSourceMember(d => d.Password, o => o.DoNotValidate());
+
+        CreateMap<OrderCreationDto, Order>(MemberList.Source);
+        CreateMap<OrderItemDto, OrderItem>(MemberList.Source);
     }
 }

@@ -14,43 +14,42 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
-namespace Business.Tests;
+namespace Business.Tests.ServiceTests;
 
-public class CommentServiceTests
+public class CommentServiceTests : TestsBase
 {
     private readonly CommentService _sut;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
-    private readonly Fixture _fixture = new();
     private readonly IMapper _mapper = UnitTestHelper.CreateMapper();
     private readonly Mock<ISession> _sessionMock = new();
+
     private readonly Mock<UserManager<User>> _userManagerMock =
-            new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
+        new(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
+
     private readonly Mock<ILogger<CommentService>> _loggerMock = new();
 
     public CommentServiceTests()
     {
-        _fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
-        _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
-        
-        _sut = new CommentService(_unitOfWorkMock.Object, _mapper, _sessionMock.Object, _userManagerMock.Object, _loggerMock.Object);
+        _sut = new CommentService(_unitOfWorkMock.Object, _mapper, _sessionMock.Object, _userManagerMock.Object,
+            _loggerMock.Object);
     }
 
     [Fact]
     public async Task CreateAsync_ShouldCreateGame_WhenParentCommentUnspecified()
     {
         // Arrange
-        var commentCreationDto = _fixture.Build<CommentCreationDto>()
+        var commentCreationDto = Fixture.Build<CommentCreationDto>()
             .Without(c => c.ParentId)
             .Create();
-        var user = _fixture.Create<User>();
+        var user = Fixture.Create<User>();
         var mappedComment = _mapper.Map<Comment>(commentCreationDto);
         mappedComment.User = user;
         var expectedToCreate = mappedComment.ToExpectedObject();
         var expected = _mapper.Map<CommentDto>(mappedComment);
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByIdAsync(commentCreationDto.GameId))
-            .ReturnsAsync(_fixture.Create<Game>());
+            .ReturnsAsync(Fixture.Create<Game>());
         _unitOfWorkMock.Setup(u => u.CommentRepository.Add(It.IsAny<Comment>()));
         _sessionMock.Setup(s => s.UserId).Returns(user.Id);
         _userManagerMock.Setup(u => u.FindByIdAsync(user.Id.ToString()))
@@ -71,18 +70,18 @@ public class CommentServiceTests
     public async Task CreateAsync_ShouldCreateGame_WhenParentCommentSpecified()
     {
         // Arrange
-        var commentCreationDto = _fixture.Create<CommentCreationDto>();
-        var parentComment = _fixture.Build<Comment>()
+        var commentCreationDto = Fixture.Create<CommentCreationDto>();
+        var parentComment = Fixture.Build<Comment>()
             .With(c => c.GameId, commentCreationDto.GameId)
             .Create();
-        var user = _fixture.Create<User>();
+        var user = Fixture.Create<User>();
         var mappedComment = _mapper.Map<Comment>(commentCreationDto);
         mappedComment.User = user;
         var expectedToCreate = mappedComment.ToExpectedObject();
         var expected = _mapper.Map<CommentDto>(mappedComment);
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByIdAsync(commentCreationDto.GameId))
-            .ReturnsAsync(_fixture.Create<Game>());
+            .ReturnsAsync(Fixture.Create<Game>());
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(commentCreationDto.ParentId!.Value))
             .ReturnsAsync(parentComment);
         _sessionMock.Setup(s => s.UserId).Returns(user.Id);
@@ -104,7 +103,7 @@ public class CommentServiceTests
     public async Task CreateAsync_ShouldFail_WhenGameDoesNotExists()
     {
         // Arrange
-        var commentCreationDto = _fixture.Create<CommentCreationDto>();
+        var commentCreationDto = Fixture.Create<CommentCreationDto>();
         var expectedExceptionMessage = $"Game with id '{commentCreationDto.GameId}' not found.";
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByIdAsync(commentCreationDto.GameId))
@@ -125,11 +124,11 @@ public class CommentServiceTests
     public async Task CreateAsync_ShouldFail_WhenParentCommentDoesNotExists()
     {
         // Arrange
-        var commentCreationDto = _fixture.Create<CommentCreationDto>();
+        var commentCreationDto = Fixture.Create<CommentCreationDto>();
         var expectedExceptionMessage = $"Comment with id '{commentCreationDto.ParentId}' not found.";
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByIdAsync(commentCreationDto.GameId))
-            .ReturnsAsync(_fixture.Create<Game>());
+            .ReturnsAsync(Fixture.Create<Game>());
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(commentCreationDto.ParentId!.Value))
             .ReturnsAsync((Comment?) null);
 
@@ -148,12 +147,12 @@ public class CommentServiceTests
     public async Task CreateAsync_ShouldFail_WhenParentCommentFromOtherGame()
     {
         // Arrange
-        var commentCreationDto = _fixture.Create<CommentCreationDto>();
+        var commentCreationDto = Fixture.Create<CommentCreationDto>();
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByIdAsync(commentCreationDto.GameId))
-            .ReturnsAsync(_fixture.Create<Game>());
+            .ReturnsAsync(Fixture.Create<Game>());
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(commentCreationDto.ParentId!.Value))
-            .ReturnsAsync(_fixture.Create<Comment>());
+            .ReturnsAsync(Fixture.Create<Comment>());
 
         // Act
         Func<Task> result = async () => await _sut.CreateAsync(commentCreationDto);
@@ -164,16 +163,16 @@ public class CommentServiceTests
         _unitOfWorkMock.Verify(u => u.CommentRepository.Add(It.IsAny<Comment>()), Times.Never);
         _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
     }
-    
+
     [Fact]
     public async Task CreateAsync_ShouldFail_WhenAuthorizedUserNotFound()
     {
         // Arrange
-        var game = _fixture.Create<Game>();
-        var commentCreationDto = _fixture.Build<CommentCreationDto>()
+        var game = Fixture.Create<Game>();
+        var commentCreationDto = Fixture.Build<CommentCreationDto>()
             .Without(c => c.ParentId)
             .Create();
-        var nonexistentUserId = _fixture.Create<Guid>();
+        var nonexistentUserId = Fixture.Create<Guid>();
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByIdAsync(commentCreationDto.GameId))
             .ReturnsAsync(game);
@@ -193,8 +192,8 @@ public class CommentServiceTests
     public async Task GetAllByGameKeyAsync_ShouldReturnAllCommentsRelatedToGame()
     {
         // Arrange
-        var game = _fixture.Create<Game>();
-        var comments = _fixture.Build<Comment>()
+        var game = Fixture.Create<Game>();
+        var comments = Fixture.Build<Comment>()
             .Without(c => c.Game)
             .CreateMany();
         var expectedComments = _mapper.Map<IEnumerable<CommentDto>>(comments);
@@ -215,7 +214,7 @@ public class CommentServiceTests
     public async Task GetAllByGameKeyAsync_ShouldFail_WhenGameDoesNotExists()
     {
         // Arrange
-        var nonexistentGameKey = _fixture.Create<string>();
+        var nonexistentGameKey = Fixture.Create<string>();
 
         _unitOfWorkMock.Setup(u => u.GameRepository.GetByKeyAsync(nonexistentGameKey))
             .ReturnsAsync((Game?) null);
@@ -231,10 +230,10 @@ public class CommentServiceTests
     public async Task EditAsync_ShouldEditComment()
     {
         // Arrange
-        var comment = _fixture.Build<Comment>()
+        var comment = Fixture.Build<Comment>()
             .With(c => c.Deleted, false)
             .Create();
-        var commentUpdateDto = _fixture.Create<CommentUpdateDto>();
+        var commentUpdateDto = Fixture.Create<CommentUpdateDto>();
         var expectedCommentToUpdate = _mapper.Map(commentUpdateDto, comment.DeepClone()).ToExpectedObject();
 
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
@@ -254,9 +253,9 @@ public class CommentServiceTests
     public async Task EditAsync_ShouldFail_WhenCommentDoesNotExist()
     {
         // Arrange
-        var nonexistentCommentId = _fixture.Create<Guid>();
-        var commentUpdateDto = _fixture.Create<CommentUpdateDto>();
-        var userId = _fixture.Create<Guid>();
+        var nonexistentCommentId = Fixture.Create<Guid>();
+        var commentUpdateDto = Fixture.Create<CommentUpdateDto>();
+        var userId = Fixture.Create<Guid>();
 
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(nonexistentCommentId))
             .ReturnsAsync((Comment?) null);
@@ -272,15 +271,15 @@ public class CommentServiceTests
             u.CommentRepository.Update(It.IsAny<Comment>()), Times.Never);
         _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Never);
     }
-    
+
     [Fact]
     public async Task EditAsync_ShouldFail_WhenCommentMarkedAsDeleted()
     {
         // Arrange
-        var comment = _fixture.Build<Comment>()
+        var comment = Fixture.Build<Comment>()
             .With(c => c.Deleted, true)
             .Create();
-        var commentUpdateDto = _fixture.Create<CommentUpdateDto>();
+        var commentUpdateDto = Fixture.Create<CommentUpdateDto>();
 
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
             .ReturnsAsync(comment);
@@ -301,11 +300,11 @@ public class CommentServiceTests
     public async Task EditAsync_ShouldFail_WhenUserTriesToEditOtherUsersComment()
     {
         // Arrange
-        var comment = _fixture.Build<Comment>()
+        var comment = Fixture.Build<Comment>()
             .With(c => c.Deleted, false)
             .Create();
-        var commentUpdateDto = _fixture.Create<CommentUpdateDto>();
-        var userId = _fixture.Create<Guid>();
+        var commentUpdateDto = Fixture.Create<CommentUpdateDto>();
+        var userId = Fixture.Create<Guid>();
 
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
             .ReturnsAsync(comment);
@@ -326,7 +325,7 @@ public class CommentServiceTests
     public async Task DeleteAsync_ShouldMarkCommentAsDeleted()
     {
         // Arrange
-        var comment = _fixture.Build<Comment>()
+        var comment = Fixture.Build<Comment>()
             .With(c => c.Deleted, false)
             .Create();
         var updatedComment = comment.DeepClone();
@@ -350,7 +349,7 @@ public class CommentServiceTests
     public async Task DeleteAsync_ShouldFail_WhenCommentDoesNotExist()
     {
         // Arrange
-        var nonexistentCommentId = _fixture.Create<Guid>();
+        var nonexistentCommentId = Fixture.Create<Guid>();
 
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(nonexistentCommentId))
             .ReturnsAsync((Comment?) null);
@@ -370,10 +369,10 @@ public class CommentServiceTests
     public async Task DeleteAsync_ShouldFail_WhenUserTriesToDeleteOtherUsersComment()
     {
         // Arrange
-        var comment = _fixture.Build<Comment>()
+        var comment = Fixture.Build<Comment>()
             .With(c => c.Deleted, false)
             .Create();
-        var userId = _fixture.Create<Guid>();
+        var userId = Fixture.Create<Guid>();
 
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
             .ReturnsAsync(comment);
@@ -394,7 +393,7 @@ public class CommentServiceTests
     public async Task DeleteAsync_ShouldFail_WhenCommentHasAlreadyBeenDeleted()
     {
         // Arrange
-        var comment = _fixture.Build<Comment>()
+        var comment = Fixture.Build<Comment>()
             .With(c => c.Deleted, true)
             .Create();
 
@@ -417,7 +416,7 @@ public class CommentServiceTests
     public async Task RestoreAsync_ShouldRestoreComment()
     {
         // Arrange
-        var comment = _fixture.Build<Comment>()
+        var comment = Fixture.Build<Comment>()
             .With(c => c.Deleted, true)
             .Create();
         var updatedComment = comment.DeepClone();
@@ -441,7 +440,7 @@ public class CommentServiceTests
     public async Task RestoreAsync_ShouldFail_WhenCommentDoesNotExist()
     {
         // Arrange
-        var nonexistentCommentId = _fixture.Create<Guid>();
+        var nonexistentCommentId = Fixture.Create<Guid>();
 
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(nonexistentCommentId))
             .ReturnsAsync((Comment?) null);
@@ -461,10 +460,10 @@ public class CommentServiceTests
     public async Task RestoreAsync_ShouldFail_WhenUserTriesToRestoreOtherUsersComment()
     {
         // Arrange
-        var comment = _fixture.Build<Comment>()
+        var comment = Fixture.Build<Comment>()
             .With(c => c.Deleted, true)
             .Create();
-        var userId = _fixture.Create<Guid>();
+        var userId = Fixture.Create<Guid>();
 
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
             .ReturnsAsync(comment);
@@ -485,7 +484,7 @@ public class CommentServiceTests
     public async Task RestoreAsync_ShouldFail_WhenCommentIsNotDeleted()
     {
         // Arrange
-        var comment = _fixture.Build<Comment>()
+        var comment = Fixture.Build<Comment>()
             .With(c => c.Deleted, false)
             .Create();
 

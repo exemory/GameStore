@@ -47,4 +47,11 @@ public interface IGameRepository : IRepository<Game>
     /// <param name="platformTypes">List of platform types</param>
     /// <returns>All games supported on specified platform types with included genres</returns>
     public Task<IEnumerable<Game>> GetAllByPlatformTypesWithGenresAsync(IEnumerable<string> platformTypes);
+    
+    /// <summary>
+    /// Get games by their ids
+    /// </summary>
+    /// <param name="gameIds">List of game identifiers</param>
+    /// <returns>Games with ids specified by <paramref name="gameIds"/></returns>
+    public Task<ICollection<Game>> GetByIds(IEnumerable<Guid> gameIds);
 }

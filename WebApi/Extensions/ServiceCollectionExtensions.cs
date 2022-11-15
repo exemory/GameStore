@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
 using Business.Options;
 using Business.Validators;
 using Data;
@@ -31,6 +32,10 @@ public static class ServiceCollectionExtensions
         services.AddControllers(o =>
         {
             o.Filters.Add<SessionFilter>();
+        }).AddJsonOptions(o =>
+        {
+            var enumConverter = new JsonStringEnumConverter();
+            o.JsonSerializerOptions.Converters.Add(enumConverter);
         });
 
         services.AddIdentityCore<User>(options =>
