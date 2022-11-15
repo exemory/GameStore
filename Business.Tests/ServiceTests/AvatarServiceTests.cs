@@ -13,9 +13,9 @@ using NSubstitute.ExceptionExtensions;
 using NSubstitute.ReturnsExtensions;
 using Xunit;
 
-namespace Business.Tests;
+namespace Business.Tests.ServiceTests;
 
-public class AvatarServiceTests
+public class AvatarServiceTests : TestsBase
 {
     private readonly AvatarService _sut;
 
@@ -28,13 +28,8 @@ public class AvatarServiceTests
     private readonly ISession _session = Substitute.For<ISession>();
     private readonly ILogger<AvatarService> _logger = Substitute.For<ILogger<AvatarService>>();
 
-    private readonly Fixture _fixture = new();
-
     public AvatarServiceTests()
     {
-        _fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
-        _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
-
         _sut = new AvatarService(_storageService, _userManager, _session, _logger);
     }
 
@@ -46,8 +41,8 @@ public class AvatarServiceTests
     {
         // Arrange
         var fileStream = new MemoryStream();
-        var user = _fixture.Create<User>();
-        var storedFileName = _fixture.Create<string>();
+        var user = Fixture.Create<User>();
+        var storedFileName = Fixture.Create<string>();
 
         var expectedUser = user.DeepClone();
         expectedUser.Avatar = storedFileName;
@@ -69,8 +64,8 @@ public class AvatarServiceTests
     {
         // Arrange
         var fileStream = new MemoryStream();
-        var fileName = _fixture.Create<string>();
-        var nonexistentUserId = _fixture.Create<Guid>();
+        var fileName = Fixture.Create<string>();
+        var nonexistentUserId = Fixture.Create<Guid>();
 
         _session.UserId.Returns(nonexistentUserId);
         _userManager.FindByIdAsync(nonexistentUserId.ToString()).ReturnsNull();
@@ -89,8 +84,8 @@ public class AvatarServiceTests
     {
         // Arrange
         var fileStream = new MemoryStream();
-        var fileName = _fixture.Create<string>();
-        var user = _fixture.Create<User>();
+        var fileName = Fixture.Create<string>();
+        var user = Fixture.Create<User>();
 
         _session.UserId.Returns(user.Id);
         _userManager.FindByIdAsync(user.Id.ToString()).Returns(user);
@@ -108,7 +103,7 @@ public class AvatarServiceTests
     public async Task GetAvatarImageAsync_ShouldReturnAvatarImage_WhenUsernameIsNotSpecified()
     {
         // Arrange
-        var user = _fixture.Create<User>();
+        var user = Fixture.Create<User>();
         var fileStream = new MemoryStream();
 
         _session.IsAuthorized.Returns(true);
@@ -130,7 +125,7 @@ public class AvatarServiceTests
     public async Task GetAvatarImageAsync_ShouldReturnAvatarImage_WhenUsernameIsSpecified()
     {
         // Arrange
-        var user = _fixture.Create<User>();
+        var user = Fixture.Create<User>();
         var fileStream = new MemoryStream();
 
         _userManager.FindByNameAsync(user.UserName).Returns(user);
@@ -150,7 +145,7 @@ public class AvatarServiceTests
     public async Task GetUserAsync_ShouldFail_WhenUserDoesNotExist()
     {
         // Arrange
-        var nonexistentUsername = _fixture.Create<string>();
+        var nonexistentUsername = Fixture.Create<string>();
         var expectedExceptionMessage = $"User with username '{nonexistentUsername}' not found.";
 
         _userManager.FindByNameAsync(nonexistentUsername).ReturnsNull();
@@ -180,7 +175,7 @@ public class AvatarServiceTests
     public async Task GetAvatarImageAsync_ShouldFail_WhenAuthorizedUserDoesNotExist()
     {
         // Arrange
-        var nonexistentUserId = _fixture.Create<Guid>();
+        var nonexistentUserId = Fixture.Create<Guid>();
 
         _session.IsAuthorized.Returns(true);
         _session.UserId.Returns(nonexistentUserId);
@@ -197,7 +192,7 @@ public class AvatarServiceTests
     public async Task GetAvatarImageAsync_ShouldFail_WhenUserHasNotAvatar()
     {
         // Arrange
-        var user = _fixture.Build<User>()
+        var user = Fixture.Build<User>()
             .Without(u => u.Avatar)
             .Create();
         const string expectedExceptionMessage = "User does not have avatar.";
@@ -218,7 +213,7 @@ public class AvatarServiceTests
     public async Task GetAvatarImage_ShouldFail_WhenUserAvatarImageNotFound()
     {
         // Arrange
-        var user = _fixture.Create<User>();
+        var user = Fixture.Create<User>();
         const string expectedExceptionMessage = "User's avatar not found.";
 
         _session.IsAuthorized.Returns(true);

@@ -11,22 +11,17 @@ using FluentAssertions;
 using NSubstitute;
 using Xunit;
 
-namespace Business.Tests;
+namespace Business.Tests.ServiceTests;
 
-public class OrderServiceTests
+public class OrderServiceTests : TestsBase
 {
     private readonly OrderService _sut;
 
     private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
     private readonly IMapper _mapper = UnitTestHelper.CreateMapper();
 
-    private readonly IFixture _fixture = new Fixture();
-
     public OrderServiceTests()
     {
-        _fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
-        _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
-
         _sut = new OrderService(_unitOfWork, _mapper);
     }
 
@@ -34,11 +29,11 @@ public class OrderServiceTests
     public async Task CreateAsync_ShouldCreateOrder()
     {
         // Arrange
-        var orderCreationDto = _fixture.Build<OrderCreationDto>()
+        var orderCreationDto = Fixture.Build<OrderCreationDto>()
             .With(o => o.PaymentType, PaymentType.Card.ToString)
             .Create();
         var games = orderCreationDto.Items
-            .Select(i => _fixture.Build<Game>().With(g => g.Id, i.GameId).Create())
+            .Select(i => Fixture.Build<Game>().With(g => g.Id, i.GameId).Create())
             .ToList();
         var expectedGameIds = games.Select(g => g.Id).ToList().ToExpectedObject();
         var expectedOrderToAdd = _mapper.Map<Order>(orderCreationDto).ToExpectedObject();
@@ -58,7 +53,7 @@ public class OrderServiceTests
     public async Task CreateAsync_ShouldFail_WhenGamesDoesNotExists()
     {
         // Arrange
-        var orderCreationDto = _fixture.Create<OrderCreationDto>();
+        var orderCreationDto = Fixture.Create<OrderCreationDto>();
 
         _unitOfWork.GameRepository.GetByIds(Arg.Any<IEnumerable<Guid>>()).Returns(new List<Game>());
 

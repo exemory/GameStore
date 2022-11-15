@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using AutoFixture;
+using AutoMapper;
 
 namespace Business.Tests;
 
@@ -13,7 +14,15 @@ public static class UnitTestHelper
     public static IMapper CreateMapper()
     {
         var configuration = CreateMapperConfiguration();
-
         return new Mapper(configuration);
+    }
+
+    public static IFixture CreateFixture()
+    {
+        var fixture = new Fixture();
+        fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
+        fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+
+        return fixture;
     }
 }

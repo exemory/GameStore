@@ -8,28 +8,25 @@ using FluentAssertions;
 using Moq;
 using Xunit;
 
-namespace Business.Tests;
+namespace Business.Tests.ServiceTests;
 
-public class GenreServiceTests
+public class GenreServiceTests : TestsBase
 {
     private readonly GenreService _sut;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
-    private readonly Fixture _fixture = new();
     private readonly IMapper _mapper = UnitTestHelper.CreateMapper();
 
     public GenreServiceTests()
     {
         _sut = new GenreService(_unitOfWorkMock.Object, _mapper);
-        _fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
-        _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
     }
-    
+
     [Fact]
     public async Task GetAllAsync_ShouldReturnAllGenres()
     {
         // Arrange
-        var genres = _fixture.Build<Genre>()
+        var genres = Fixture.Build<Genre>()
             .Without(g => g.Games)
             .CreateMany();
         var expected = _mapper.Map<IEnumerable<GenreDto>>(genres);

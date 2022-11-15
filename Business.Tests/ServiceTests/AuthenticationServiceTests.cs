@@ -16,9 +16,9 @@ using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using Xunit;
 
-namespace Business.Tests;
+namespace Business.Tests.ServiceTests;
 
-public class AuthenticationServiceTests
+public class AuthenticationServiceTests : TestsBase
 {
     private readonly AuthenticationService _sut;
 
@@ -30,19 +30,14 @@ public class AuthenticationServiceTests
     private readonly IOptions<JwtOptions> _jwtOptions = Substitute.For<IOptions<JwtOptions>>();
     private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
-    private readonly Fixture _fixture = new();
-
     public AuthenticationServiceTests()
     {
-        _fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
-        _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
-
-        var jwtOptions = _fixture.Build<JwtOptions>()
+        var jwtOptions = Fixture.Build<JwtOptions>()
             .With(j => j.Lifetime, TimeSpan.FromDays(1))
             .Create();
 
         _jwtOptions.Value.Returns(jwtOptions);
-        _dateTimeProvider.UtcNow.Returns(_fixture.Create<DateTimeOffset>().ToUniversalTime());
+        _dateTimeProvider.UtcNow.Returns(Fixture.Create<DateTimeOffset>().ToUniversalTime());
 
         _sut = new AuthenticationService(_userManager, _mapper, _jwtOptions, _dateTimeProvider);
     }
@@ -51,7 +46,7 @@ public class AuthenticationServiceTests
     public async Task SignUpAsync_ShouldRegisterUser()
     {
         // Arrange
-        var signUpDto = _fixture.Create<SignUpDto>();
+        var signUpDto = Fixture.Create<SignUpDto>();
         var expectedUserToCreate = _mapper.Map<User>(signUpDto)
             .ToExpectedObject(o => o.Ignore(u => u.ConcurrencyStamp));
 
@@ -70,10 +65,10 @@ public class AuthenticationServiceTests
     public async Task SignUpAsync_ShouldFail_WhenCreatingUserFailed()
     {
         // Arrange
-        var signUpDto = _fixture.Create<SignUpDto>();
+        var signUpDto = Fixture.Create<SignUpDto>();
         var expectedUserToCreate = _mapper.Map<User>(signUpDto)
             .ToExpectedObject(o => o.Ignore(u => u.ConcurrencyStamp));
-        var errors = _fixture.CreateMany<IdentityError>().ToArray();
+        var errors = Fixture.CreateMany<IdentityError>().ToArray();
         var identityError = IdentityResult.Failed(errors);
         var expectedErrorMessage = string.Join(' ', errors.Select(e => e.Description));
 
@@ -98,7 +93,7 @@ public class AuthenticationServiceTests
         // Arrange
         var expectedUser = user
             .ToExpectedObject(o => o.Ignore(u => u.ConcurrencyStamp));
-        var userRoles = _fixture.CreateMany<string>().ToList();
+        var userRoles = Fixture.CreateMany<string>().ToList();
         var expectedTokenExpiration = (_dateTimeProvider.UtcNow + _jwtOptions.Value.Lifetime)
             .ToUnixTimeSeconds()
             .ToString();
@@ -137,9 +132,7 @@ public class AuthenticationServiceTests
 
     public static IEnumerable<object[]> SignInAsync_ShouldAuthenticateUser_TestData()
     {
-        var fixture = new Fixture();
-        fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
-        fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+        var fixture = UnitTestHelper.CreateFixture();
 
         var user1 = fixture.Create<User>();
         yield return new object[]
@@ -164,7 +157,7 @@ public class AuthenticationServiceTests
     public async Task SignInAsync_ShouldFail_WhenUserDoesNotExist()
     {
         // Arrange
-        var signInDto = _fixture.Create<SignInDto>();
+        var signInDto = Fixture.Create<SignInDto>();
 
         _userManager.FindByNameAsync(signInDto.Login).ReturnsNull();
         _userManager.FindByEmailAsync(signInDto.Login).ReturnsNull();
@@ -182,8 +175,8 @@ public class AuthenticationServiceTests
     public async Task SignInAsync_ShouldFail_WhenPasswordIsInvalid()
     {
         // Arrange
-        var signInDto = _fixture.Create<SignInDto>();
-        var user = _fixture.Create<User>();
+        var signInDto = Fixture.Create<SignInDto>();
+        var user = Fixture.Create<User>();
         var expectedUserToCheckPassword = user
             .ToExpectedObject(o => o.Ignore(u => u.ConcurrencyStamp));
 

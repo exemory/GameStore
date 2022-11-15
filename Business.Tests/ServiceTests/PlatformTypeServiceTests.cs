@@ -8,28 +8,25 @@ using FluentAssertions;
 using Moq;
 using Xunit;
 
-namespace Business.Tests;
+namespace Business.Tests.ServiceTests;
 
-public class PlatformTypeServiceTests
+public class PlatformTypeServiceTests : TestsBase
 {
     private readonly PlatformTypeService _sut;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
-    private readonly Fixture _fixture = new();
     private readonly IMapper _mapper = UnitTestHelper.CreateMapper();
 
     public PlatformTypeServiceTests()
     {
         _sut = new PlatformTypeService(_unitOfWorkMock.Object, _mapper);
-        _fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
-        _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
     }
-    
+
     [Fact]
     public async Task GetAllAsync_ShouldReturnAllPlatformTypes()
     {
         // Arrange
-        var platformTypes = _fixture.Build<PlatformType>()
+        var platformTypes = Fixture.Build<PlatformType>()
             .Without(p => p.Games)
             .CreateMany();
         var expected = _mapper.Map<IEnumerable<PlatformTypeDto>>(platformTypes);
