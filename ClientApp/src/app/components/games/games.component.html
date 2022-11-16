@@ -10,7 +10,7 @@
         <input matInput [(ngModel)]="nameFilter" (keydown.escape)="nameFilter=''"
                autocomplete="off">
         <button class="clear-filter-button" *ngIf="nameFilter" matSuffix mat-icon-button (click)="nameFilter=''">
-          <mat-icon>clear</mat-icon>
+          <mat-icon fontSet="material-icons-outlined">clear</mat-icon>
         </button>
       </mat-form-field>
 
@@ -29,7 +29,7 @@
         </mat-select>
         <button class="clear-filter-button" *ngIf="genresFilter.length" matSuffix mat-icon-button
                 (click)="genresFilter = []; $event.stopPropagation()">
-          <mat-icon>clear</mat-icon>
+          <mat-icon fontSet="material-icons-outlined">clear</mat-icon>
         </button>
       </mat-form-field>
 
@@ -41,8 +41,8 @@
         <div class="description" (click)="$event.stopPropagation()">
           <div class="buy-section">
             <p class="price">{{game.price | currency}}</p>
-            <button mat-raised-button class="buy-button" color="accent" (click)="onBuyClick($event, game)">
-              <mat-icon>shopping_cart</mat-icon>
+            <button mat-raised-button class="buy-button" color="accent" (click)="addGameToCart(game)">
+              <mat-icon fontSet="material-icons-outlined">shopping_cart</mat-icon>
               BUY
             </button>
           </div>
@@ -53,7 +53,7 @@
         </div>
         <button mat-icon-button class="actions-button" [class.visible]="menuTrigger.menuOpen"
                 [matMenuTriggerFor]="gameActionsMenu" #menuTrigger="matMenuTrigger" (click)="$event.stopPropagation()">
-          <mat-icon>more_horiz</mat-icon>
+          <mat-icon fontSet="material-icons-outlined">more_horiz</mat-icon>
         </button>
         <mat-menu #gameActionsMenu="matMenu" class="thread-action-menu" xPosition="before">
           <button mat-menu-item (click)="openEditGameDialog(game)">

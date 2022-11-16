@@ -38,5 +38,6 @@ $green: mat.define-palette(mat.$green-palette);
   --color-snack-bar-success: #{mat.get-color-from-palette($green, 700)};
   --color-snack-bar-error: #{mat.get-color-from-palette($red, 700)};
 
+  --color-secondary-text: #{mat.get-color-from-palette(mat.$light-theme-foreground-palette, secondary-text)};
   --color-disabled-text: #{mat.get-color-from-palette(mat.$light-theme-foreground-palette, disabled)};
 }

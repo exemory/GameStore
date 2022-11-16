@@ -1,0 +1,20 @@
+#completing-order-form {
+  display: flex;
+  flex-direction: column;
+
+  .select-trigger {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 18px;
+
+    .icon {
+      position: absolute;
+      left: 0;
+    }
+
+    .selected-payment-type {
+      margin-left: 40px;
+    }
+  }
+}

@@ -4,7 +4,7 @@
 
     <div class="dropzone" [class.avatar-selected]="imageSrc" appDnd (fileDropped)="onFileDropped($event)">
       <ng-container *ngIf="!imageSrc">
-        <mat-icon class="upload-file-icon">upload_file</mat-icon>
+        <mat-icon fontSet="material-icons-outlined" class="upload-file-icon">upload_file</mat-icon>
         <p class="drop-text">Drag and drop image here</p>
       </ng-container>
 

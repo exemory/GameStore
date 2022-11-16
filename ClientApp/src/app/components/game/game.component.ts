@@ -11,6 +11,7 @@ import {FormBuilder} from "@angular/forms";
 import {CommentCreationData} from "../../interfaces/comment-creation-data";
 import {AuthService} from "../../services/auth.service";
 import {CommentUpdateData} from "../../interfaces/comment-update-data";
+import {CartService} from "../../services/cart.service";
 
 @Component({
   selector: 'app-game',
@@ -46,7 +47,8 @@ export class GameComponent implements OnInit {
               private ns: NotificationService,
               private router: Router,
               private fb: FormBuilder,
-              private auth: AuthService) {
+              private auth: AuthService,
+              private cart: CartService) {
   }
 
   ngOnInit(): void {
@@ -272,5 +274,9 @@ export class GameComponent implements OnInit {
           this.ns.notifyError(`Operation failed. ${err.error?.message ?? ''}`);
         }
       });
+  }
+
+  addGameToCart(game: GameWithDetails) {
+    this.cart.addGame(game);
   }
 }

@@ -4,7 +4,7 @@
     <mat-form-field appearance="outline">
       <mat-label>Username</mat-label>
       <input matInput formControlName="username" maxlength="15">
-      <mat-icon matSuffix>login</mat-icon>
+      <mat-icon fontSet="material-icons-outlined" matSuffix>login</mat-icon>
       <mat-error *ngIf="form.get('username')?.hasError('required')">This field is required</mat-error>
       <mat-error *ngIf="form.get('username')?.hasError('minlength')">
         Username must be at least 3 characters long
@@ -18,7 +18,7 @@
     <mat-form-field appearance="outline">
       <mat-label>Email</mat-label>
       <input matInput placeholder="mail@example.com" formControlName="email" required email>
-      <mat-icon matSuffix>alternate_email</mat-icon>
+      <mat-icon fontSet="material-icons-outlined" matSuffix>alternate_email</mat-icon>
       <mat-error *ngIf="form.get('email')?.hasError('required')">This field is required</mat-error>
       <mat-error *ngIf="form.get('email')?.hasError('email')">Email address is invalid</mat-error>
     </mat-form-field>
@@ -26,14 +26,14 @@
     <mat-form-field appearance="outline">
       <mat-label>First name</mat-label>
       <input matInput formControlName="firstName" maxlength="50">
-      <mat-icon matSuffix>face</mat-icon>
+      <mat-icon fontSet="material-icons-outlined" matSuffix>face</mat-icon>
       <mat-error *ngIf="form.get('firstName')?.hasError('required')">This field is required</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Last name</mat-label>
       <input matInput formControlName="lastName" maxlength="50">
-      <mat-icon matSuffix>face</mat-icon>
+      <mat-icon fontSet="material-icons-outlined" matSuffix>face</mat-icon>
       <mat-error *ngIf="form.get('lastName')?.hasError('required')">This field is required</mat-error>
     </mat-form-field>
 
@@ -43,7 +43,7 @@
              formControlName="password">
       <button class="show-hide-password" type="button" mat-icon-button matSuffix
               (click)="hidePassword = !hidePassword">
-        <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+        <mat-icon fontSet="material-icons-outlined">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
       </button>
       <mat-error *ngIf="form.get('password')?.hasError('required')">This field is required</mat-error>
       <mat-error *ngIf="form.get('password')?.hasError('minlength')">
@@ -57,7 +57,7 @@
              formControlName="confirmPassword" [errorStateMatcher]="confirmPasswordStateMatcher">
       <button class="show-hide-password" type="button" mat-icon-button matSuffix
               (click)="hideConfirmPassword = !hideConfirmPassword">
-        <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+        <mat-icon fontSet="material-icons-outlined">{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
       </button>
       <mat-error *ngIf="form.hasError('passwordMismatch')">Passwords must match</mat-error>
     </mat-form-field>

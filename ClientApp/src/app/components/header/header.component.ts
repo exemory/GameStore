@@ -4,6 +4,8 @@ import {MatDialog} from "@angular/material/dialog";
 import {UploadAvatarDialogComponent} from "../upload-avatar-dialog/upload-avatar-dialog.component";
 import {HttpClient} from "@angular/common/http";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
+import {CartService} from "../../services/cart.service";
+import {map} from "rxjs";
 
 @Component({
   selector: 'app-header',
@@ -12,12 +14,17 @@ import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 })
 export class HeaderComponent implements OnInit {
 
+  cartItemsCount = this.cart.items.pipe(
+    map(i => i.reduce((sum, item) => sum + item.quantity, 0))
+  );
+
   avatarUrl?: SafeUrl | string = 'assets/default-user-avatar.png';
 
   constructor(public auth: AuthService,
               private dialog: MatDialog,
               private api: HttpClient,
-              private sanitizer: DomSanitizer) {
+              private sanitizer: DomSanitizer,
+              public cart: CartService) {
   }
 
   ngOnInit(): void {

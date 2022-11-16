@@ -10,8 +10,8 @@
         <img [src]="getGameImageUrl(game)" alt="Game image" class="image">
         <div class="buy-section">
           <p class="price">{{game.price | currency}}</p>
-          <button mat-raised-button color="accent" class="buy-button">
-            <mat-icon>shopping_cart</mat-icon>
+          <button mat-raised-button color="accent" class="buy-button" (click)="addGameToCart(game)">
+            <mat-icon fontSet="material-icons-outlined">shopping_cart</mat-icon>
             BUY
           </button>
         </div>
@@ -82,7 +82,7 @@
               [class.visible]="menuTrigger.menuOpen"
               [matMenuTriggerFor]="commentActionsMenu" [matMenuTriggerData]="{$implicit: comment}"
               #menuTrigger="matMenuTrigger" (click)="$event.stopPropagation()">
-        <mat-icon>more_horiz</mat-icon>
+        <mat-icon fontSet="material-icons-outlined">more_horiz</mat-icon>
       </button>
     </div>
     <ng-container *ngIf="!isCommentEditing(comment) else editCommentTemplate">
@@ -135,7 +135,7 @@
   </div>
 </ng-template>
 
-<mat-menu #commentActionsMenu="matMenu" class="thread-action-menu" xPosition="before">
+<mat-menu #commentActionsMenu="matMenu" xPosition="before">
   <ng-template matMenuContent let-comment>
     <ng-container *ngIf="!isCommentDeleted(comment) else deletedCommentActions">
       <button mat-menu-item (click)="editComment(comment)">
@@ -143,14 +143,14 @@
         <span>Edit</span>
       </button>
       <button mat-menu-item class="delete-menu-option" (click)="deleteComment(comment)">
-        <mat-icon>delete</mat-icon>
+        <mat-icon fontSet="material-icons-outlined">delete</mat-icon>
         <span>Delete</span>
       </button>
     </ng-container>
 
     <ng-template #deletedCommentActions>
       <button mat-menu-item (click)="restoreComment(comment)">
-        <mat-icon>restore</mat-icon>
+        <mat-icon fontSet="material-icons-outlined">restore</mat-icon>
         <span>Restore</span>
       </button>
     </ng-template>

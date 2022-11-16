@@ -4,7 +4,7 @@ import {BehaviorSubject, tap} from "rxjs";
 import {Session} from "../interfaces/session";
 import {SignInData} from "../interfaces/sign-in-data";
 import {JwtHelperService} from '@auth0/angular-jwt';
-import {MatDialog} from "@angular/material/dialog";
+import {DialogPosition, MatDialog} from "@angular/material/dialog";
 import {SignInDialogComponent} from "../components/sign-in-dialog/sign-in-dialog.component";
 import {SignUpDialogComponent} from "../components/sign-up-dialog/sign-up-dialog.component";
 
