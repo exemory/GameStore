@@ -77,7 +77,7 @@
       <p class="username">{{getFullUserNameFromComment(comment)}}</p>
       <p class="date">{{comment.creationDate | timeSince}}</p>
       <button class="actions-button"
-              *ngIf="isCurrentUserAuthorIfComment(comment)"
+              *ngIf="isUserHasAccessToManipulateComment(comment)"
               mat-icon-button
               [class.visible]="menuTrigger.menuOpen"
               [matMenuTriggerFor]="commentActionsMenu" [matMenuTriggerData]="{$implicit: comment}"
@@ -138,7 +138,7 @@
 <mat-menu #commentActionsMenu="matMenu" xPosition="before">
   <ng-template matMenuContent let-comment>
     <ng-container *ngIf="!isCommentDeleted(comment) else deletedCommentActions">
-      <button mat-menu-item (click)="editComment(comment)">
+      <button *ngIf="isCurrentUserAuthorOfComment(comment)" mat-menu-item (click)="editComment(comment)">
         <mat-icon>edit</mat-icon>
         <span>Edit</span>
       </button>

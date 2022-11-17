@@ -12,6 +12,7 @@ import {CommentCreationData} from "../../interfaces/comment-creation-data";
 import {AuthService} from "../../services/auth.service";
 import {CommentUpdateData} from "../../interfaces/comment-update-data";
 import {CartService} from "../../services/cart.service";
+import {UserRole} from "../../enums/user-role";
 
 @Component({
   selector: 'app-game',
@@ -108,6 +109,16 @@ export class GameComponent implements OnInit {
     return `${env.apiUrl}games/${game.key}/image`;
   }
 
+  get isUserManager() {
+    if (!this.auth.isLoggedIn.value) {
+      return false;
+    }
+
+    const userRoles = this.auth.session!.userInfo.userRoles;
+
+    return userRoles.includes(UserRole.Manager);
+  }
+
   get rootComments() {
     return this.comments.filter(c => c.parentId === null);
   }
@@ -124,8 +135,12 @@ export class GameComponent implements OnInit {
     return `${comment.userInfo.firstName} ${comment.userInfo.lastName}`;
   }
 
-  isCurrentUserAuthorIfComment(comment: Comment) {
+  isCurrentUserAuthorOfComment(comment: Comment) {
     return comment.userInfo.username === this.auth.session?.userInfo.username;
+  }
+
+  isUserHasAccessToManipulateComment(comment: Comment) {
+    return this.isUserManager || this.isCurrentUserAuthorOfComment(comment);
   }
 
   getCommentUserAvatarUrl(comment: Comment) {
