@@ -16,8 +16,10 @@ public class UnitOfWork : IUnitOfWork
     /// <param name="genreRepository">Genre repository</param>
     /// <param name="platformTypeRepository">Platform type repository</param>
     /// <param name="orderRepository">Order repository</param>
+    /// <param name="userRepository">User repository</param>
     public UnitOfWork(GameStoreContext context, IGameRepository gameRepository, ICommentRepository commentRepository,
-        IGenreRepository genreRepository, IPlatformTypeRepository platformTypeRepository, IOrderRepository orderRepository)
+        IGenreRepository genreRepository, IPlatformTypeRepository platformTypeRepository,
+        IOrderRepository orderRepository, IUserRepository userRepository)
     {
         _context = context;
         GameRepository = gameRepository;
@@ -25,6 +27,7 @@ public class UnitOfWork : IUnitOfWork
         GenreRepository = genreRepository;
         PlatformTypeRepository = platformTypeRepository;
         OrderRepository = orderRepository;
+        UserRepository = userRepository;
     }
 
     public IGameRepository GameRepository { get; }
@@ -32,6 +35,7 @@ public class UnitOfWork : IUnitOfWork
     public IGenreRepository GenreRepository { get; }
     public IPlatformTypeRepository PlatformTypeRepository { get; }
     public IOrderRepository OrderRepository { get; }
+    public IUserRepository UserRepository { get; }
 
     public async Task SaveAsync()
     {
