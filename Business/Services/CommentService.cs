@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.DataTransferObjects;
 using Business.Exceptions;
+using Business.Extensions;
 using Business.Interfaces;
 using Data.Entities;
 using Data.Interfaces;
@@ -68,10 +69,10 @@ public class CommentService : ICommentService
         if (user == null)
         {
             _logger.LogError("Authorized user with id '{UserId}' does not exist", _session.UserId);
-            throw new AccessDeniedException("User is not authorized.");
+            ThrowAccessDenied();
         }
 
-        return user;
+        return user!;
     }
 
     public async Task<IEnumerable<CommentDto>> GetAllByGameKeyAsync(string gameKey)
@@ -103,7 +104,7 @@ public class CommentService : ICommentService
 
         if (comment.UserId != _session.UserId)
         {
-            throw new AccessDeniedException("You can only edit your own comments.");
+            ThrowAccessDenied();
         }
 
         return comment;
@@ -123,9 +124,9 @@ public class CommentService : ICommentService
     {
         var comment = await GetCommentByIdAsync(commentId);
 
-        if (comment.UserId != _session.UserId)
+        if (comment.UserId != _session.UserId && !_session.IsManager())
         {
-            throw new AccessDeniedException("You can only delete your own comments.");
+            ThrowAccessDenied();
         }
 
         if (comment.Deleted)
@@ -150,9 +151,9 @@ public class CommentService : ICommentService
     {
         var comment = await GetCommentByIdAsync(commentId);
 
-        if (comment.UserId != _session.UserId)
+        if (comment.UserId != _session.UserId && !_session.IsManager())
         {
-            throw new AccessDeniedException("You can only restore your own comments.");
+            ThrowAccessDenied();
         }
 
         if (!comment.Deleted)
@@ -213,5 +214,10 @@ public class CommentService : ICommentService
     private static void ThrowCommentNotFound(Guid commentId)
     {
         throw new NotFoundException($"Comment with id '{commentId}' not found.");
+    }
+
+    private static void ThrowAccessDenied()
+    {
+        throw new AccessDeniedException("Access denied.");
     }
 }
