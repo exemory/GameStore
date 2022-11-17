@@ -1,5 +1,6 @@
 ﻿using Business.DataTransferObjects;
 using Business.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
@@ -34,6 +35,7 @@ public class GamesController : ControllerBase
     /// Genres or platform types specified by ids do not exist
     /// </response>
     [HttpPost]
+    [Authorize(Roles = "Manager,Admin")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -56,6 +58,7 @@ public class GamesController : ControllerBase
     /// Genres or platform types specified by ids do not exist
     /// </response>
     [HttpPut("{gameId:guid}")]
+    [Authorize(Roles = "Manager,Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -100,6 +103,7 @@ public class GamesController : ControllerBase
     /// <response code="204">Game has been deleted</response>
     /// <response code="404">Game specified by <paramref name="gameId"/> not found</response>
     [HttpDelete("{gameId:guid}")]
+    [Authorize(Roles = "Manager,Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Delete(Guid gameId)
@@ -131,6 +135,7 @@ public class GamesController : ControllerBase
     /// <response code="200">Returns result of uploading operation, including image id</response>
     /// <response code="400">The image file extension is not supported</response>
     [HttpPost("images")]
+    [Authorize(Roles = "Manager,Admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ImageUploadResultDto>> UploadImage(IFormFile file)
