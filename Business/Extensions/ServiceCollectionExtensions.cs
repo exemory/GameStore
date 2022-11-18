@@ -8,21 +8,24 @@ namespace Business.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddBusinessLayer(this IServiceCollection services, IConfiguration storageConfiguration, IConfiguration jwtConfiguration)
+    private const string ServiceNameEnding = "Service";
+
+    public static IServiceCollection AddBusinessLayer(this IServiceCollection services,
+        IConfiguration storageConfiguration, IConfiguration jwtConfiguration)
     {
         services.Configure<StorageOptions>(storageConfiguration);
         services.Configure<JwtOptions>(jwtConfiguration);
-        
+
         services.AddScoped<IDbInitializer, DbInitializer>();
 
-        services.AddScoped<IStorageService, StorageService>();
-        services.AddScoped<IGameService, GameService>();
-        services.AddScoped<ICommentService, CommentService>();
-        services.AddScoped<IGenreService, GenreService>();
-        services.AddScoped<IPlatformTypeService, PlatformTypeService>();
-        services.AddScoped<IAuthenticationService, AuthenticationService>();
-        services.AddScoped<IAvatarService, AvatarService>();
-        services.AddScoped<IOrderService, OrderService>();
+        services.Scan(s =>
+        {
+            s.FromAssembliesOf(typeof(IAuthenticationService))
+                .AddClasses(classes =>
+                    classes.Where(t => t.Name.EndsWith(ServiceNameEnding)))
+                .AsMatchingInterface()
+                .WithScopedLifetime();
+        });
 
         services.AddScoped<ISession, Session>();
 
