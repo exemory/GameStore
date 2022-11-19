@@ -23,10 +23,14 @@
               About
             </a>
           </li>
-
           <li>
             <a routerLink="/support" routerLinkActive="active-link">
               Support
+            </a>
+          </li>
+          <li *ngIf="isUserAdmin">
+            <a routerLink="/users" routerLinkActive="active-link">
+              Users
             </a>
           </li>
         </ul>
@@ -35,7 +39,9 @@
 
     <div class="cart">
       <button mat-icon-button color="primary" (click)="cart.openCartDialog()">
-        <mat-icon fontSet="material-icons-outlined" [matBadge]="cartItemsCount | async" [matBadgeHidden]="cart.isEmpty" matBadgeSize="small" matBadgeColor="accent">shopping_cart</mat-icon>
+        <mat-icon fontSet="material-icons-outlined" [matBadge]="cartItemsCount | async" [matBadgeHidden]="cart.isEmpty"
+                  matBadgeSize="small" matBadgeColor="accent">shopping_cart
+        </mat-icon>
       </button>
     </div>
 

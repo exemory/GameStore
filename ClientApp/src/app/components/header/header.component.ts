@@ -6,6 +6,7 @@ import {HttpClient} from "@angular/common/http";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {CartService} from "../../services/cart.service";
 import {map} from "rxjs";
+import {UserRole} from "../../enums/user-role";
 
 @Component({
   selector: 'app-header',
@@ -52,6 +53,10 @@ export class HeaderComponent implements OnInit {
 
   get fullUserName() {
     return `${this.auth.session?.userInfo.firstName} ${this.auth.session?.userInfo.lastName}`;
+  }
+
+  get isUserAdmin() {
+    return this.auth.session?.userInfo.userRoles.includes(UserRole.Admin);
   }
 
   signIn() {

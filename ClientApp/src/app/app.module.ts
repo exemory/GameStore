@@ -36,6 +36,10 @@ import {TimeSincePipe} from './shared/pipes/time-since.pipe';
 import {CartDialogComponent} from './components/cart-dialog/cart-dialog.component';
 import {MatBadgeModule} from "@angular/material/badge";
 import {CompletionOrderDialogComponent} from './components/completion-order-dialog/completion-order-dialog.component';
+import { UsersComponent } from './components/users/users.component';
+import {MatSortModule} from "@angular/material/sort";
+import {MatTableModule} from "@angular/material/table";
+import {MatPaginatorModule} from "@angular/material/paginator";
 
 @NgModule({
   declarations: [
@@ -54,6 +58,7 @@ import {CompletionOrderDialogComponent} from './components/completion-order-dial
     TimeSincePipe,
     CartDialogComponent,
     CompletionOrderDialogComponent,
+    UsersComponent,
   ],
   imports: [
     BrowserModule,
@@ -75,7 +80,10 @@ import {CompletionOrderDialogComponent} from './components/completion-order-dial
     FormsModule,
     MatSelectModule,
     MatCheckboxModule,
-    MatBadgeModule
+    MatBadgeModule,
+    MatSortModule,
+    MatTableModule,
+    MatPaginatorModule
   ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true},

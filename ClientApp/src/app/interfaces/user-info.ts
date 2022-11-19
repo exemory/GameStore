@@ -6,5 +6,5 @@ export interface UserInfo {
   firstName: string,
   lastName: string,
   userRoles: UserRole[],
-  hasAvatar: string
+  hasAvatar: boolean
 }

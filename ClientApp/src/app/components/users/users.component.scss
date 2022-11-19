@@ -1,0 +1,26 @@
+.wrapper {
+  max-width: 1400px;
+  margin: auto;
+  padding: 0 16px;
+}
+
+.table {
+  width: 100%;
+
+  .options-header {
+    width: 64px;
+  }
+
+  .options-button {
+    color: var(--color-disabled-text);
+    display: none;
+
+    &.visible {
+      display: block;
+    }
+  }
+
+  .table-row:hover .options-button {
+    display: block !important;
+  }
+}
