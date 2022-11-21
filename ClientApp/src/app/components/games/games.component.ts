@@ -75,7 +75,7 @@ export class GamesComponent implements OnInit {
       return false;
     }
 
-    const userRoles = this.auth.session!.userInfo.userRoles;
+    const userRoles = this.auth.session!.userInfo.roles;
 
     return userRoles.includes(UserRole.Manager) || userRoles.includes(UserRole.Admin);
   }

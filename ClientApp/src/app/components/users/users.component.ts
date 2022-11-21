@@ -53,11 +53,11 @@ export class UsersComponent implements OnInit {
   }
 
   getUserRoles(user: UserInfo) {
-    return user.userRoles.join(', ');
+    return user.roles.join(', ');
   }
 
   isUserHasManagerRole(user: UserInfo) {
-    return user.userRoles.includes(UserRole.Manager);
+    return user.roles.includes(UserRole.Manager);
   }
 
   addManagerRoleToUser(user: UserInfo) {
@@ -68,8 +68,8 @@ export class UsersComponent implements OnInit {
     this.api.put(`users/${user.id}/roles`, data)
       .subscribe({
         next: () => {
-          if (!user.userRoles.includes(UserRole.Manager)) {
-            user.userRoles.push(UserRole.Manager);
+          if (!user.roles.includes(UserRole.Manager)) {
+            user.roles.push(UserRole.Manager);
           }
         },
         error: err => {
@@ -86,9 +86,9 @@ export class UsersComponent implements OnInit {
     this.api.put(`users/${user.id}/roles`, data)
       .subscribe({
         next: () => {
-          const index = user.userRoles.indexOf(UserRole.Manager);
+          const index = user.roles.indexOf(UserRole.Manager);
           if (index !== -1) {
-            user.userRoles.splice(index, 1);
+            user.roles.splice(index, 1);
           }
         },
         error: err => {

@@ -56,7 +56,7 @@ export class HeaderComponent implements OnInit {
   }
 
   get isUserAdmin() {
-    return this.auth.session?.userInfo.userRoles.includes(UserRole.Admin);
+    return this.auth.session?.userInfo.roles.includes(UserRole.Admin);
   }
 
   signIn() {
