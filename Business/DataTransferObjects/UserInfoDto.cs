@@ -7,6 +7,6 @@ public class UserInfoDto
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;
     
-    public IEnumerable<string> UserRoles { get; set; } = new List<string>();
+    public IEnumerable<string> Roles { get; set; } = new List<string>();
     public bool HasAvatar { get; set; }
 }

@@ -98,7 +98,7 @@ public class AuthenticationServiceTests : TestsBase
             .ToUnixTimeSeconds()
             .ToString();
         var expectedUserInfo = _mapper.Map<User, UserInfoDto>(user);
-        expectedUserInfo.UserRoles = userRoles;
+        expectedUserInfo.Roles = userRoles;
 
         _userManager.FindByNameAsync(user.UserName).Returns(user);
         _userManager.FindByEmailAsync(user.Email).Returns(user);
