@@ -20,7 +20,9 @@ namespace Data.Repositories
 
         public async Task<IEnumerable<User>> GetAllAsync()
         {
-            return await _entities.AsNoTracking()
+            return await _entities.Include(u => u.UserRoles)
+                .ThenInclude(r => r.Role)
+                .AsNoTracking()
                 .ToListAsync();
         }
     }

@@ -33,7 +33,7 @@ public class AutomapperProfile : Profile
 
         CreateMap<User, UserInfoDto>()
             .ForMember(u => u.HasAvatar, o => o.MapFrom(u => u.Avatar != null))
-            .ForMember(u => u.UserRoles, o => o.Ignore());
+            .ForMember(u => u.UserRoles, o => o.MapFrom(u => u.UserRoles.Select(r => r.Role.Name)));
 
         CreateMap<User, CommentUserInfoDto>()
             .ForMember(u => u.HasAvatar, o => o.MapFrom(u => u.Avatar != null));

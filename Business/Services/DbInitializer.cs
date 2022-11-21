@@ -9,10 +9,10 @@ namespace Business.Services;
 public class DbInitializer : IDbInitializer
 {
     private readonly GameStoreContext _context;
-    private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+    private readonly RoleManager<Role> _roleManager;
     private readonly UserManager<User> _userManager;
 
-    public DbInitializer(GameStoreContext context, RoleManager<IdentityRole<Guid>> roleManager,
+    public DbInitializer(GameStoreContext context, RoleManager<Role> roleManager,
         UserManager<User> userManager)
     {
         _context = context;
@@ -38,7 +38,7 @@ public class DbInitializer : IDbInitializer
         {
             foreach (var roleName in RequiredData.Roles)
             {
-                await _roleManager.CreateAsync(new IdentityRole<Guid>(roleName));
+                await _roleManager.CreateAsync(new Role(roleName));
             }
         }
     }

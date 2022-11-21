@@ -47,7 +47,7 @@ public static class ServiceCollectionExtensions
                 options.Password.RequireNonAlphanumeric = false;
                 options.User.RequireUniqueEmail = true;
             })
-            .AddRoles<IdentityRole<Guid>>()
+            .AddRoles<Role>()
             .AddEntityFrameworkStores<GameStoreContext>();
 
         services.AddAuthentication(options =>
