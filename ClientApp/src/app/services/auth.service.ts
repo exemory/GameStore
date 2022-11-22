@@ -7,6 +7,7 @@ import {JwtHelperService} from '@auth0/angular-jwt';
 import {MatDialog} from "@angular/material/dialog";
 import {SignInDialogComponent} from "../components/sign-in-dialog/sign-in-dialog.component";
 import {SignUpDialogComponent} from "../components/sign-up-dialog/sign-up-dialog.component";
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,8 @@ export class AuthService {
   isLoggedIn = new BehaviorSubject(false);
 
   constructor(private api: HttpClient,
-              private dialog: MatDialog) {
+              private dialog: MatDialog,
+              private router: Router) {
     const session = this.storedSession;
 
     if (!session) {
@@ -70,6 +72,12 @@ export class AuthService {
   public signOut() {
     this._session = undefined;
     this.removeSession();
+
+    switch (this.router.url) {
+      case '/users':
+        this.router.navigate(['/']);
+    }
+
     this.isLoggedIn.next(false);
   }
 
