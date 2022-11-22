@@ -16,6 +16,12 @@
     </div>
     <div class="mat-elevation-z4">
       <table class="table" mat-table [dataSource]="dataSource" matSort>
+        <ng-container matColumnDef="avatar">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let user">
+            <img class="avatar" [src]="getUserAvatarUrl(user)" alt="user avatar">
+          </td>
+        </ng-container>
 
         <ng-container matColumnDef="username">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Username</th>
@@ -38,7 +44,7 @@
         </ng-container>
 
         <ng-container matColumnDef="options">
-          <th class="options-header" mat-header-cell *matHeaderCellDef></th>
+          <th mat-header-cell *matHeaderCellDef></th>
           <td mat-cell *matCellDef="let user">
             <button class="options-button" [class.visible]="menuTrigger.menuOpen" #menuTrigger="matMenuTrigger"
                     mat-icon-button [matMenuTriggerFor]="userOptionsMenu" [matMenuTriggerData]="{$implicit: user}">
@@ -48,7 +54,7 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row class="table-row" *matRowDef="let user; columns: displayedColumns;"></tr>
+        <tr mat-row class="row" *matRowDef="let user; columns: displayedColumns;"></tr>
 
         <tr class="mat-row" *matNoDataRow>
           <td class="mat-cell" colspan="5">No data matching the filter '{{searchValue}}'</td>

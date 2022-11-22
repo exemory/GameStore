@@ -7,6 +7,7 @@ import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {UserRole} from "../../enums/user-role";
 import {UserRolesUpdateData} from "../../interfaces/user-roles-update-data";
+import {environment as env} from "../../../environments/environment";
 
 @Component({
   selector: 'app-users',
@@ -30,7 +31,7 @@ export class UsersComponent implements OnInit {
   loading = true;
   loadingError = false;
 
-  displayedColumns: string[] = ['username', 'firstName', 'lastName', 'roles', 'options'];
+  displayedColumns: string[] = ['avatar', 'username', 'firstName', 'lastName', 'roles', 'options'];
   dataSource = new MatTableDataSource<UserInfo>();
 
   searchValue = '';
@@ -67,6 +68,11 @@ export class UsersComponent implements OnInit {
           this.loadingError = true;
         }
       });
+  }
+
+  getUserAvatarUrl(user: UserInfo) {
+    return user.hasAvatar ? `${env.apiUrl}avatar?username=${user.username}` :
+      'assets/default-user-avatar.png';
   }
 
   getUserRoles(user: UserInfo) {

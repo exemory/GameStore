@@ -35,8 +35,28 @@
 .table {
   width: 100%;
 
-  .options-header {
+  .mat-column-avatar {
+    width: 80px;
+  }
+
+  .mat-column-username {
+    width: 20%;
+  }
+
+  .mat-column-firstName,
+  .mat-column-lastName {
+    width: 27.5%;
+  }
+
+  .mat-column-options {
     width: 64px;
+  }
+
+  .avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
   }
 
   .options-button {
@@ -48,7 +68,11 @@
     }
   }
 
-  .table-row:hover .options-button {
-    display: block !important;
+  .row {
+    &:hover {
+      .options-button {
+        display: block !important;
+      }
+    }
   }
 }
