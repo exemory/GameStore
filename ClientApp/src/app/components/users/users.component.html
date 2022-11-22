@@ -4,7 +4,17 @@
   </div>
 
   <ng-container *ngIf="!loading && !loadingError">
-    <div class="mat-elevation-z8">
+    <div class="tools">
+      <mat-form-field class="form-field" appearance="standard">
+        <mat-label>Search</mat-label>
+        <input matInput [(ngModel)]="searchValue" (input)="applyFilter()" (keydown.escape)="clearFilter()"
+               autocomplete="off">
+        <button class="clear-filter-button" *ngIf="searchValue" matSuffix mat-icon-button (click)="clearFilter()">
+          <mat-icon fontSet="material-icons-outlined">clear</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+    <div class="mat-elevation-z4">
       <table class="table" mat-table [dataSource]="dataSource" matSort>
 
         <ng-container matColumnDef="username">
@@ -41,7 +51,7 @@
         <tr mat-row class="table-row" *matRowDef="let user; columns: displayedColumns;"></tr>
 
         <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell" colspan="5">No data matching the filter "{{''}}"</td>
+          <td class="mat-cell" colspan="5">No data matching the filter '{{searchValue}}'</td>
         </tr>
       </table>
 
@@ -62,7 +72,7 @@
     <ng-template #removeManagerRoleFromUserTemplate>
       <button mat-menu-item (click)="removeManagerRoleFromUser(user)">
         <mat-icon fontSet="material-icons-outlined">group_remove</mat-icon>
-        <span>remove from managers</span>
+        <span>Remove from managers</span>
       </button>
     </ng-template>
   </ng-template>

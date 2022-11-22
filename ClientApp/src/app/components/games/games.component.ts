@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Game} from "../../interfaces/game";
 import {HttpClient} from "@angular/common/http";
 import {NotificationService} from "../../services/notification.service";
@@ -17,8 +17,7 @@ import {UserRole} from "../../enums/user-role";
 @Component({
   selector: 'app-games',
   templateUrl: './games.component.html',
-  styleUrls: ['./games.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./games.component.scss']
 })
 export class GamesComponent implements OnInit {
 

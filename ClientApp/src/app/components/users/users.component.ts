@@ -33,11 +33,28 @@ export class UsersComponent implements OnInit {
   displayedColumns: string[] = ['username', 'firstName', 'lastName', 'roles', 'options'];
   dataSource = new MatTableDataSource<UserInfo>();
 
+  searchValue = '';
+
   constructor(private api: HttpClient,
               private ns: NotificationService) {
   }
 
   ngOnInit(): void {
+    this.dataSource.filterPredicate = this.filterPredicate;
+
+    this.loadUsers();
+  }
+
+  private filterPredicate(u: UserInfo, f: string) {
+    f = f.trim().toLowerCase();
+
+    return u.username.toLowerCase().includes(f) ||
+      u.firstName.toLowerCase().includes(f) ||
+      u.lastName.toLowerCase().includes(f) ||
+      u.roles.join(', ').toLowerCase().includes(f);
+  }
+
+  private loadUsers() {
     this.api.get<UserInfo[]>('users')
       .subscribe({
         next: users => {
@@ -58,6 +75,19 @@ export class UsersComponent implements OnInit {
 
   isUserHasManagerRole(user: UserInfo) {
     return user.roles.includes(UserRole.Manager);
+  }
+
+  applyFilter() {
+    this.dataSource.filter = this.searchValue;
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+  clearFilter() {
+    this.searchValue = '';
+    this.applyFilter();
   }
 
   addManagerRoleToUser(user: UserInfo) {
