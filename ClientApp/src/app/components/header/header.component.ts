@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {AuthService} from "../../services/auth.service";
 import {MatDialog} from "@angular/material/dialog";
 import {UploadAvatarDialogComponent} from "../upload-avatar-dialog/upload-avatar-dialog.component";
@@ -20,15 +20,19 @@ export class HeaderComponent implements OnInit {
   );
 
   avatarUrl?: SafeUrl | string = 'assets/default-user-avatar.png';
+  showMobileMenu = false;
 
   constructor(public auth: AuthService,
               private dialog: MatDialog,
               private api: HttpClient,
               private sanitizer: DomSanitizer,
-              public cart: CartService) {
+              public cart: CartService,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
+    document.addEventListener('click', this.onPageClick.bind(this));
+
     this.auth.isLoggedIn.subscribe({
       next: isLoggedIn => {
         if (isLoggedIn) {
@@ -36,6 +40,18 @@ export class HeaderComponent implements OnInit {
         }
       }
     });
+  }
+
+  private onPageClick(e: any) {
+    const target = e.target as Element;
+
+    if (!target.closest('.menu-toggle-btn') &&
+      !target.closest('.cdk-overlay-backdrop') &&
+      !target.classList.contains('mobile-menu') &&
+      !target.classList.contains('menu-overlay')) {
+      this.showMobileMenu = false;
+      this.cdr.detectChanges();
+    }
   }
 
   loadUserAvatar() {
