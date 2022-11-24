@@ -5,6 +5,7 @@
 
   <ng-container *ngIf="!loading && !loadingError">
     <p class="game-name">{{game.name}}</p>
+
     <div class="container">
       <div>
         <img [src]="getGameImageUrl(game)" alt="Game image" class="image">
@@ -28,7 +29,7 @@
         <hr class="divider hide">
       </div>
 
-      <div>
+      <div class="second-grid-item">
         <p class="description">{{game.description}}</p>
 
         <hr class="divider">
@@ -41,7 +42,7 @@
                         #body></textarea>
             </mat-form-field>
 
-            <button class="send-button" type="submit"
+            <button class="post-button" type="submit"
                     [disabled]="sendingCreateRequest || form.invalid || !body.value.trim()"
                     mat-raised-button
                     color="primary">
