@@ -346,6 +346,34 @@ public class CommentServiceTests : TestsBase
     }
 
     [Fact]
+    public async Task DeleteAsync_ShouldMarkCommentAsDeleted_WhenUserIsManager()
+    {
+        // Arrange
+        const string managerRole = "Manager";
+        var comment = Fixture.Build<Comment>()
+            .With(c => c.Deleted, false)
+            .Create();
+        var updatedComment = comment.DeepClone();
+        updatedComment.Deleted = true;
+        var expectedCommentToUpdate = updatedComment.ToExpectedObject();
+        var userRoles = new List<string> {managerRole};
+
+        _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
+            .ReturnsAsync(comment);
+        _sessionMock.Setup(s => s.IsAuthorized).Returns(true);
+        _sessionMock.Setup(s => s.UserId).Returns(Fixture.Create<Guid>());
+        _sessionMock.Setup(s => s.UserRoles).Returns(userRoles);
+
+        // Act
+        await _sut.DeleteAsync(comment.Id);
+
+        // Assert
+        _unitOfWorkMock.Verify(u =>
+            u.CommentRepository.Update(It.Is<Comment>(c => expectedCommentToUpdate.Equals(c))), Times.Once);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Once);
+    }
+
+    [Fact]
     public async Task DeleteAsync_ShouldFail_WhenCommentDoesNotExist()
     {
         // Arrange
@@ -426,6 +454,34 @@ public class CommentServiceTests : TestsBase
         _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
             .ReturnsAsync(comment);
         _sessionMock.Setup(s => s.UserId).Returns(comment.UserId);
+
+        // Act
+        await _sut.RestoreAsync(comment.Id);
+
+        // Assert
+        _unitOfWorkMock.Verify(u =>
+            u.CommentRepository.Update(It.Is<Comment>(c => expectedCommentToUpdate.Equals(c))), Times.Once);
+        _unitOfWorkMock.Verify(u => u.SaveAsync(), Times.Once);
+    }
+    
+    [Fact]
+    public async Task RestoreAsync_ShouldRestoreComment_WhenUserIsManager()
+    {
+        // Arrange
+        const string managerRole = "Manager";
+        var comment = Fixture.Build<Comment>()
+            .With(c => c.Deleted, true)
+            .Create();
+        var updatedComment = comment.DeepClone();
+        updatedComment.Deleted = false;
+        var expectedCommentToUpdate = updatedComment.ToExpectedObject();
+        var userRoles = new List<string> {managerRole};
+
+        _unitOfWorkMock.Setup(u => u.CommentRepository.GetByIdAsync(comment.Id))
+            .ReturnsAsync(comment);
+        _sessionMock.Setup(s => s.IsAuthorized).Returns(true);
+        _sessionMock.Setup(s => s.UserId).Returns(Fixture.Create<Guid>());
+        _sessionMock.Setup(s => s.UserRoles).Returns(userRoles);
 
         // Act
         await _sut.RestoreAsync(comment.Id);

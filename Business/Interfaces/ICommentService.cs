@@ -24,7 +24,7 @@ public interface ICommentService
     /// Thrown when parent comment does not belong to the specified game
     /// </exception>
     /// <exception cref="AccessDeniedException">
-    /// Thrown when the authorized user not found
+    /// Thrown when the user does not have permission to create the comment
     /// </exception>
     public Task<CommentDto> CreateAsync(CommentCreationDto commentCreationDto);
 
@@ -44,7 +44,7 @@ public interface ICommentService
     /// Thrown when comment specified by <paramref name="commentId"/> does not exist
     /// </exception>
     /// <exception cref="AccessDeniedException">
-    /// Thrown when user tries to edit other user's comment
+    /// Thrown when the user does not have permission to edit the comment
     /// </exception>
     public Task EditAsync(Guid commentId, CommentUpdateDto commentUpdateDto);
 
@@ -56,7 +56,7 @@ public interface ICommentService
     /// Thrown when comment specified by <paramref name="commentId"/> does not exist
     /// </exception>
     /// <exception cref="AccessDeniedException">
-    /// Thrown when user tries to delete other user's comment
+    /// Thrown when the user does not have permission to delete the comment
     /// </exception>
     /// <exception cref="GameStoreException">
     /// Thrown when the comment has already been deleted
@@ -71,7 +71,7 @@ public interface ICommentService
     /// Thrown when comment specified by <paramref name="commentId"/> does not exist
     /// </exception>
     /// <exception cref="AccessDeniedException">
-    /// Thrown when user tries to restore other user's comment
+    /// Thrown when the user does not have permission to restore the comment
     /// </exception>
     /// <exception cref="GameStoreException">
     /// Thrown when the comment is not deleted

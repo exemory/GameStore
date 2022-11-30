@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data;
 
-public class GameStoreContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
+public class GameStoreContext : IdentityDbContext<User, Role, Guid, IdentityUserClaim<Guid>, UserRole,
+    IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
 {
     public GameStoreContext(DbContextOptions options) : base(options)
     {
@@ -30,5 +31,6 @@ public class GameStoreContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
         builder.ApplyConfiguration(new UserConfiguration());
         builder.ApplyConfiguration(new OrderConfiguration());
         builder.ApplyConfiguration(new OrderItemConfiguration());
+        builder.ApplyConfiguration(new UserRoleConfiguration());
     }
 }

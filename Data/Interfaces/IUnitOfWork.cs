@@ -10,6 +10,7 @@ public interface IUnitOfWork
     public IGenreRepository GenreRepository { get; }
     public IPlatformTypeRepository PlatformTypeRepository { get; }
     public IOrderRepository OrderRepository { get; }
+    public IUserRepository UserRepository { get; }
 
     /// <summary>
     /// Save all changes made through the repositories in the context to the database

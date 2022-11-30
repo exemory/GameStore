@@ -60,7 +60,7 @@ namespace Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
 
                     b.HasCheckConstraint("CK_Comment_ParentId", "[ParentId] != [Id]");
                 });
@@ -100,7 +100,7 @@ namespace Data.Migrations
                     b.HasIndex("Key")
                         .IsUnique();
 
-                    b.ToTable("Games");
+                    b.ToTable("Games", (string)null);
 
                     b.HasCheckConstraint("CK_Game_Price", "[Price] BETWEEN 0 AND 1000");
                 });
@@ -126,7 +126,7 @@ namespace Data.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Genres");
+                    b.ToTable("Genres", (string)null);
 
                     b.HasCheckConstraint("CK_Genre_ParentId", "[ParentId] != [Id]");
 
@@ -256,7 +256,7 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Data.Entities.OrderItem", b =>
@@ -280,7 +280,7 @@ namespace Data.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItems", (string)null);
 
                     b.HasCheckConstraint("CK_OrderItem_Quantity", "[Quantity] > 0");
                 });
@@ -301,7 +301,7 @@ namespace Data.Migrations
                     b.HasIndex("Type")
                         .IsUnique();
 
-                    b.ToTable("PlatformTypes");
+                    b.ToTable("PlatformTypes", (string)null);
 
                     b.HasData(
                         new
@@ -417,7 +417,7 @@ namespace Data.Migrations
 
                     b.HasIndex("GenresId");
 
-                    b.ToTable("GameGenre");
+                    b.ToTable("GameGenre", (string)null);
                 });
 
             modelBuilder.Entity("GamePlatformType", b =>
@@ -432,7 +432,7 @@ namespace Data.Migrations
 
                     b.HasIndex("PlatformTypesId");
 
-                    b.ToTable("GamePlatformType");
+                    b.ToTable("GamePlatformType", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
