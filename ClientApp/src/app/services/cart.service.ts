@@ -19,8 +19,12 @@ export class CartService {
   private cartDialog?: MatDialogRef<CartDialogComponent>;
 
   constructor(private dialog: MatDialog) {
-    this._items = this.restoreCartItems();
-    this.items.next(this._items);
+    const storedItems = this.restoreCartItems();
+
+    if (storedItems?.length > 0) {
+      this._items = storedItems;
+      this.items.next(this._items);
+    }
 
     this.items.subscribe(items => {
       this.storeCartItems(items);
@@ -36,7 +40,7 @@ export class CartService {
   private restoreCartItems() {
     const items = localStorage.getItem(this.cartItemsKey);
 
-    if (items == null) {
+    if (items === null) {
       return;
     }
 

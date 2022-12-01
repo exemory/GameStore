@@ -109,8 +109,6 @@ export class EditGameDialogComponent implements OnInit {
     this.dialogRef.disableClose = true;
     this.inProgress = true;
 
-    console.log(data)
-
     this.api.put<Game>(`games/${this.game.id}`, data)
       .subscribe({
         next: () => {

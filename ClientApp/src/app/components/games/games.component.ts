@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Game} from "../../interfaces/game";
 import {HttpClient} from "@angular/common/http";
 import {NotificationService} from "../../services/notification.service";
@@ -11,12 +11,13 @@ import {Genre} from "../../interfaces/genre";
 import {PlatformType} from "../../interfaces/platform-type";
 import {forkJoin} from "rxjs";
 import {CartService} from "../../services/cart.service";
+import {AuthService} from "../../services/auth.service";
+import {UserRole} from "../../enums/user-role";
 
 @Component({
   selector: 'app-games',
   templateUrl: './games.component.html',
-  styleUrls: ['./games.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./games.component.scss']
 })
 export class GamesComponent implements OnInit {
 
@@ -25,7 +26,6 @@ export class GamesComponent implements OnInit {
 
   games!: Game[];
   genres!: Genre[];
-  platforms!: PlatformType[];
 
   nameFilter = '';
   genresFilter = <Genre[]>[];
@@ -35,7 +35,8 @@ export class GamesComponent implements OnInit {
   constructor(private api: HttpClient,
               private ns: NotificationService,
               private dialog: MatDialog,
-              private cart: CartService) {
+              private cart: CartService,
+              private auth: AuthService) {
   }
 
   ngOnInit(): void {
@@ -64,12 +65,18 @@ export class GamesComponent implements OnInit {
     return this.api.get<Genre[]>('genres');
   }
 
-  onBuyClick(event: any, game: Game): void {
-    event.stopPropagation();
-  }
-
   getGameImageUrl(game: Game): string {
     return `url("${env.apiUrl}games/${game.key}/image?${this.updatedGames[game.id]}")`;
+  }
+
+  get isUserManagerOrAdmin() {
+    if (!this.auth.isLoggedIn.value) {
+      return false;
+    }
+
+    const userRoles = this.auth.session!.userInfo.roles;
+
+    return userRoles.includes(UserRole.Manager) || userRoles.includes(UserRole.Admin);
   }
 
   openAddGameDialog() {

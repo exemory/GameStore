@@ -26,7 +26,7 @@
   }
 
   .clear-filter-button {
-    color: rgba(0, 0, 0, 0.54);;
+    color: rgba(0, 0, 0, 0.54);
   }
 
   .additional-selection {
@@ -155,6 +155,34 @@
     .game:nth-child(4n + 1),
     .game:nth-child(4n + 4) {
       grid-column-start: span 2;
+    }
+  }
+}
+
+@media screen and (max-width: 660px) {
+  .tools {
+    flex-direction: column;
+    align-content: center !important;
+    padding: 20px;
+
+    .form-field {
+      position: unset !important;
+      top: unset !important;
+      max-width: unset !important;
+    }
+
+    .add-game-button {
+      margin-left: unset !important;
+      align-self: flex-end;
+    }
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .tools {
+    .add-game-button {
+      margin-left: unset !important;
+      width: 100% !important;
     }
   }
 }

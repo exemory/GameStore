@@ -33,7 +33,9 @@
         </button>
       </mat-form-field>
 
-      <button mat-raised-button color="primary" class="add-game-button" (click)="openAddGameDialog()">Add Game</button>
+      <button *ngIf="isUserManagerOrAdmin" mat-raised-button color="primary" class="add-game-button"
+              (click)="openAddGameDialog()">Add Game
+      </button>
     </div>
     <div class="game-list">
       <div *ngFor="let game of filteredGames; let i = index" class="game" [routerLink]="[game.key]"
@@ -51,8 +53,9 @@
             <a class="name" [routerLink]="[game.key]">{{game.name}}</a>
           </div>
         </div>
-        <button mat-icon-button class="actions-button" [class.visible]="menuTrigger.menuOpen"
-                [matMenuTriggerFor]="gameActionsMenu" #menuTrigger="matMenuTrigger" (click)="$event.stopPropagation()">
+        <button *ngIf="isUserManagerOrAdmin" mat-icon-button class="actions-button"
+                [class.visible]="menuTrigger.menuOpen" [matMenuTriggerFor]="gameActionsMenu"
+                #menuTrigger="matMenuTrigger" (click)="$event.stopPropagation()">
           <mat-icon fontSet="material-icons-outlined">more_horiz</mat-icon>
         </button>
         <mat-menu #gameActionsMenu="matMenu" class="thread-action-menu" xPosition="before">

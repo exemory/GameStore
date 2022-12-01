@@ -1,7 +1,7 @@
 <div class="container">
   <h2 mat-dialog-title>Your Cart</h2>
 
-  <div class="car-items-container">
+  <div class="cart-items-container">
     <div class="items-list" *ngIf="!cart.isEmpty; else emptyCartTemplate">
       <ng-container *ngFor="let item of cart.items | async">
         <ng-container *ngTemplateOutlet="itemTemplate; context:{ $implicit: item }"></ng-container>
@@ -19,20 +19,20 @@
 
 <ng-template #itemTemplate let-item>
   <div class="item-container">
-    <img class="game-image" [src]="getGameImageUrl(item.game)" alt="Game image">
+    <img class="image" [src]="getGameImageUrl(item.game)" alt="Game image">
     <div class="name-price-container">
-      <span class="game-name">{{item.game.name}}</span>
-      <div class="price-quantity-container">
-        <p class="price">{{item.game.price | currency}}</p>
-        <div class="quantity-control">
-          <button mat-icon-button class="quantity-button" (click)="increaseQuantity(item.game, -1)" color="primary">−
-          </button>
-          <p class="quantity-label">{{item.quantity}}</p>
-          <button mat-icon-button class="quantity-button" (click)="increaseQuantity(item.game, 1)" color="primary">+
-          </button>
-        </div>
-        <p class="total-items-price">total {{item.game.price * item.quantity | currency}}</p>
-      </div>
+      <p class="name">{{item.game.name}}</p>
+      <p class="price">{{item.game.price | currency}} x {{item.quantity}}</p>
+      <p class="total-items-price">{{item.game.price * item.quantity | currency}}</p>
+    </div>
+    <div class="quantity-control">
+      <button mat-icon-button class="quantity-button" (click)="increaseQuantity(item.game, 1)" color="primary">
+        +
+      </button>
+      <p class="quantity-label">{{item.quantity}}</p>
+      <button mat-icon-button class="quantity-button" (click)="increaseQuantity(item.game, -1)" color="primary">
+        −
+      </button>
     </div>
     <button class="remove-item" mat-icon-button color="accent" (click)="cart.removeGame(item.game)">
       <mat-icon fontSet="material-icons-outlined">close</mat-icon>

@@ -1,0 +1,99 @@
+.wrapper {
+  max-width: 1400px;
+  margin: auto;
+  padding: 0 16px;
+}
+
+.tools {
+  margin-bottom: 50px;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  border-radius: 5px;
+  padding: 0 20px;
+  border: 1px solid #ddd;
+
+  .form-field {
+    position: relative;
+    top: 3px;
+    max-width: 220px;
+    width: 100%;
+  }
+
+  .mat-input-element::placeholder,
+  .mat-form-field-label {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .clear-filter-button {
+    color: rgba(0, 0, 0, 0.54);
+  }
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+
+  .mat-column-username,
+  .mat-column-firstName,
+  .mat-column-lastName {
+    padding-right: 10px;
+  }
+
+  .mat-column-avatar {
+    width: 59px;
+    min-width: 59px;
+    padding-right: 15px;
+  }
+
+  .mat-column-username {
+    width: 16%;
+  }
+
+  .mat-column-firstName,
+  .mat-column-lastName {
+    width: 27%;
+  }
+
+  .mat-column-options {
+    width: 64px;
+    min-width: 64px;
+  }
+
+  .avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .options-button {
+    color: var(--color-disabled-text);
+    display: none;
+
+    &.visible {
+      display: block;
+    }
+  }
+
+  .row {
+    &:hover {
+      .options-button {
+        display: block !important;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .tools {
+    .form-field {
+      max-width: unset !important;
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {AuthService} from "../../services/auth.service";
 import {MatDialog} from "@angular/material/dialog";
 import {UploadAvatarDialogComponent} from "../upload-avatar-dialog/upload-avatar-dialog.component";
@@ -6,6 +6,7 @@ import {HttpClient} from "@angular/common/http";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {CartService} from "../../services/cart.service";
 import {map} from "rxjs";
+import {UserRole} from "../../enums/user-role";
 
 @Component({
   selector: 'app-header',
@@ -19,15 +20,19 @@ export class HeaderComponent implements OnInit {
   );
 
   avatarUrl?: SafeUrl | string = 'assets/default-user-avatar.png';
+  showMobileMenu = false;
 
   constructor(public auth: AuthService,
               private dialog: MatDialog,
               private api: HttpClient,
               private sanitizer: DomSanitizer,
-              public cart: CartService) {
+              public cart: CartService,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
+    document.addEventListener('click', this.onPageClick.bind(this));
+
     this.auth.isLoggedIn.subscribe({
       next: isLoggedIn => {
         if (isLoggedIn) {
@@ -35,6 +40,18 @@ export class HeaderComponent implements OnInit {
         }
       }
     });
+  }
+
+  private onPageClick(e: any) {
+    const target = e.target as Element;
+
+    if (!target.closest('.menu-toggle-btn') &&
+      !target.closest('.cdk-overlay-backdrop') &&
+      !target.classList.contains('mobile-menu') &&
+      !target.classList.contains('menu-overlay')) {
+      this.showMobileMenu = false;
+      this.cdr.detectChanges();
+    }
   }
 
   loadUserAvatar() {
@@ -52,6 +69,10 @@ export class HeaderComponent implements OnInit {
 
   get fullUserName() {
     return `${this.auth.session?.userInfo.firstName} ${this.auth.session?.userInfo.lastName}`;
+  }
+
+  get isUserAdmin() {
+    return this.auth.session?.userInfo.roles.includes(UserRole.Admin);
   }
 
   signIn() {
