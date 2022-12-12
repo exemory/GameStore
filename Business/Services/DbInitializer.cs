@@ -22,7 +22,11 @@ public class DbInitializer : IDbInitializer
 
     public async Task Initialize()
     {
-        await _context.Database.MigrateAsync();
+        if (_context.Database.IsRelational())
+        {
+            await _context.Database.MigrateAsync();
+        }
+
         await SeedRequiredData();
     }
 
