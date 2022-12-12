@@ -70,3 +70,7 @@ await app.InitializeDb();
 app.InitializeStorageFolders();
 
 app.Run();
+
+public abstract partial class Program
+{
+}
