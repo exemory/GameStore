@@ -49,11 +49,12 @@ public class DbInitializer : IDbInitializer
 
     private async Task AddAdmin()
     {
-        var adminExists = await _userManager.FindByNameAsync(RequiredData.Admin.UserName) != null;
+        var admin = RequiredData.Admin;
+        var adminExists = await _userManager.FindByNameAsync(admin.UserName) != null;
         if (!adminExists)
         {
-            await _userManager.CreateAsync(RequiredData.Admin, RequiredData.AdminPassword);
-            await _userManager.AddToRoleAsync(RequiredData.Admin, "Admin");
+            await _userManager.CreateAsync(admin, RequiredData.AdminPassword);
+            await _userManager.AddToRoleAsync(admin, "Admin");
         }
     }
 }
