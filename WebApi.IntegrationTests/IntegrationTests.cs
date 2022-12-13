@@ -1,46 +1,27 @@
 ﻿using AutoFixture;
+using Business.Interfaces;
 using Data;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using Xunit;
 
 namespace WebApi.IntegrationTests;
 
-public abstract class IntegrationTests
+public abstract class IntegrationTests : IClassFixture<TestingWebAppFactory>
 {
     protected readonly HttpClient TestClient;
     protected readonly Fixture Fixture = new();
 
-    protected IntegrationTests()
+    protected IntegrationTests(TestingWebAppFactory appFactory)
     {
-        var appFactory = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureServices(ConfigureServices);
-            });
+        using var scope = appFactory.Services.CreateScope();
+        using var dbContext = scope.ServiceProvider.GetRequiredService<GameStoreContext>();
+        
+        dbContext.Database.EnsureDeleted();
+        dbContext.Database.EnsureCreated();
+        
+        var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+        dbInitializer.Initialize().GetAwaiter().GetResult();
 
         TestClient = appFactory.CreateClient();
-    }
-
-    protected virtual void ConfigureServices(IServiceCollection services)
-    {
-        services.RemoveAll<GameStoreContext>();
-        services.RemoveAll<DbContextOptions>();
-        services.RemoveAll<DbContextOptions<GameStoreContext>>();
-
-        var s = Fixture.Create<string>();
-
-        services.AddDbContext<GameStoreContext>(o =>
-        {
-            o.UseInMemoryDatabase(s);
-            o.EnableSensitiveDataLogging();
-        });
-
-        using var serviceProvider = services.BuildServiceProvider();
-        using var scope = serviceProvider.CreateScope();
-        using var dbContext = scope.ServiceProvider.GetRequiredService<GameStoreContext>();
-
-        dbContext.Database.EnsureCreated();
     }
 }

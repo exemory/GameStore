@@ -10,6 +10,10 @@ public class GenresControllerTests : IntegrationTests
 {
     private const string GenresUrl = "/api/genres";
     
+    public GenresControllerTests(TestingWebAppFactory appFactory) : base(appFactory)
+    {
+    }
+    
     [Fact]
     public async Task GetAll_ShouldReturnAllGenres()
     { 

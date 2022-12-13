@@ -13,6 +13,10 @@ public class AuthenticationControllerTests : IntegrationTests
     private const string SignUpUrl = "api/auth/sign-up";
     private const string SignInUrl = "api/auth/sign-in";
 
+    public AuthenticationControllerTests(TestingWebAppFactory appFactory) : base(appFactory)
+    {
+    }
+    
     [Fact]
     public async Task SignUp_ShouldRegisterUser()
     {

@@ -10,6 +10,10 @@ public class PlatformTypesControllerTests : IntegrationTests
 {
     private const string PlatformTypesUrl = "/api/platformTypes";
 
+    public PlatformTypesControllerTests(TestingWebAppFactory appFactory) : base(appFactory)
+    {
+    }
+    
     [Fact]
     public async Task GetAll_ShouldReturnAllPlatformTypes()
     {

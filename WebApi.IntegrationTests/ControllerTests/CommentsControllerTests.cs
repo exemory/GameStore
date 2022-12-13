@@ -10,6 +10,10 @@ namespace WebApi.IntegrationTests.ControllerTests;
 public class CommentsControllerTests : IntegrationTests
 {
     private const string CommentsUrl = "api/comments";
+    
+    public CommentsControllerTests(TestingWebAppFactory appFactory) : base(appFactory)
+    {
+    }
 
     [Fact]
     public async Task New_ShouldCreateComment()
