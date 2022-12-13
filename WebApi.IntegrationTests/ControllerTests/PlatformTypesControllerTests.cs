@@ -18,9 +18,10 @@ public class PlatformTypesControllerTests : IntegrationTests
     public async Task GetAll_ShouldReturnAllPlatformTypes()
     {
         // Arrange
-
+        var testClient = AppFactory.CreateClient();
+        
         // Act
-        var response = await TestClient.GetAsync(PlatformTypesUrl);
+        var response = await testClient.GetAsync(PlatformTypesUrl);
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.OK);

@@ -20,6 +20,7 @@ public class CommentsControllerTests : IntegrationTests
     public async Task New_ShouldCreateComment()
     {
         // Arrange
+        var testClient = AppFactory.CreateClient();
         var game = Fixture.Build<Game>()
             .Without(g => g.Comments)
             .Without(g => g.Genres)
@@ -28,7 +29,7 @@ public class CommentsControllerTests : IntegrationTests
         DbContext.Games.Add(game);
         await DbContext.SaveChangesAsync();
 
-        await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
+        await IntegrationTestHelpers.AuthorizeAsUserAsync(testClient);
 
         var commentCreationDto = Fixture.Build<CommentCreationDto>()
             .With(d => d.GameId, game.Id)
@@ -36,7 +37,7 @@ public class CommentsControllerTests : IntegrationTests
             .Create();
 
         // Act
-        var response = await TestClient.PostAsJsonAsync(CommentsUrl, commentCreationDto);
+        var response = await testClient.PostAsJsonAsync(CommentsUrl, commentCreationDto);
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.Created);
@@ -53,6 +54,7 @@ public class CommentsControllerTests : IntegrationTests
     public async Task New_ShouldFail_WhenUserIsNotAuthorized()
     {
         // Arrange
+        var testClient = AppFactory.CreateClient();
         var game = Fixture.Build<Game>()
             .Without(g => g.Comments)
             .Without(g => g.Genres)
@@ -67,7 +69,7 @@ public class CommentsControllerTests : IntegrationTests
             .Create();
 
         // Act
-        var response = await TestClient.PostAsJsonAsync(CommentsUrl, commentCreationDto);
+        var response = await testClient.PostAsJsonAsync(CommentsUrl, commentCreationDto);
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
@@ -80,7 +82,10 @@ public class CommentsControllerTests : IntegrationTests
     [Fact]
     public async Task GetAllByGameKey_ShouldReturnGameComments()
     {
-        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
+        // Arrange
+        var testClient = AppFactory.CreateClient();
+        
+        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(testClient);
         var user = DbContext.Users.First(u => u.UserName == userCredentials.Login);
 
         var game = Fixture.Build<Game>()
@@ -107,7 +112,7 @@ public class CommentsControllerTests : IntegrationTests
         var url = $"{CommentsUrl}?gameKey={game.Key}";
 
         // Act
-        var response = await TestClient.GetAsync(url);
+        var response = await testClient.GetAsync(url);
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.OK);
@@ -126,7 +131,9 @@ public class CommentsControllerTests : IntegrationTests
     public async Task Edit_ShouldEditComment()
     {
         // Arrange
-        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
+        var testClient = AppFactory.CreateClient();
+        
+        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(testClient);
         var user = DbContext.Users.First(u => u.UserName == userCredentials.Login);
 
         var game = Fixture.Build<Game>()
@@ -153,7 +160,7 @@ public class CommentsControllerTests : IntegrationTests
         var updateCommentDto = Fixture.Create<CommentUpdateDto>();
 
         // Act
-        var response = await TestClient.PutAsJsonAsync(url, updateCommentDto);
+        var response = await testClient.PutAsJsonAsync(url, updateCommentDto);
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.NoContent);
@@ -169,7 +176,9 @@ public class CommentsControllerTests : IntegrationTests
     public async Task Edit_ShouldFail_WhenUserIsNotAuthorized()
     {
         // Arrange
-        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
+        var testClient = AppFactory.CreateClient();
+        
+        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(testClient);
         var user = DbContext.Users.First(u => u.UserName == userCredentials.Login);
 
         var game = Fixture.Build<Game>()
@@ -192,13 +201,13 @@ public class CommentsControllerTests : IntegrationTests
         DbContext.Comments.AddRange(comment);
         await DbContext.SaveChangesAsync();
 
-        IntegrationTestHelpers.RemoveAuthorization(TestClient);
+        IntegrationTestHelpers.RemoveAuthorization(testClient);
 
         var url = $"{CommentsUrl}/{comment.Id}";
         var updateCommentDto = Fixture.Create<CommentUpdateDto>();
 
         // Act
-        var response = await TestClient.PutAsJsonAsync(url, updateCommentDto);
+        var response = await testClient.PutAsJsonAsync(url, updateCommentDto);
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
@@ -214,7 +223,9 @@ public class CommentsControllerTests : IntegrationTests
     public async Task Delete_ShouldDeleteComment()
     {
         // Arrange
-        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
+        var testClient = AppFactory.CreateClient();
+        
+        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(testClient);
         var user = DbContext.Users.First(u => u.UserName == userCredentials.Login);
 
         var game = Fixture.Build<Game>()
@@ -240,7 +251,7 @@ public class CommentsControllerTests : IntegrationTests
         var url = $"{CommentsUrl}/{comment.Id}";
 
         // Act
-        var response = await TestClient.DeleteAsync(url);
+        var response = await testClient.DeleteAsync(url);
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.NoContent);
@@ -256,7 +267,9 @@ public class CommentsControllerTests : IntegrationTests
     public async Task Delete_ShouldFail_WhenUserIsNotAuthorized()
     {
         // Arrange
-        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
+        var testClient = AppFactory.CreateClient();
+        
+        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(testClient);
         var user = DbContext.Users.First(u => u.UserName == userCredentials.Login);
 
         var game = Fixture.Build<Game>()
@@ -279,12 +292,12 @@ public class CommentsControllerTests : IntegrationTests
         DbContext.Comments.AddRange(comment);
         await DbContext.SaveChangesAsync();
 
-        IntegrationTestHelpers.RemoveAuthorization(TestClient);
+        IntegrationTestHelpers.RemoveAuthorization(testClient);
 
         var url = $"{CommentsUrl}/{comment.Id}";
 
         // Act
-        var response = await TestClient.DeleteAsync(url);
+        var response = await testClient.DeleteAsync(url);
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
@@ -300,7 +313,9 @@ public class CommentsControllerTests : IntegrationTests
     public async Task Restore_ShouldRestoreComment()
     {
         // Arrange
-        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
+        var testClient = AppFactory.CreateClient();
+        
+        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(testClient);
         var user = DbContext.Users.First(u => u.UserName == userCredentials.Login);
 
         var game = Fixture.Build<Game>()
@@ -326,7 +341,7 @@ public class CommentsControllerTests : IntegrationTests
         var url = $"{CommentsUrl}/{comment.Id}/restore";
 
         // Act
-        var response = await TestClient.PutAsync(url, null);
+        var response = await testClient.PutAsync(url, null);
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.NoContent);
@@ -342,7 +357,9 @@ public class CommentsControllerTests : IntegrationTests
     public async Task Restore_ShouldFail_WhenUserIsNotAuthorized()
     {
         // Arrange
-        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
+        var testClient = AppFactory.CreateClient();
+        
+        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(testClient);
         var user = DbContext.Users.First(u => u.UserName == userCredentials.Login);
 
         var game = Fixture.Build<Game>()
@@ -365,12 +382,12 @@ public class CommentsControllerTests : IntegrationTests
         DbContext.Comments.AddRange(comment);
         await DbContext.SaveChangesAsync();
 
-        IntegrationTestHelpers.RemoveAuthorization(TestClient);
+        IntegrationTestHelpers.RemoveAuthorization(testClient);
 
         var url = $"{CommentsUrl}/{comment.Id}/restore";
 
         // Act
-        var response = await TestClient.PutAsync(url, null);
+        var response = await testClient.PutAsync(url, null);
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.Unauthorized);

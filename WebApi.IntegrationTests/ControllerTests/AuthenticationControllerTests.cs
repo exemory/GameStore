@@ -21,10 +21,11 @@ public class AuthenticationControllerTests : IntegrationTests
     public async Task SignUp_ShouldRegisterUser()
     {
         // Arrange
+        var testClient = AppFactory.CreateClient();
         var signUpDto = IntegrationTestHelpers.CreateSignUpDto();
 
         // Act
-        var response = await TestClient.PostAsJsonAsync(SignUpUrl, signUpDto);
+        var response = await testClient.PostAsJsonAsync(SignUpUrl, signUpDto);
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.Created);
@@ -38,17 +39,18 @@ public class AuthenticationControllerTests : IntegrationTests
     public async Task SignIn_ShouldLoginUser()
     {
         // Arrange
+        var testClient = AppFactory.CreateClient();
         var signUpDto = IntegrationTestHelpers.CreateSignUpDto();
         var signInDto = Fixture.Build<SignInDto>()
             .With(d => d.Login, signUpDto.Username)
             .With(d => d.Password, signUpDto.Password)
             .Create();
 
-        var signUpResponse = await TestClient.PostAsJsonAsync(SignUpUrl, signUpDto);
+        var signUpResponse = await testClient.PostAsJsonAsync(SignUpUrl, signUpDto);
         signUpResponse.EnsureSuccessStatusCode();
 
         // Act
-        var signInResponse = await TestClient.PostAsJsonAsync(SignInUrl, signInDto);
+        var signInResponse = await testClient.PostAsJsonAsync(SignInUrl, signInDto);
 
         // Assert
         signInResponse.Should().HaveStatusCode(HttpStatusCode.OK);
@@ -69,6 +71,7 @@ public class AuthenticationControllerTests : IntegrationTests
     public async Task SignIn_ShouldLoginAdminUser()
     {
         // Arrange
+        var testClient = AppFactory.CreateClient();
         const string adminRole = "Admin";
         var signInDto = Fixture.Build<SignInDto>()
             .With(d => d.Login, RequiredData.Admin.UserName)
@@ -76,7 +79,7 @@ public class AuthenticationControllerTests : IntegrationTests
             .Create();
 
         // Act
-        var response = await TestClient.PostAsJsonAsync(SignInUrl, signInDto);
+        var response = await testClient.PostAsJsonAsync(SignInUrl, signInDto);
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.OK);

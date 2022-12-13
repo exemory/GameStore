@@ -18,9 +18,10 @@ public class GenresControllerTests : IntegrationTests
     public async Task GetAll_ShouldReturnAllGenres()
     { 
         // Arrange
+        var testClient = AppFactory.CreateClient();
 
         // Act
-        var response = await TestClient.GetAsync(GenresUrl);
+        var response = await testClient.GetAsync(GenresUrl);
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.OK);
