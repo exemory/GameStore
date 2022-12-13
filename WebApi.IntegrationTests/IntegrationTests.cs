@@ -1,5 +1,4 @@
 ﻿using AutoFixture;
-using Business.Interfaces;
 using Data;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -11,16 +10,13 @@ public abstract class IntegrationTests : IClassFixture<TestingWebAppFactory>
     protected readonly HttpClient TestClient;
     protected readonly Fixture Fixture = new();
 
+    protected readonly IServiceScope ServiceScope;
+    protected readonly GameStoreContext DbContext;
+
     protected IntegrationTests(TestingWebAppFactory appFactory)
     {
-        using var scope = appFactory.Services.CreateScope();
-        using var dbContext = scope.ServiceProvider.GetRequiredService<GameStoreContext>();
-        
-        dbContext.Database.EnsureDeleted();
-        dbContext.Database.EnsureCreated();
-        
-        var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-        dbInitializer.Initialize().GetAwaiter().GetResult();
+        ServiceScope = appFactory.Services.CreateScope();
+        DbContext = ServiceScope.ServiceProvider.GetRequiredService<GameStoreContext>();
 
         TestClient = appFactory.CreateClient();
     }

@@ -2,6 +2,7 @@
 using System.Net.Http.Json;
 using AutoFixture;
 using Business.DataTransferObjects;
+using Data.Entities;
 using FluentAssertions;
 using Xunit;
 
@@ -10,7 +11,7 @@ namespace WebApi.IntegrationTests.ControllerTests;
 public class CommentsControllerTests : IntegrationTests
 {
     private const string CommentsUrl = "api/comments";
-    
+
     public CommentsControllerTests(TestingWebAppFactory appFactory) : base(appFactory)
     {
     }
@@ -19,8 +20,14 @@ public class CommentsControllerTests : IntegrationTests
     public async Task New_ShouldCreateComment()
     {
         // Arrange
-        await IntegrationTestHelpers.AuthorizeAsAdminAsync(TestClient);
-        var game = await IntegrationTestHelpers.CreateGameAsync(TestClient);
+        var game = Fixture.Build<Game>()
+            .Without(g => g.Comments)
+            .Without(g => g.Genres)
+            .Without(g => g.PlatformTypes)
+            .Create();
+        DbContext.Games.Add(game);
+        await DbContext.SaveChangesAsync();
+
         await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
 
         var commentCreationDto = Fixture.Build<CommentCreationDto>()
@@ -36,15 +43,23 @@ public class CommentsControllerTests : IntegrationTests
 
         var comment = await response.Content.ReadFromJsonAsync<CommentDto>();
         comment.Should().BeEquivalentTo(commentCreationDto, o => o.ExcludingMissingMembers());
+
+        // Cleanup
+        DbContext.Games.Remove(game);
+        await DbContext.SaveChangesAsync();
     }
 
     [Fact]
     public async Task New_ShouldFail_WhenUserIsNotAuthorized()
     {
         // Arrange
-        await IntegrationTestHelpers.AuthorizeAsAdminAsync(TestClient);
-        var game = await IntegrationTestHelpers.CreateGameAsync(TestClient);
-        IntegrationTestHelpers.RemoveAuthorization(TestClient);
+        var game = Fixture.Build<Game>()
+            .Without(g => g.Comments)
+            .Without(g => g.Genres)
+            .Without(g => g.PlatformTypes)
+            .Create();
+        DbContext.Games.Add(game);
+        await DbContext.SaveChangesAsync();
 
         var commentCreationDto = Fixture.Build<CommentCreationDto>()
             .With(d => d.GameId, game.Id)
@@ -56,18 +71,38 @@ public class CommentsControllerTests : IntegrationTests
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+
+        // Cleanup
+        DbContext.Games.Remove(game);
+        await DbContext.SaveChangesAsync();
     }
 
     [Fact]
     public async Task GetAllByGameKey_ShouldReturnGameComments()
     {
-        // Arrange
-        await IntegrationTestHelpers.AuthorizeAsAdminAsync(TestClient);
-        var game = await IntegrationTestHelpers.CreateGameAsync(TestClient);
-        var comment1 = await IntegrationTestHelpers.CreateCommentAsync(TestClient, game.Id);
-        await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
-        var comment2 = await IntegrationTestHelpers.CreateCommentAsync(TestClient, game.Id);
-        IntegrationTestHelpers.RemoveAuthorization(TestClient);
+        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
+        var user = DbContext.Users.First(u => u.UserName == userCredentials.Login);
+
+        var game = Fixture.Build<Game>()
+            .Without(g => g.Comments)
+            .Without(g => g.Genres)
+            .Without(g => g.PlatformTypes)
+            .Create();
+
+        var comments = Fixture.Build<Comment>()
+            .With(c => c.Deleted, false)
+            .Without(c => c.ParentId)
+            .Without(c => c.Parent)
+            .With(c => c.GameId, game.Id)
+            .With(c => c.Game, game)
+            .With(c => c.UserId, user.Id)
+            .With(c => c.User, user)
+            .CreateMany()
+            .ToList();
+
+        DbContext.Games.Add(game);
+        DbContext.Comments.AddRange(comments);
+        await DbContext.SaveChangesAsync();
 
         var url = $"{CommentsUrl}?gameKey={game.Key}";
 
@@ -77,18 +112,42 @@ public class CommentsControllerTests : IntegrationTests
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.OK);
 
-        var comments = await response.Content.ReadFromJsonAsync<IEnumerable<CommentDto>>();
-        comments.Should().BeEquivalentTo(new[] {comment1, comment2});
+        var result = await response.Content.ReadFromJsonAsync<IEnumerable<CommentDto>>();
+
+        result.Should().BeEquivalentTo(comments, o => o.ExcludingMissingMembers());
+
+        // Cleanup
+        DbContext.Games.Remove(game);
+        DbContext.Comments.RemoveRange(comments);
+        await DbContext.SaveChangesAsync();
     }
 
     [Fact]
     public async Task Edit_ShouldEditComment()
     {
         // Arrange
-        await IntegrationTestHelpers.AuthorizeAsAdminAsync(TestClient);
-        var game = await IntegrationTestHelpers.CreateGameAsync(TestClient);
-        await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
-        var comment = await IntegrationTestHelpers.CreateCommentAsync(TestClient, game.Id);
+        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
+        var user = DbContext.Users.First(u => u.UserName == userCredentials.Login);
+
+        var game = Fixture.Build<Game>()
+            .Without(g => g.Comments)
+            .Without(g => g.Genres)
+            .Without(g => g.PlatformTypes)
+            .Create();
+
+        var comment = Fixture.Build<Comment>()
+            .With(c => c.Deleted, false)
+            .Without(c => c.ParentId)
+            .Without(c => c.Parent)
+            .With(c => c.GameId, game.Id)
+            .With(c => c.Game, game)
+            .With(c => c.UserId, user.Id)
+            .With(c => c.User, user)
+            .Create();
+
+        DbContext.Games.Add(game);
+        DbContext.Comments.AddRange(comment);
+        await DbContext.SaveChangesAsync();
 
         var url = $"{CommentsUrl}/{comment.Id}";
         var updateCommentDto = Fixture.Create<CommentUpdateDto>();
@@ -98,16 +157,41 @@ public class CommentsControllerTests : IntegrationTests
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.NoContent);
+        
+        // Cleanup
+        DbContext.Games.Remove(game);
+        DbContext.Comments.Remove(comment);
+        DbContext.Users.Remove(user);
+        await DbContext.SaveChangesAsync();
     }
 
     [Fact]
     public async Task Edit_ShouldFail_WhenUserIsNotAuthorized()
     {
         // Arrange
-        await IntegrationTestHelpers.AuthorizeAsAdminAsync(TestClient);
-        var game = await IntegrationTestHelpers.CreateGameAsync(TestClient);
-        await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
-        var comment = await IntegrationTestHelpers.CreateCommentAsync(TestClient, game.Id);
+        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
+        var user = DbContext.Users.First(u => u.UserName == userCredentials.Login);
+
+        var game = Fixture.Build<Game>()
+            .Without(g => g.Comments)
+            .Without(g => g.Genres)
+            .Without(g => g.PlatformTypes)
+            .Create();
+
+        var comment = Fixture.Build<Comment>()
+            .With(c => c.Deleted, false)
+            .Without(c => c.ParentId)
+            .Without(c => c.Parent)
+            .With(c => c.GameId, game.Id)
+            .With(c => c.Game, game)
+            .With(c => c.UserId, user.Id)
+            .With(c => c.User, user)
+            .Create();
+
+        DbContext.Games.Add(game);
+        DbContext.Comments.AddRange(comment);
+        await DbContext.SaveChangesAsync();
+
         IntegrationTestHelpers.RemoveAuthorization(TestClient);
 
         var url = $"{CommentsUrl}/{comment.Id}";
@@ -118,16 +202,40 @@ public class CommentsControllerTests : IntegrationTests
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+
+        // Cleanup
+        DbContext.Games.Remove(game);
+        DbContext.Comments.Remove(comment);
+        DbContext.Users.Remove(user);
+        await DbContext.SaveChangesAsync();
     }
 
     [Fact]
     public async Task Delete_ShouldDeleteComment()
     {
         // Arrange
-        await IntegrationTestHelpers.AuthorizeAsAdminAsync(TestClient);
-        var game = await IntegrationTestHelpers.CreateGameAsync(TestClient);
-        await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
-        var comment = await IntegrationTestHelpers.CreateCommentAsync(TestClient, game.Id);
+        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
+        var user = DbContext.Users.First(u => u.UserName == userCredentials.Login);
+
+        var game = Fixture.Build<Game>()
+            .Without(g => g.Comments)
+            .Without(g => g.Genres)
+            .Without(g => g.PlatformTypes)
+            .Create();
+
+        var comment = Fixture.Build<Comment>()
+            .With(c => c.Deleted, false)
+            .Without(c => c.ParentId)
+            .Without(c => c.Parent)
+            .With(c => c.GameId, game.Id)
+            .With(c => c.Game, game)
+            .With(c => c.UserId, user.Id)
+            .With(c => c.User, user)
+            .Create();
+
+        DbContext.Games.Add(game);
+        DbContext.Comments.AddRange(comment);
+        await DbContext.SaveChangesAsync();
 
         var url = $"{CommentsUrl}/{comment.Id}";
 
@@ -136,16 +244,41 @@ public class CommentsControllerTests : IntegrationTests
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.NoContent);
+
+        // Cleanup
+        DbContext.Games.Remove(game);
+        DbContext.Comments.Remove(comment);
+        DbContext.Users.Remove(user);
+        await DbContext.SaveChangesAsync();
     }
 
     [Fact]
     public async Task Delete_ShouldFail_WhenUserIsNotAuthorized()
     {
         // Arrange
-        await IntegrationTestHelpers.AuthorizeAsAdminAsync(TestClient);
-        var game = await IntegrationTestHelpers.CreateGameAsync(TestClient);
-        await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
-        var comment = await IntegrationTestHelpers.CreateCommentAsync(TestClient, game.Id);
+        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
+        var user = DbContext.Users.First(u => u.UserName == userCredentials.Login);
+
+        var game = Fixture.Build<Game>()
+            .Without(g => g.Comments)
+            .Without(g => g.Genres)
+            .Without(g => g.PlatformTypes)
+            .Create();
+
+        var comment = Fixture.Build<Comment>()
+            .With(c => c.Deleted, false)
+            .Without(c => c.ParentId)
+            .Without(c => c.Parent)
+            .With(c => c.GameId, game.Id)
+            .With(c => c.Game, game)
+            .With(c => c.UserId, user.Id)
+            .With(c => c.User, user)
+            .Create();
+
+        DbContext.Games.Add(game);
+        DbContext.Comments.AddRange(comment);
+        await DbContext.SaveChangesAsync();
+
         IntegrationTestHelpers.RemoveAuthorization(TestClient);
 
         var url = $"{CommentsUrl}/{comment.Id}";
@@ -155,16 +288,40 @@ public class CommentsControllerTests : IntegrationTests
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+
+        // Cleanup
+        DbContext.Games.Remove(game);
+        DbContext.Comments.Remove(comment);
+        DbContext.Users.Remove(user);
+        await DbContext.SaveChangesAsync();
     }
 
     [Fact]
     public async Task Restore_ShouldRestoreComment()
     {
         // Arrange
-        await IntegrationTestHelpers.AuthorizeAsAdminAsync(TestClient);
-        var game = await IntegrationTestHelpers.CreateGameAsync(TestClient);
-        await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
-        var comment = await IntegrationTestHelpers.CreateDeletedComment(TestClient, game.Id);
+        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
+        var user = DbContext.Users.First(u => u.UserName == userCredentials.Login);
+
+        var game = Fixture.Build<Game>()
+            .Without(g => g.Comments)
+            .Without(g => g.Genres)
+            .Without(g => g.PlatformTypes)
+            .Create();
+
+        var comment = Fixture.Build<Comment>()
+            .With(c => c.Deleted, true)
+            .Without(c => c.ParentId)
+            .Without(c => c.Parent)
+            .With(c => c.GameId, game.Id)
+            .With(c => c.Game, game)
+            .With(c => c.UserId, user.Id)
+            .With(c => c.User, user)
+            .Create();
+
+        DbContext.Games.Add(game);
+        DbContext.Comments.AddRange(comment);
+        await DbContext.SaveChangesAsync();
 
         var url = $"{CommentsUrl}/{comment.Id}/restore";
 
@@ -173,16 +330,41 @@ public class CommentsControllerTests : IntegrationTests
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.NoContent);
+
+        // Cleanup
+        DbContext.Games.Remove(game);
+        DbContext.Comments.Remove(comment);
+        DbContext.Users.Remove(user);
+        await DbContext.SaveChangesAsync();
     }
 
     [Fact]
     public async Task Restore_ShouldFail_WhenUserIsNotAuthorized()
     {
         // Arrange
-        await IntegrationTestHelpers.AuthorizeAsAdminAsync(TestClient);
-        var game = await IntegrationTestHelpers.CreateGameAsync(TestClient);
-        await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
-        var comment = await IntegrationTestHelpers.CreateDeletedComment(TestClient, game.Id);
+        var userCredentials = await IntegrationTestHelpers.AuthorizeAsUserAsync(TestClient);
+        var user = DbContext.Users.First(u => u.UserName == userCredentials.Login);
+
+        var game = Fixture.Build<Game>()
+            .Without(g => g.Comments)
+            .Without(g => g.Genres)
+            .Without(g => g.PlatformTypes)
+            .Create();
+
+        var comment = Fixture.Build<Comment>()
+            .With(c => c.Deleted, true)
+            .Without(c => c.ParentId)
+            .Without(c => c.Parent)
+            .With(c => c.GameId, game.Id)
+            .With(c => c.Game, game)
+            .With(c => c.UserId, user.Id)
+            .With(c => c.User, user)
+            .Create();
+
+        DbContext.Games.Add(game);
+        DbContext.Comments.AddRange(comment);
+        await DbContext.SaveChangesAsync();
+
         IntegrationTestHelpers.RemoveAuthorization(TestClient);
 
         var url = $"{CommentsUrl}/{comment.Id}/restore";
@@ -192,5 +374,11 @@ public class CommentsControllerTests : IntegrationTests
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+
+        // Cleanup
+        DbContext.Games.Remove(game);
+        DbContext.Comments.Remove(comment);
+        DbContext.Users.Remove(user);
+        await DbContext.SaveChangesAsync();
     }
 }

@@ -27,5 +27,11 @@ public class TestingWebAppFactory : WebApplicationFactory<Program>
             o.UseInMemoryDatabase(databaseName);
             o.EnableSensitiveDataLogging();
         });
+
+        using var serviceProvider = services.BuildServiceProvider();
+        using var scope = serviceProvider.CreateScope();
+        using var dbContext = scope.ServiceProvider.GetRequiredService<GameStoreContext>();
+
+        dbContext.Database.EnsureCreated();
     }
 }

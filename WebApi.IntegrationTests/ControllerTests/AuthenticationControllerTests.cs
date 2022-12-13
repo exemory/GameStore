@@ -28,6 +28,10 @@ public class AuthenticationControllerTests : IntegrationTests
 
         // Assert
         response.Should().HaveStatusCode(HttpStatusCode.Created);
+        
+        // Cleanup
+        DbContext.Users.Remove(DbContext.Users.First(u => u.UserName == signUpDto.Username));
+        await DbContext.SaveChangesAsync();
     }
 
     [Fact]
@@ -55,6 +59,10 @@ public class AuthenticationControllerTests : IntegrationTests
         session.UserInfo.Should().BeEquivalentTo(signUpDto, o => o.ExcludingMissingMembers());
         session.UserInfo.Roles.Should().BeEmpty();
         session.UserInfo.HasAvatar.Should().BeFalse();
+        
+        // Cleanup
+        DbContext.Users.Remove(DbContext.Users.First(u => u.UserName == signUpDto.Username));
+        await DbContext.SaveChangesAsync();
     }
 
     [Fact]
