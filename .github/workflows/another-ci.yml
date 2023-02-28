@@ -1,0 +1,72 @@
+name: Another .NET CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Restore nuget packages cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{runner.os}}-nuget-
+      - name: Cache build
+        uses: actions/cache@v3
+        with:
+          path: .
+          key: ${{ runner.os }}-${{ github.run_id }}-build
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+  
+  test:
+    name: Test
+    
+    needs: build
+
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Restore build cache
+        uses: actions/cache@v3
+        with:
+          path: .
+          key: ${{ runner.os }}-${{ github.run_id }}-build
+
+      - name: Restore nuget packages cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{runner.os}}-nuget-
+      - name: Test
+        run: dotnet test --configuration Release --no-build --verbosity normal
